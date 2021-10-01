@@ -1,0 +1,587 @@
+:root {
+    /* Color */
+    --color-blue: #ABCCDB;
+    --color-red: #F7908B;
+    --color-yellow: #F3EFC9;
+    --color-purple: #DEBDD5;
+    --color-bright-blue: #C7FFF6;
+
+    --color-gray: #555;
+    
+    --color-blue-hover: #196ed0;
+    --color-light-gray: #f4f4f4;
+    --color-medium-gray: #dadbdc;
+    --color-call-to-action: #196ecf;
+    --color-call-to-action-hover: rgba(25, 110, 207, 0.7);
+    --color-high-impact-orange: #d14600;
+    --color-high-impact-orange-hover: #a53400;
+    --color-high-impact-yellow: #f4b700;
+    --color-flag-red: #9f3a38;
+    --color-p-font: rgba(0, 0, 0, 0.87);
+    --color-gray-font: #767676;
+    --color-warning-orange: #f2711c;
+    --color-warning-header: #794b03;
+    --color-warning-p: #705730;
+    --color-positive-green: #21ba45;
+    --color-positive-green-hover: #16ab39;
+
+    /* Font */
+    --fontSize-header: 24px;
+    --fontSize-p: 12px;
+    --fontSize-h1: 22px;
+    --fontSize-h2: 18px;
+    --fontSize-h3: 14px;
+    --fontSize-h4: 12px;
+    --fontSize-h5: 12px;
+    --fontSize-h6: 12px;
+    --fontSizeMedium-header: 28px;
+    --fontSizeMedium-p: 14px;
+    --fontSizeMedium-h1: 26px;
+    --fontSizeMedium-h2: 20px;
+    --fontSizeMedium-h3: 16px;
+    --fontSizeMedium-h4: 14px;
+    --fontSizeMedium-h5: 14px;
+    --fontSizeMedium-h6: 12px;
+    --fontFamily-Regular: "Roboto";
+    --fontFamily-Light: "Roboto";
+    --fontFamily-Bold: "Roboto";
+    --fontFamily-Secondary: Arial;
+    --fontFamily-Serif: "DM Serif Display";
+    --fontStyle-Secondary: sans-serif;
+
+    /* Margin & Padding */
+    --margin-padding-extra-small: 4px;
+    --margin-padding-small: 8px;
+    --margin-padding-medium: 12px;
+    --margin-padding-large: 16px;
+    --margin-padding-extra-large: 20px;
+    --margin-padding-massive: 48px
+}
+
+body {
+    margin: 0 !important
+}
+
+/* Margins & Padding */
+.marginAuto {
+    margin: auto !important
+}
+.noMargin, h1, h2, h3, h4, h5, h6, span {
+    margin: 0 !important
+}
+.noMarginTop {
+    margin-top: 0 !important
+}
+.noMarginBottom {
+    margin-bottom: 0 !important
+}
+.noMarginLeft {
+    margin-left: 0 !important
+}
+.noMarginRight {
+    margin-right: 0 !important
+}
+.noPaddingTop {
+    padding-top: 0 !important
+}
+.noPaddingBottom {
+    padding-bottom: 0 !important
+}
+.noPaddingLeft {
+    padding-left: 0 !important
+}
+.noPaddingRight {
+    padding-right: 0 !important
+}
+.marginTopExtraSmall {
+    margin-top: var(--margin-padding-extra-small) !important
+}
+.marginBottomExtraSmall {
+    margin-bottom: var(--margin-padding-extra-small) !important
+}
+.marginLeftExtraSmall {
+    margin-left: var(--margin-padding-extra-small) !important
+}
+.marginRightExtraSmall {
+    margin-right: var(--margin-padding-extra-small) !important
+}
+.paddingTopExtraSmall {
+    padding-top: var(--margin-padding-extra-small) !important
+}
+.paddingBottomExtraSmall {
+    padding-bottom: var(--margin-padding-extra-small) !important
+}
+.paddingLeftExtraSmall {
+    padding-left: var(--margin-padding-extra-small) !important
+}
+.paddingRightExtraSmall {
+    padding-right: var(--margin-padding-extra-small) !important
+}
+.marginTopSmall {
+    margin-top: var(--margin-padding-small) !important
+}
+.marginBottomSmall {
+    margin-bottom: var(--margin-padding-small) !important
+}
+.marginLeftSmall {
+    margin-left: var(--margin-padding-small) !important
+}
+.marginRightSmall {
+    margin-right: var(--margin-padding-small) !important
+}
+.paddingTopSmall {
+    padding-top: var(--margin-padding-small) !important
+}
+.paddingBottomSmall {
+    padding-bottom: var(--margin-padding-small) !important
+}
+.paddingLeftSmall {
+    padding-left: var(--margin-padding-small) !important
+}
+.paddingRightSmall {
+    padding-right: var(--margin-padding-small) !important
+}
+.marginTopMedium {
+    margin-top: var(--margin-padding-medium) !important
+}
+.marginBottomMedium {
+    margin-bottom: var(--margin-padding-medium) !important
+}
+.marginLeftMedium {
+    margin-left: var(--margin-padding-medium) !important
+}
+.marginRightMedium {
+    margin-right: var(--margin-padding-medium) !important
+}
+.paddingTopMedium {
+    padding-top: var(--margin-padding-medium) !important
+}
+.paddingBottomMedium {
+    padding-bottom: var(--margin-padding-medium) !important
+}
+.paddingLeftMedium {
+    padding-left: var(--margin-padding-medium) !important
+}
+.paddingRightMedium {
+    padding-right: var(--margin-padding-medium) !important
+}
+.marginTopLarge {
+    margin-top: var(--margin-padding-large) !important
+}
+.marginBottomLarge {
+    margin-bottom: var(--margin-padding-large) !important
+}
+.marginLeftLarge {
+    margin-left: var(--margin-padding-large) !important
+}
+.marginRightLarge {
+    margin-right: var(--margin-padding-large) !important
+}
+.paddingTopLarge {
+    padding-top: var(--margin-padding-large) !important
+}
+.paddingBottomLarge {
+    padding-bottom: var(--margin-padding-large) !important
+}
+.paddingLeftLarge {
+    padding-left: var(--margin-padding-large) !important
+}
+.paddingRightLarge {
+    padding-right: var(--margin-padding-large) !important
+}
+.marginTopExtraLarge {
+    margin-top: var(--margin-padding-extra-large) !important
+}
+.marginBottomExtraLarge {
+    margin-bottom: var(--margin-padding-extra-large) !important
+}
+.marginLeftExtraLarge {
+    margin-left: var(--margin-padding-extra-large) !important
+}
+.marginRightExtraLarge {
+    margin-right: var(--margin-padding-extra-large) !important
+}
+.paddingTopExtraLarge {
+    padding-top: var(--margin-padding-extra-large) !important
+}
+.paddingBottomExtraLarge {
+    padding-bottom: var(--margin-padding-extra-large) !important
+}
+.paddingLeftExtraLarge {
+    padding-left: var(--margin-padding-extra-large) !important
+}
+.paddingRightExtraLarge {
+    padding-right: var(--margin-padding-extra-large) !important
+}
+.marginTopMassive {
+    margin-top: var(--margin-padding-massive) !important
+}
+.marginBottomMassive {
+    margin-bottom: var(--margin-padding-massive) !important
+}
+.marginLeftMassive {
+    margin-left: var(--margin-padding-massive) !important
+}
+.marginRightMassive {
+    margin-right: var(--margin-padding-massive) !important
+}
+.paddingTopMassive {
+    padding-top: var(--margin-padding-massive) !important
+}
+.paddingBottomMassive {
+    padding-bottom: var(--margin-padding-massive) !important
+}
+.paddingLeftMassive {
+    padding-left: var(--margin-padding-massive) !important
+}
+.paddingRightMassive {
+    padding-right: var(--margin-padding-massive) !important
+}
+
+.marginTopAuto {
+    margin-top: auto !important
+}
+
+.backgroundColorBlue {
+    background-color: var(--color-blue) !important
+}
+.backgroundColorGray {
+    background-color: var(--color-gray) !important
+}
+.backgroundColorWhite {
+    background-color: #fff !important
+}
+
+@media print {
+    body {
+        -webkit-print-color-adjust: exact
+    }
+    .noprint {
+        visibility: hidden
+    }
+}
+
+.footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    height: 30px !important;
+    border-top: 1px solid var(--color-light-gray);
+    background-color: #fff
+}
+
+.navbar {
+    box-shadow: 0 4px 2px -2px rgb(0 0 0/40%)
+}
+
+
+
+/* Flexbox */
+.justifyStart {
+    display: flex;
+    justify-content: flex-start
+}
+.justifyCenter {
+    display: flex !important;
+    justify-content: center
+}
+.justifyEnd {
+    display: flex;
+    justify-content: flex-end !important
+}
+.justifySpaceBetween {
+    display: flex;
+    justify-content: space-between
+}
+.justifySpaceAround {
+    display: flex;
+    justify-content: space-around
+}
+.alignStart {
+    display: flex;
+    align-items: flex-start
+}
+.alignCenter {
+    display: flex;
+    align-items: center
+}
+.alignBaseline {
+    display: flex;
+    align-items: baseline
+}
+.alignEnd {
+    display: flex;
+    align-items: flex-end
+}
+.flexRow {
+    display: flex;
+    flex-direction: row
+}
+.flexColumn {
+    display: flex;
+    flex-direction: column
+}
+.flexFlowRowNoWrap {
+    display: flex;
+    flex-flow: row nowrap
+}
+.flexFlowRowWrap {
+    display: flex;
+    flex-flow: row wrap
+}
+
+/* Misc. Position */
+.displayInline {
+    display: inline;
+}
+.textCenter {
+    text-align: center !important;
+}
+.textLeft {
+    text-align: left;
+}
+.textRight {
+    text-align: right;
+}
+.justifyText {
+    text-align: justify;
+    text-justify: inter-word;
+}
+.floatRight {
+    float: right;
+}
+.floatLeft {
+    float: left;
+}
+.overflowScroll {
+    overflow: scroll !important;
+}
+.overflowScrollX {
+    overflow-x: scroll !important;
+    overflow-y: hidden !important;
+}
+.overflowScrollY {
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+}
+
+/* Fonts */
+b, button, button.small, div, input, p, span, td, th {
+    font-size: var(--fontSize-p) !important
+}
+.h1, h1 {
+    font-size: var(--fontSize-h1) !important
+}
+.h2, h2 {
+    font-size: var(--fontSize-h2) !important
+}
+.h3, h3 {
+    font-size: var(--fontSize-h3) !important
+}
+.h4, h4 {
+    font-size: var(--fontSize-h4) !important
+}
+.h5, h5 {
+    font-size: var(--fontSize-h5) !important
+}
+.h6, h6 {
+    font-size: var(--fontSize-h6) !important
+}
+header {
+    font-size: var(--fontSize-header) !important
+}
+@media screen and (min-width:1400px) {
+    b, button, div, input, p, span, td, th {
+        font-size: var(--fontSizeMedium-p) !important
+    }
+    h1 {
+        font-size: var(--fontSizeMedium-h1) !important
+    }
+    h2 {
+        font-size: var(--fontSizeMedium-h2) !important
+    }
+    h3 {
+        font-size: var(--fontSizeMedium-h3) !important
+    }
+    h4 {
+        font-size: var(--fontSizeMedium-h4) !important
+    }
+    h5 {
+        font-size: var(--fontSizeMedium-h5) !important
+    }
+    h6 {
+        font-size: var(--fontSizeMedium-h6) !important
+    }
+    header {
+        font-size: var(--fontSizeMedium-header) !important
+    }
+}
+a, h1, h2, h3, h4, h5, h6, label, p {
+    font-family: Arial, sans-serif;
+    color: rgba(0, 0, 0, .87);
+    color: var(--color-p-font)
+}
+h1, p {
+    font-family: var(--fontFamily-Regular) !important
+}
+h2 {
+    font-family: var(--fontFamily-Light) !important
+}
+h3 {
+    font-family: var(--fontFamily-Regular) !important
+}
+h4 {
+    font-family: var(--fontFamily-Bold) !important
+}
+h5 {
+    font-family: var(--fontFamily-Regular) !important
+}
+h6 {
+    font-family: var(--fontFamily-Bold) !important
+}
+.extraSmallFont {
+    font-size: 10px !important
+}
+.small, .smallFont {
+    font-size: 12px !important
+}
+.mediumFont {
+    font-size: 14px !important
+}
+.largeFont {
+    font-size: 16px !important
+}
+.massiveFont {
+    font-size: 36px !important
+}
+.enormousFont {
+    font-size: 56px !important
+}
+@media screen and (max-width:900px) {
+    .massiveFont {
+        font-size: 24px !important
+    }
+    .enormousFont {
+        font-size: 48px !important
+    }
+}
+.strongFont, strong {
+    font-weight: 900 !important
+}
+.italicFont {
+    font-style: italic
+}
+a, button, div, input, small, span, td, th {
+    font-family: var(--fontFamily-Regular) !important;
+    font-weight: 400 !important
+}
+.serifFont {
+    font-family: var(--fontFamily-Serif) !important
+}
+.blueFont {
+    color: var(--color-blue) !important
+}
+.actionBlueFont, .brightBlueFont {
+    color: var(--color-call-to-action) !important
+}
+.redFont {
+    color: var(--color-flag-red) !important
+}
+.orangeFont {
+    color: var(--color-warning-orange) !important
+}
+.actionFont {
+    color: var(--color-call-to-action) !important
+}
+.greenFont {
+    color: var(--color-positive-green) !important
+}
+.blackFont {
+    color: #000 !important
+}
+.grayFont {
+    color: var(--color-gray-font) !important
+}
+.whiteFont {
+    color: #fff !important
+}
+.actionFont:hover {
+    cursor: pointer !important
+}
+
+button {
+    min-width: 96px !important;
+    min-height: 48px !important;
+    /* background-color: var(--color-blue) !important; */
+    /* color: #fff !important; */
+    /* border: 1px solid var(--color-blue) !important; */
+    border-radius: 100px !important;
+    padding: 16px 20px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+}
+.cursorPointer, button:hover {
+    cursor: pointer
+}
+
+.width90Percent {
+    width: 90% !important
+}
+.width100Percent {
+    width: 100% !important
+}
+.widthFitContent {
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content
+}
+
+/* Misc. */
+.boxShadowSmall {
+    box-shadow: 0 4px 2px -2px rgba(0, 0, 0, .4) !important
+}
+.boxShadowLarge {
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, .4) !important
+}
+.borderRadiusSmall {
+    border-radius: 4px !important
+}
+.displayNone {
+    display: none  !important
+}
+.checkbox {
+    border-color: #96c8da !important
+}
+.checkbox:checked {
+    background-color: var(--color-blue) !important
+}
+.checkbox:focus {
+    box-shadow: none !important
+}
+.printable * {
+    display: block
+}
+table {
+    border-collapse: collapse
+}
+
+@media print {
+    .noprint {
+        display: none
+    }
+}
+
+/* Fonts */
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+}
+@font-face {
+    font-family: 'DM Serif Display';
+    font-style: serif;
+    font-weight: 400;
+    src: url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
+}
+/* @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather&display=swap'); */

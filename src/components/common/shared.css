@@ -1,0 +1,24 @@
+/* Homepage */
+.backgroundCover {
+    width: 100vw !important;
+    height: 100vh !important;
+    background-image: url('../../images/delicate-arch.png');
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+}
+.backgroundOpacity {
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: rgba(256, 256, 256, .5);
+}
+.zIndexNegative {
+    z-index: -1;
+}
+
+/* Misc. */
+.underlined {
+    border-bottom: 1px solid black;
+}
