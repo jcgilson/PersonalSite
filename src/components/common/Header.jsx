@@ -1,5 +1,6 @@
 import React from "react";
 import tiktokLogo from '../../images/tiktok.png';
+// import nameLogo from '../../images/nameLogo.png';
 
 const Header = (props) => {
     const { currentPage, setCurrentPage } = props;
@@ -20,6 +21,7 @@ const Header = (props) => {
 
     return (
         <nav className="flexRow justifySpaceBetween alignCenter paddingTopSmall paddingLeftLarge paddingRightLarge paddingBottomSmall">
+            {/* <img src={nameLogo} style={{ height: '60px' }} alt="tiktok logo" /> */}
             <a className="flexRow alignCenter cursorPointer removeTextDecoration" href="https://www.tiktok.com/@jack.gilson" target="_blank">
                 <img src={tiktokLogo} style={{ height: '30px' }} alt="tiktok logo" />
                 <h2 className="marginLeftSmall">jack.gilson</h2>

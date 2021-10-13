@@ -1,18 +1,13 @@
 import React, { useState } from "react";
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import Paper from '@mui/material/Paper';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
+// MUI
+import {
+  Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination,
+  TableRow, TableSortLabel, Paper, FormControlLabel, Switch
+} from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
+// Consts
 import { nationalParks } from './travelData';
+// CSS
 import './content.css';
 
 function descendingComparator(a, b, orderBy) {
