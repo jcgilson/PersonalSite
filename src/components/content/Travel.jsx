@@ -1,207 +1,39 @@
-import React, { useState } from "react";
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import Paper from '@mui/material/Paper';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
-import { visuallyHidden } from '@mui/utils';
-import { nationalParks } from './travelData';
+import React, { useState, useEffect } from "react";
+import "../common/shared.css"
+import roadtrip2019 from "../../images/roadtrip2019-cropped.png";
 
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
+const Travel = () => {
+    return (
+		// <article id="home" className="backgroundOpacity">
+		<article id="home" className="">
+			{/* <div className="backgroundCover blackCanyon zIndexNegative"/> */}
+			<div className=""/>
+			<section className="flexRow">
+				<div className="width90Percent backgroundColorWhite marginAuto marginTopMassive paddingBottomLarge flexColumn alignCenter">
+					<img src={roadtrip2019} style={{ borderBottom: '1px solid black' }} alt="roadtrip google maps screenshot" className="width80Percent marginBottomMedium" />
+					<h1 className="massiveFont serifFont">2019 Roadtrip</h1>
+					<h3 className="grayFont">11 National Parks, 24 Days Camping, 5000+ Miles Driven</h3>
+					{/* <p className="textLeft width100Percent marginLeftLarge"> */}
+					<p className="">
+						During my senior year of college I began planning the trip of a lifetime with my best friend.
+					</p>
+					<ol>
+						<li>Rocky Mountain</li>
+						<li>Canyonlands</li>
+						<li>Arches</li>
+						<li>Capitol Reef</li>
+						<li>Bryce Canyon</li>
+						<li>Grand Canyon</li>
+						<li>Zion</li>
+						<li>Grand Teton</li>
+						<li>Yellowstone</li>
+						<li>Wind Cave</li>
+						<li>Badlands</li>
+					</ol>
+				</div>
+			</section>
+		</article>
+    )
 }
 
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-// This method is created for cross-browser compatibility, if you don't
-// need to support IE11, you can use Array.prototype.sort() directly
-function stableSort(array, comparator) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
-
-const headCells = [
-  {
-    id: 'name',
-    numeric: false,
-    disablePadding: false,
-    label: 'National Park',
-  },
-  {
-    id: 'orderVisited',
-    numeric: true,
-    disablePadding: false,
-    label: 'Order Visited',
-  },
-  {
-    id: 'yearsVisited',
-    numeric: true,
-    disablePadding: false,
-    label: 'Visitation Dates',
-  },
-  {
-    id: 'favoriteOrder',
-    numeric: true,
-    disablePadding: false,
-    label: 'Favorite Order',
-  }
-];
-
-function EnhancedTableHead(props) {
-  const { order, orderBy, onRequestSort } = props;
-  const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
-  };
-
-  return (
-    <TableHead>
-      <TableRow>
-        {headCells.map((headCell) => (
-          <TableCell
-            key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
-            sortDirection={orderBy === headCell.id ? order : false}
-			className="backgroundColorBlue"
-          >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </TableSortLabel>
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
-}
-
-export default function EnhancedTable() {
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('calories');
-  const [page, setPage] = useState(0);
-  const [dense, setDense] = useState(true);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
-
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - nationalParks.length) : 0;
-
-  return (
-    <Box sx={{ width: '80vw', marginLeft: '10%', marginTop: '6vh', maxHeight: '85vh' }}>
-      <Paper sx={{ width: '100%', mb: 2, borderRadius: '8px', boxShadow: '0 4px 12px -2px rgba(0,0,0,0.4)' }}>
-        <TableContainer>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
-            <EnhancedTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              rowCount={nationalParks.length}
-            />
-            <TableBody>
-              {/* if you don't need to support IE11, you can replace the `stableSort` call with:
-                 nationalParks.slice().sort(getComparator(order, orderBy)) */}
-              {stableSort(nationalParks, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((park) => {
-                  return (
-                    <TableRow>
-                      <TableCell
-                        component="th"
-                        id={park}
-                        scope="row"
-                        // padding="none"
-                      >
-                        {park.name}
-                      </TableCell>
-                      <TableCell align="right">{park.orderVisited}</TableCell>
-                      <TableCell align="right">{park.yearsVisited?.join(", ")}</TableCell>
-                      <TableCell align="right">{park.favoriteOrder}</TableCell>
-                    </TableRow>
-                  );
-                })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <div className="flexRow justifySpaceBetween paddingLeftExtraLarge backgroundColorGray">
-			<FormControlLabel
-				control={<Switch checked={dense} onChange={handleChangeDense} />}
-				label="Dense padding"
-			/>
-            <TablePagination
-				rowsPerPageOptions={[5, 10, 25]}
-				component="div"
-				count={nationalParks.length}
-				rowsPerPage={rowsPerPage}
-				page={page}
-				onPageChange={handleChangePage}
-				onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-        </div>
-      </Paper>
-    </Box>
-  );
-}
+export default Travel;

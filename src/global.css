@@ -6,7 +6,10 @@
     --color-purple: #DEBDD5;
     --color-bright-blue: #C7FFF6;
 
-    --color-gray: #555;
+    --color-gray: #dedede;
+
+    --color-primary: #FF5733;
+    --color-secondary: #1294B3;
     
     --color-blue-hover: #196ed0;
     --color-light-gray: #f4f4f4;
@@ -251,6 +254,12 @@ body {
 .backgroundColorWhite {
     background-color: #fff !important
 }
+.backgroundColorPrimary {
+    background-color: var(--color-primary) !important;
+}
+.backgroundColorSecondary {
+    background-color: var(--color-secondary) !important;
+}
 
 @media print {
     body {
@@ -366,7 +375,7 @@ body {
 
 /* Fonts */
 b, button, button.small, div, input, p, span, td, th {
-    font-size: var(--fontSize-p) !important
+    font-size: var(--fontSize-h3) !important
 }
 .h1, h1 {
     font-size: var(--fontSize-h1) !important
@@ -470,6 +479,9 @@ h6 {
 .italicFont {
     font-style: italic
 }
+.removeTextDecoration {
+    text-decoration: none;
+}
 a, button, div, input, small, span, td, th {
     font-family: var(--fontFamily-Regular) !important;
     font-weight: 400 !important
@@ -522,8 +534,9 @@ button {
 .cursorPointer, button:hover {
     cursor: pointer
 }
-
-.width90Percent {
+.width80Percent {
+    width: 80% !important
+}.width90Percent {
     width: 90% !important
 }
 .width100Percent {
@@ -583,5 +596,3 @@ table {
     font-weight: 400;
     src: url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
 }
-/* @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Merriweather&display=swap'); */

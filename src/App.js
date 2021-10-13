@@ -4,17 +4,19 @@ import './components/common/shared.css';
 import Header from './components/common/Header';
 import Home from './components/common/Home';
 import Travel from './components/content/Travel';
+import Itineraries from './components/content/Itineraries';
 
 function App() {
 
   const [currentPage, setCurrentPage] = useState('Home');
 
   return (
-      <body className="pageContainer">
+      <body>
         <Header setCurrentPage={setCurrentPage} currentPage={currentPage} />
         <main>
-			<Home />
-			{currentPage === "Travel" && <Travel />}
+          {currentPage === "Home" && <Home />}
+          {currentPage === "Travel" && <Travel />}
+          {currentPage === "Itineraries" && <Itineraries />}
         </main>
         <footer>
 

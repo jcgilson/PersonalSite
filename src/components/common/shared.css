@@ -2,12 +2,18 @@
 .backgroundCover {
     width: 100vw !important;
     height: 100vh !important;
-    background-image: url('../../images/delicate-arch.png');
     background-size: cover;
     background-position: center;
+    /* background-attachment: fixed; */
     overflow: hidden;
     position: absolute;
     top: 0;
+}
+.backgroundCover.delicateArch {
+    background-image: url('../../images/delicate-arch.png');
+}
+.backgroundCover.blackCanyon {
+    background-image: url('../../images/black-canyon.png');
 }
 .backgroundOpacity {
     width: 100vw !important;

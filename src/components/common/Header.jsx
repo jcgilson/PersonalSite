@@ -1,25 +1,29 @@
 import React from "react";
+import tiktokLogo from '../../images/tiktok.png';
 
 const Header = (props) => {
     const { currentPage, setCurrentPage } = props;
 
     const navLinks = () => {
-        const links = ["Travel", "Itineraries", "Bucket-List", "Contact"];
+        const links = ["Travel", "Itineraries", "Bucket-List", "About"];
         return links.map((link) => {
             return (
-                <h4
+                <h3
                     className={`cursorPointer marginRightMedium${currentPage === link ? " underlined" : ""}`}
                     onClick={() => setCurrentPage(link)}
                 >
                     {link}
-                </h4>
+                </h3>
             );
         })
     }
 
     return (
         <nav className="flexRow justifySpaceBetween alignCenter paddingTopSmall paddingLeftLarge paddingRightLarge paddingBottomSmall">
-            <h1>Jack Gilson</h1>
+            <a className="flexRow alignCenter cursorPointer removeTextDecoration" href="https://www.tiktok.com/@jack.gilson" target="_blank">
+                <img src={tiktokLogo} style={{ height: '30px' }} alt="tiktok logo" />
+                <h2 className="marginLeftSmall">jack.gilson</h2>
+            </a>
             <section className="flexRow">
                 {navLinks()}
             </section>
