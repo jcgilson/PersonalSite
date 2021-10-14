@@ -8,7 +8,7 @@ const Itineraries = () => {
         <article>
             {/* <section className="backgroundOpacity flexColumn justifyCenter alignCenter"> */}
             {/* <section className="backgroundOpacity cardContainer flexFlowRowWrap justifyCenter alignCenter"> */}
-            <section className="cardContainer flexFlowRowWrap justifyCenter alignCenter">
+            <section className="width90Percent flexFlowRowWrap justifyCenter alignCenter">
                 {/* <div className="backgroundColorWhite width80Percent marginAuto marginTopMassive flexColumn alignCenter">
                     <h1 className="serifFont">Pacific Northwest</h1>
                     <h3 className="grayFont">Oregon, Washington, Vancouver</h3>

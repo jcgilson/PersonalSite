@@ -6,7 +6,7 @@ import {
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 // Consts
-import { nationalParks } from './travelData';
+import { nationalParks } from './nationalParks';
 // CSS
 import './content.css';
 

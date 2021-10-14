@@ -10,6 +10,8 @@
 
     --color-primary: #FF5733;
     --color-secondary: #1294B3;
+
+    --color-green: #056A00;
     
     --color-blue-hover: #196ed0;
     --color-light-gray: #f4f4f4;
@@ -505,7 +507,7 @@ a, button, div, input, small, span, td, th {
     color: var(--color-call-to-action) !important
 }
 .greenFont {
-    color: var(--color-positive-green) !important
+    color: var(--color-green) !important
 }
 .blackFont {
     color: #000 !important
@@ -520,17 +522,24 @@ a, button, div, input, small, span, td, th {
     cursor: pointer !important
 }
 
-button {
+/* button {
     min-width: 96px !important;
     min-height: 48px !important;
-    /* background-color: var(--color-blue) !important; */
-    /* color: #fff !important; */
-    /* border: 1px solid var(--color-blue) !important; */
     border-radius: 100px !important;
     padding: 16px 20px !important;
     font-weight: 600 !important;
     text-transform: none !important;
+    
+    Comment these out
+    background-color: var(--color-blue) !important;
+    color: #fff !important;
+    border: 1px solid var(--color-blue) !important;
 }
+button.small, .mapbox button {
+    min-width: 44px !important;
+    min-height: 28px !important;
+    padding: 6px 8px !important; 
+} */
 .cursorPointer, button:hover {
     cursor: pointer
 }

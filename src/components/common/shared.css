@@ -31,3 +31,28 @@
 .underlined {
     border-bottom: 1px solid black;
 }
+
+.mapbox {
+    margin: 0 auto;
+    width: 90vw;
+    height: 600px;
+}
+
+.marker {
+    background-image: url('../../images/tree.png');
+    background-size: cover;
+    width: 30px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.marker.unvisited {
+    background-image: url('../../images/unvisited.png');
+}
+
+.mapboxgl-popup-content {
+    min-width: 200px;
+    max-height: 200px;
+    overflow-y: scroll;
+}
