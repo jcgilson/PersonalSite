@@ -1,6 +1,6 @@
 export const nationalParks = [
     { id: 1, name: "Acadia", states: "Maine", visited: true, lat: 44.35, long: -68.21, orderVisited: 13, favoriteOrder: 10, yearsVisited: ["August 2020"] },
-    { id: 2, name: "American Samoa", states: "American Samoa", lat: 14.25, long: -170.68 },
+    { id: 2, name: "American Samoa", states: "American Samoa", lat: -14.25, long: -170.68 },
     { id: 3, name: "Arches", states: "Utah", visited: true, lat: 38.68, long: -109.57, orderVisited: 4, favoriteOrder: 2, yearsVisited: ["May 2019", "September 2021"] },
     { id: 4, name: "Badlands", states: "South Dakota", visited: true, lat: 43.75, long: -102.50, orderVisited: 12, favoriteOrder: 15, yearsVisited: ["June 2019"] },
     { id: 5, name: "Big Bend", states: "Texas", lat: 29.25, long: -103.25 },

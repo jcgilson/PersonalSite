@@ -1,0 +1,12 @@
+{
+    "app" : {
+        "background": {
+            "type" : "color",
+            "imageSource": "delicateArch",
+            "colorHexCode": "FFB3B3"
+        }
+    },
+    "itineraries": {
+        "cardVariation": "card"
+    }
+}

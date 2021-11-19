@@ -1,0 +1,95 @@
+[
+    [
+        "Id",
+        "Name",
+        "National Parks Only",
+        "Destinations",
+        "Destination Names",
+        "Short Description",
+        "Description",
+        "Preview .PNG Image Source",
+        "Modal Image Sources",
+        "Modal Image Descriptions",
+        "Header",
+        "Subheader",
+        "Map Zoom Ratio",
+        "Map Center Coordinates"
+    ],
+    [
+        "Help",
+        null,
+        "TRUE or FALSE",
+        "If National Parks Only, use Park Id's from \"National Parks\" Sheet",
+        "Format as [\"A\", \"B\", ...]",
+        null,
+        null,
+        "For Lake.png, use \"Lake\"",
+        "Format as [A, B, ...]",
+        "Format as [\"A\", \"B\", ...]",
+        null,
+        null,
+        "Number between 1-10",
+        "{lat:38.50,long-114.00}\nlat between -90 to 90, long between -180 to 180"
+    ],
+    [
+        "id",
+        "name",
+        "nationalParksOnly",
+        "destinations",
+        "destinationNames",
+        "shortDescription",
+        "description",
+        "previewImageSource",
+        "modalImageSources",
+        "modalImageDescriptions",
+        "header",
+        "subHeader",
+        "mapZoom",
+        "mapCenter"
+    ],
+    [
+        1,
+        "2019 Roadtrip",
+        true,
+        "[51,9,3,10,8,24,63,25,61,59,4]",
+        "[\"Rocky Mountain\", \"Canyonlands\", \"Arches\", \"Capitol Reef\", \"Bryce Canyon\", \"Grand Canyon\", \"Zion\", \"Grand Teton\", \"Yellowstone\", \"Wind Cave\", \"Badlands\"]",
+        "11 National Parks, 24 Days Camping, 5000+ Miles Driven",
+        "During my senior year of college I began planning the trip of a lifetime with my best friend.",
+        "arches",
+        "[arches, arches, arches]",
+        "[\"Arches\", \"Arches\", \"Arches\"]",
+        "RMNP, UT, WY, SD",
+        "11 National Parks & Mount Rushmore",
+        5,
+        "{lat:40.6,long:-108.5}"
+    ],
+    [
+        2,
+        "2021 Roadtrip",
+        true,
+        "[51,7,3,9,43,27]",
+        "[\"Rocky Mountain\", \"Black Canyon of the Gunnison\", \"Arches\", \"Canyonlands\", \"Mesa Verde\", \"Great Sand Dunes\"]",
+        "6 National Parks",
+        null,
+        "blackCanyon",
+        null,
+        null,
+        "CO & Moab",
+        "6 National Parks",
+        6.4,
+        "{lat:38.8,long:-107.72}"
+    ]
+]{
+    "app" : {
+        "background": {
+            "type" : "image",
+            "image": "delicateArch",
+            "color": "FF0000"
+        }
+    },
+    "itineraries": {
+        "cardVariation": "card",
+        "itineraries": ""
+
+    }
+}

@@ -1,0 +1,15 @@
+// {
+//     "app" : {
+//         "background": {
+//             "type" : "image", // Accepts: "image", "color"
+//             "image": "delicateArch", // Accepts .PNG img src prefix
+//         }
+//     },
+//     "itineraries": {
+//         "cardVariation": "card", // Accepts: "card", "contained"
+//     }
+// }
+
+
+
+

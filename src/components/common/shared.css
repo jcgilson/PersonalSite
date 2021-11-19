@@ -11,14 +11,19 @@
 }
 .backgroundCover.delicateArch {
     background-image: url('../../images/delicate-arch.png');
+    /* background-image: linear-gradient(180deg,transparent 0%,#ffffff),url('../../images/delicate-arch.png'); */
 }
 .backgroundCover.blackCanyon {
     background-image: url('../../images/black-canyon.png');
+    /* background-image: linear-gradient(180deg,transparent 0%,#ffffff),url('../../images/black-canyon.png'); */
 }
-.backgroundOpacity {
+.backgroundCover .backgroundOpacity {
     width: 100vw !important;
     height: 100vh !important;
-    background-color: rgba(256, 256, 256, .5);
+    /* background-color: rgba(256, 256, 256, .5); */
+    background-color: rgba(256, 256, 256, .7);
+    /* background-color: rgba(256, 256, 256, 1); */
+    /* background-color: rgba(0, 0, 0, .5); */
     position: absolute;
     top: 0;
     /* margin-top: 0px !important; */
@@ -34,10 +39,11 @@
 
 .mapbox {
     margin: 0 auto;
-    width: 90vw;
+    width: 80vw;
     height: 600px;
 }
 
+/* Marker styles */
 .marker {
     background-image: url('../../images/tree.png');
     background-size: cover;
@@ -46,13 +52,37 @@
     border-radius: 50%;
     cursor: pointer;
 }
-
 .marker.unvisited {
     background-image: url('../../images/unvisited.png');
+}
+.marker.destination {
+    background-image: url('../../images/destination.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 50px;
+    border-radius: 0;
 }
 
 .mapboxgl-popup-content {
     min-width: 200px;
     max-height: 200px;
     overflow-y: scroll;
+}
+
+/* Homepage background images */
+.cardBackgroundImage {
+    height: 300px;
+    background-size: cover;
+}
+.cardBackgroundImage:first-of-type {
+    background-image: url('../../images/delicate-arch.png');
+}
+.cardBackgroundImage:nth-of-type(2) {
+    /* background-image: url('../../images/roadtrip2019.png'); */
+}
+.cardBackgroundImage:nth-of-type(3) {
+    background-image: url('../../images/sunset.png');
+}
+.cardBackgroundImage:nth-of-type(4) {
+    background-image: url('../../images/tree.png');
 }
