@@ -18,6 +18,8 @@
     --color-medium-gray: #dadbdc;
     --color-call-to-action: #196ecf;
     --color-call-to-action-hover: rgba(25, 110, 207, 0.7);
+    --color-call-to-action-alt: rgba(0,0,0);
+    --color-call-to-action-alt-hover: rgba(0,0,0);
     --color-high-impact-orange: #d14600;
     --color-high-impact-orange-hover: #a53400;
     --color-high-impact-yellow: #f4b700;
@@ -47,11 +49,15 @@
     --fontSizeMedium-h4: 14px;
     --fontSizeMedium-h5: 14px;
     --fontSizeMedium-h6: 12px;
-    --fontFamily-Regular: "Roboto";
+    /* --fontFamily-Regular: "Roboto";
     --fontFamily-Light: "Roboto";
-    --fontFamily-Bold: "Roboto";
+    --fontFamily-Bold: "Roboto"; */
+    --fontFamily-Regular: "Raleway Thin";
+    --fontFamily-Light: "Raleway Thin";
+    --fontFamily-Bold: "Raleway Thin";
     --fontFamily-Secondary: Arial;
-    --fontFamily-Serif: "DM Serif Display";
+    /* --fontFamily-Serif: "DM Serif Display"; */
+    --fontFamily-Serif: "Raleway Thin";
     --fontStyle-Secondary: sans-serif;
 
     /* Margin & Padding */
@@ -263,6 +269,20 @@ body {
     background-color: var(--color-secondary) !important;
 }
 
+/* Golf Score Colors */
+.backgroundColorEagle {
+    background-color: #FECD31 !important
+}
+.backgroundColorBirdie {
+    background-color: #87C6A2 !important
+}
+.backgroundColorBogey {
+    background-color: #F17780 !important
+}
+.backgroundColorBogeyPlus {
+    background-color: #7BA9CF !important
+}
+
 @media print {
     body {
         -webkit-print-color-adjust: exact
@@ -431,24 +451,31 @@ a, h1, h2, h3, h4, h5, h6, label, p {
     color: rgba(0, 0, 0, .87);
     color: var(--color-p-font);
     margin: 0 !important;
+    font-weight: 200;
 }
 h1, p {
-    font-family: var(--fontFamily-Regular) !important
+    font-family: var(--fontFamily-Regular) !important;
+    font-weight: 200;
 }
 h2 {
-    font-family: var(--fontFamily-Light) !important
+    font-family: var(--fontFamily-Light) !important;
+    font-weight: 200;
 }
 h3 {
-    font-family: var(--fontFamily-Regular) !important
+    font-family: var(--fontFamily-Regular) !important;
+    font-weight: 200;
 }
 h4 {
-    font-family: var(--fontFamily-Bold) !important
+    font-family: var(--fontFamily-Bold) !important;
+    font-weight: 200;
 }
 h5 {
-    font-family: var(--fontFamily-Regular) !important
+    font-family: var(--fontFamily-Regular) !important;
+    font-weight: 200;
 }
 h6 {
-    font-family: var(--fontFamily-Bold) !important
+    font-family: var(--fontFamily-Bold) !important;
+    font-weight: 200;
 }
 .extraSmallFont {
     font-size: 10px !important
@@ -504,6 +531,9 @@ a, button, div, input, small, span, td, th {
 .orangeFont {
     color: var(--color-warning-orange) !important
 }
+.altActionFont {
+    color: var(--color-call-to-action-alt) !important
+}
 .actionFont {
     color: var(--color-call-to-action) !important
 }
@@ -519,7 +549,7 @@ a, button, div, input, small, span, td, th {
 .whiteFont {
     color: #fff !important
 }
-.actionFont:hover {
+.actionFont:hover, .altActionFont:hover {
     cursor: pointer !important
 }
 
@@ -608,4 +638,16 @@ table {
     font-style: serif;
     font-weight: 400;
     src: url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
+}
+@font-face {
+    font-family: 'Open Sans';
+    font-style: sans-serif;
+    font-weight: 300;
+    src: url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+}
+@font-face {
+    font-family: 'Raleway Thin';
+    font-style: sans-serif;
+    font-weight: 100;
+    src: url('https://fonts.googleapis.com/css2?family=Raleway:wght@100&display=swap');
 }

@@ -32,6 +32,46 @@
     z-index: -1;
 }
 
+/* Golf Page */
+.golfTable .distribute10 {
+    width: calc(100% / 10) !important;
+    max-width: 12.5% !important;
+}
+.golf h1, .golf h2, .golf h3, .golf h4, .golf h5, .golf h6,
+.golf span, .golf th, .golf td, .golf div, .golf p, .golf a {
+    color: white;
+}
+
+.golf .subTable h1, .golf .subTable h2, .golf .subTable h3, .golf .subTable h4,
+.golf .subTable h5, .golf .subTable h6, .golf .subTable span, .golf .subTable th,
+.golf .subTable td, .golf .subTable div, .golf .subTable p, .golf .subTable a {
+    color: black;
+    padding: 8px;
+}
+
+.golfTable .golfTableBorderRightSmall {
+    border-right: 1px solid #f1f2f3;
+}
+
+.golfTable .chip {
+    border-radius: 4px;
+    margin-right: 4px !important;
+    margin-bottom: 2px !important;
+}
+
+/* .golf .displayHoverArrow svg {
+    color: white;
+    display: none;
+} */
+.golf .displayDownArrowAfter:after {
+    content: ' \2193';
+    color: white;
+}
+.golf .displayUpArrowAfter:after {
+    content: ' \2191';
+    color: white;
+}
+
 /* Misc. */
 .underlined {
     border-bottom: 1px solid black;

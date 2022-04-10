@@ -5,6 +5,7 @@ import Home from './components/common/Home';
 import Itineraries from './components/content/Itineraries';
 import NationalParks from './components/content/NationalParks';
 // import Gallery from './components/content/Gallery';
+import Golf from './components/content/Golf';
 import Resources from './components/content/Resources';
 import Footer from './components/common/Footer';
 // MUI
@@ -21,10 +22,10 @@ const Excel = require('exceljs');
 
 function App() {
 
-  const links = ["Itineraries", "National Parks", "Gallery", "Resources"];
+  const links = ["Itineraries", "National Parks", "Gallery", "Golf", "Resources"];
   const [configuration, setConfiguration] = useState(defaultConfiguration);
   const [itineraries, setItineraries] = useState(defaultItineraries);
-  const [currentPage, setCurrentPage] = useState("Itineraries");
+  const [currentPage, setCurrentPage] = useState("Golf");
   const [displayUploadButton, setDisplayUploadButton] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   
@@ -33,7 +34,7 @@ function App() {
 
   const getAppBackgroundClassName = () => {
     const backgroundConfiguration = configuration.app.background;
-    let backgroundClassName = '';
+    let backgroundClassName = 'body ';
 
     if (backgroundConfiguration.type === "image") {
       backgroundClassName += `backgroundCover zIndexNegative ${backgroundConfiguration.imageSource}`;
@@ -127,8 +128,8 @@ function App() {
   console.log("configuration",configuration)
 
   return (
-      <div className="body">
-        <article className={getAppBackgroundClassName()}>
+      <div className={getAppBackgroundClassName()}>
+        <article>
           <section className="backgroundOpacity zIndexNegative" />
         </article>
         <main>
@@ -137,9 +138,10 @@ function App() {
           {currentPage === "Itineraries" && <Itineraries itineraries={itineraries} configuration={configuration} />}
           {currentPage === "National Parks" && <NationalParks />}
           {/* {currentPage === "Gallery" && <Gallery />} */}
+          {currentPage === "Golf" && <Golf />}
           {currentPage === "Resources" && <Resources />}
           {/* Upload Excel */}
-          {displayUploadButton &&
+          {displayUploadButton && currentPage !== "Golf" &&
             <button
                 onClick={() => handleOpenModal()}
                 style={{ backgroundColor: 'black', position: 'fixed', bottom: '24px', left: '24px', borderRadius: '48px', padding: '8px', height: '64px', width: '64px' }}

@@ -2,8 +2,16 @@
 /* Background colors */
 .colorFFB3B3 {
     width: 100vw !important;
-    height: 100vh !important;
+    min-height: 100vh !important;
     background-color: #FFB3B3;
+    position: absolute;
+    top: 0;
+    z-index: -1;
+}
+.color026647 {
+    width: 100vw !important;
+    min-height: 100vh !important;
+    background-color: #026647;
     position: absolute;
     top: 0;
     z-index: -1;
