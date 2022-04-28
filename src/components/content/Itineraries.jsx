@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Map from './Map';
 // MUI
 import { Modal, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import { ChevronLeft ,ChevronRight } from '@material-ui/icons';
+import { ChevronLeft, ChevronRight } from '@material-ui/icons';
 // Consts
 import { defaultItineraries } from './consts/DefaultItineraries.js';
 import { nationalParks } from './consts/NationalParks.js';

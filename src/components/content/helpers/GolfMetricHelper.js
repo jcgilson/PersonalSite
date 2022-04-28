@@ -22,51 +22,53 @@ export const calculateConsecutiveOnePutts = (allRounds) => {
     let tempEndHoleOfStreak = 0;
 
     for (let round of allRounds) {
-        for (let hole = 1; hole <= round.numHoles; hole++ ) {
-            // One putt or chip in occurred
-            if (round[`hole${hole}`].putts === 0 || round[`hole${hole}`].putts === 1) {
-                // Adding to streak
-                consecutiveOnePutts++;
-
-                // Set start streak when empty
-                if (tempStartDateOfStreak === "") {
-                    tempStartDateOfStreak = round.date;
-                    tempStartCourseOfStreak = round.course;
-                    tempStartHoleOfStreak = hole;
-                    tempEndDateOfStreak = round.date;
-                    tempEndCourseOfStreak = round.course;
-                    tempEndHoleOfStreak = hole;
+        for (let hole = 1; hole <= 18; hole++ ) {
+            if (round[`hole${hole}`]) {
+                // One putt or chip in occurred
+                if (round[`hole${hole}`].putts === 0 || round[`hole${hole}`].putts === 1) {
+                    // Adding to streak
+                    consecutiveOnePutts++;
+    
+                    // Set start streak when empty
+                    if (tempStartDateOfStreak === "") {
+                        tempStartDateOfStreak = round.date;
+                        tempStartCourseOfStreak = round.course;
+                        tempStartHoleOfStreak = hole;
+                        tempEndDateOfStreak = round.date;
+                        tempEndCourseOfStreak = round.course;
+                        tempEndHoleOfStreak = hole;
+                    } else {
+                        // Set only end streak when start streak exists
+                        tempEndDateOfStreak = round.date;
+                        tempEndCourseOfStreak = round.course;
+                        tempEndHoleOfStreak = hole;
+                    }
+    
+                    // Set most consecutive one putts when streak is made
+                    if (consecutiveOnePutts > tempMostConsecutiveOnePutts) {
+                        tempMostConsecutiveOnePutts = consecutiveOnePutts;
+                    }
                 } else {
-                    // Set only end streak when start streak exists
-                    tempEndDateOfStreak = round.date;
-                    tempEndCourseOfStreak = round.course;
-                    tempEndHoleOfStreak = hole;
+                    // When streak is set, save values
+                    if (tempMostConsecutiveOnePutts > mostConsecutiveOnePutts) {
+                        finalStartDateOfStreak = tempStartDateOfStreak;
+                        finalStartCourseOfStreak = tempStartCourseOfStreak;
+                        finalStartHoleOfStreak = tempStartHoleOfStreak;
+                        finalEndDateOfStreak = tempEndDateOfStreak;
+                        finalEndCourseOfStreak = tempEndCourseOfStreak;
+                        finalEndHoleOfStreak = tempEndHoleOfStreak;
+                        mostConsecutiveOnePutts = tempMostConsecutiveOnePutts;
+                    }
+                    // Reset temporarily values when streak is over
+                    tempStartDateOfStreak = "";
+                    tempStartCourseOfStreak = "";
+                    tempStartHoleOfStreak = 0;
+                    tempEndDateOfStreak = "";
+                    tempEndCourseOfStreak = "";
+                    tempEndHoleOfStreak = 0;
+                    tempMostConsecutiveOnePutts = 0;
+                    consecutiveOnePutts = 0;
                 }
-
-                // Set most consecutive one putts when streak is made
-                if (consecutiveOnePutts > tempMostConsecutiveOnePutts) {
-                    tempMostConsecutiveOnePutts = consecutiveOnePutts;
-                }
-            } else {
-                // When streak is set, save values
-                if (tempMostConsecutiveOnePutts > mostConsecutiveOnePutts) {
-                    finalStartDateOfStreak = tempStartDateOfStreak;
-                    finalStartCourseOfStreak = tempStartCourseOfStreak;
-                    finalStartHoleOfStreak = tempStartHoleOfStreak;
-                    finalEndDateOfStreak = tempEndDateOfStreak;
-                    finalEndCourseOfStreak = tempEndCourseOfStreak;
-                    finalEndHoleOfStreak = tempEndHoleOfStreak;
-                    mostConsecutiveOnePutts = tempMostConsecutiveOnePutts;
-                }
-                // Reset temporarily values when streak is over
-                tempStartDateOfStreak = "";
-                tempStartCourseOfStreak = "";
-                tempStartHoleOfStreak = 0;
-                tempEndDateOfStreak = "";
-                tempEndCourseOfStreak = "";
-                tempEndHoleOfStreak = 0;
-                tempMostConsecutiveOnePutts = 0;
-                consecutiveOnePutts = 0;
             }
         }
     }
@@ -186,12 +188,7 @@ export const calculateSingleHoleMetrics = (courseInfo, allRounds) => {
             mostBirdiesPar: 0,
             mostBirdiesHole: 0,
             mostBirdiesRounds: 0,
-            // There are a number of hole not birdied
-            // leastBirdies: 100,
-            // leastBirdiesCourse: "",
-            // leastBirdiesPar: 0,
-            // leastBirdiesHole: 0,
-            // leastBirdiesRounds: 0
+            notBirdied: []
         },
         bogeyPlus: {
             mostBogeyPlus: 0,
@@ -233,7 +230,8 @@ export const calculateSingleHoleMetrics = (courseInfo, allRounds) => {
             lowestPuttAverage18Front9: 0,
             lowestPuttAverage18Back9: 0,
         },
-        ctp: {}
+        ctp: {},
+        longestDrive: {}
 
         // Sample object that is populated below
         // andersonGlenHole1: {
@@ -253,54 +251,128 @@ export const calculateSingleHoleMetrics = (courseInfo, allRounds) => {
         // }
     };
     
-    // Update randomly occuring here
     for (let round of allRounds) {
-        for (let hole = 1; hole <= round.numHoles; hole++ ) {
-            if (singleHoleMetrics[`${round.courseKey}Hole${hole}`] === undefined) {
-                singleHoleMetrics[`${round.courseKey}Hole${hole}`] = { // Initial fields for hole
-                    course: round.course,
-                    par: courseInfo[round.courseKey][`hole${hole}`].par,
-                    hole: hole,
-                    distance: courseInfo[round.courseKey][`hole${hole}`].distance,
-                    rounds: 1,
-                    cumulativeScore: round[`hole${hole}`].score,
-                    cumulativeScoreToPar: round[`hole${hole}`].score - courseInfo[round.courseKey][`hole${hole}`].par,
-                    best: round[`hole${hole}`].score,
-                    bestScoreToPar: round[`hole${hole}`].score - courseInfo[round.courseKey][`hole${hole}`].par,
-                    worst: round[`hole${hole}`].score,
-                    worstScoreToPar: round[`hole${hole}`].score - courseInfo[round.courseKey][`hole${hole}`].par,
-                    numBirdies: round[`hole${hole}`].score < courseInfo[round.courseKey][`hole${hole}`].par ? 1 : 0,
-                    numBogeyPlus: round[`hole${hole}`].score >= courseInfo[round.courseKey][`hole${hole}`].par + 2 ? 1 : 0,
-                    putts: round[`hole${hole}`].putts,
-                    dth: round[`hole${hole}`].dth ? round[`hole${hole}`].dth : null // dth not captured for all rounds
-                }
-            } else { // Metric is already defined
-                singleHoleMetrics[`${round.courseKey}Hole${hole}`].rounds++; // Add round
-                singleHoleMetrics[`${round.courseKey}Hole${hole}`].cumulativeScore = singleHoleMetrics[`${round.courseKey}Hole${hole}`].cumulativeScore + round[`hole${hole}`].score; // Add score to cumulative score
-                singleHoleMetrics[`${round.courseKey}Hole${hole}`].cumulativeScoreToPar = singleHoleMetrics[`${round.courseKey}Hole${hole}`].cumulativeScoreToPar + round[`hole${hole}`].score - courseInfo[round.courseKey][`hole${hole}`].par; // Add score to cumulative score to par
-                
-                if (round[`hole${hole}`].score < courseInfo[round.courseKey][`hole${hole}`].par) singleHoleMetrics[`${round.courseKey}Hole${hole}`].numBirdies++; // Birdie
-                if (round[`hole${hole}`].score >= courseInfo[round.courseKey][`hole${hole}`].par + 2) singleHoleMetrics[`${round.courseKey}Hole${hole}`].numBogeyPlus++; // Bogey Plus
-                
-                if (round[`hole${hole}`].score < singleHoleMetrics[`${round.courseKey}Hole${hole}`].best) { // Best score for hole is set
-                    singleHoleMetrics[`${round.courseKey}Hole${hole}`].best = round[`hole${hole}`].score;
-                    singleHoleMetrics[`${round.courseKey}Hole${hole}`].bestScoreToPar = round[`hole${hole}`].score - singleHoleMetrics[`${round.courseKey}Hole${hole}`].par;
-                }
-                if (round[`hole${hole}`].score > singleHoleMetrics[`${round.courseKey}Hole${hole}`].worst) { // Worst score for hole is set
-                    singleHoleMetrics[`${round.courseKey}Hole${hole}`].worst = round[`hole${hole}`].score;
-                    singleHoleMetrics[`${round.courseKey}Hole${hole}`].worstScoreToPar = round[`hole${hole}`].score - singleHoleMetrics[`${round.courseKey}Hole${hole}`].par;
-                }
-            }
-            // CTP
-            if (round[`hole${hole}`].dth) {
-                if (!singleHoleMetrics.ctp[`${round.courseKey}Hole${hole}`] || (round[`hole${hole}`].dth < singleHoleMetrics.ctp[`${round.courseKey}Hole${hole}`].dth)) {
-                    singleHoleMetrics.ctp[`${round.courseKey}Hole${hole}`] = {
-                        date: round.date,
+        for (let hole = 1; hole <= 18; hole++ ) {
+            if (round[`hole${hole}`]) {
+                if (singleHoleMetrics[`${round.courseKey}Hole${hole}`] === undefined) {
+                    singleHoleMetrics[`${round.courseKey}Hole${hole}`] = { // Initial fields for hole
                         course: round.course,
+                        courseKey: round.courseKey,
+                        par: courseInfo[round.courseKey][`hole${hole}`].par,
                         hole: hole,
-                        dth: round[`hole${hole}`].dth,
-                        score: round[`hole${hole}`].score,
-                        distance: courseInfo[round.courseKey][`hole${hole}`].distance
+                        distance: courseInfo[round.courseKey][`hole${hole}`].distance,
+                        rounds: 1,
+                        cumulativeScore: round[`hole${hole}`].score,
+                        cumulativeScoreToPar: round[`hole${hole}`].score - courseInfo[round.courseKey][`hole${hole}`].par,
+                        best: round[`hole${hole}`].score,
+                        bestScoreToPar: round[`hole${hole}`].score - courseInfo[round.courseKey][`hole${hole}`].par,
+                        worst: round[`hole${hole}`].score,
+                        worstScoreToPar: round[`hole${hole}`].score - courseInfo[round.courseKey][`hole${hole}`].par,
+                        numEagles: 0,
+                        numBirdies: 0,
+                        numPars: 0,
+                        numBogeys: 0,
+                        numBogeyPlus: 0,
+                        putts: round[`hole${hole}`].putts,
+                        dth: round[`hole${hole}`].dth ? round[`hole${hole}`].dth : null, // dth not captured for all rounds
+                        fairways: { l: 0, r: 0, f: 0, x: 0, na: 0 },
+                        greens: { g: 0, x: 0, gur: 0 },
+                        puttLength: round[`hole${hole}`].puttLength,
+                        handicap: courseInfo[round.courseKey][`hole${hole}`].handicap,
+                        roundsData: []
+                    }
+                } else { // Metric is already defined
+                    singleHoleMetrics[`${round.courseKey}Hole${hole}`].rounds++; // Add round
+                    singleHoleMetrics[`${round.courseKey}Hole${hole}`].cumulativeScore = singleHoleMetrics[`${round.courseKey}Hole${hole}`].cumulativeScore + round[`hole${hole}`].score; // Add score to cumulative score
+                    singleHoleMetrics[`${round.courseKey}Hole${hole}`].cumulativeScoreToPar = singleHoleMetrics[`${round.courseKey}Hole${hole}`].cumulativeScoreToPar + round[`hole${hole}`].score - courseInfo[round.courseKey][`hole${hole}`].par; // Add score to cumulative score to par
+                
+                    if (round[`hole${hole}`].score < singleHoleMetrics[`${round.courseKey}Hole${hole}`].best) { // Best score for hole is set
+                        singleHoleMetrics[`${round.courseKey}Hole${hole}`].best = round[`hole${hole}`].score;
+                        singleHoleMetrics[`${round.courseKey}Hole${hole}`].bestScoreToPar = round[`hole${hole}`].score - singleHoleMetrics[`${round.courseKey}Hole${hole}`].par;
+                    }
+                    if (round[`hole${hole}`].score > singleHoleMetrics[`${round.courseKey}Hole${hole}`].worst) { // Worst score for hole is set
+                        singleHoleMetrics[`${round.courseKey}Hole${hole}`].worst = round[`hole${hole}`].score;
+                        singleHoleMetrics[`${round.courseKey}Hole${hole}`].worstScoreToPar = round[`hole${hole}`].score - singleHoleMetrics[`${round.courseKey}Hole${hole}`].par;
+                    }
+                }
+                // Add to score distribution
+                if (round[`hole${hole}`].score <= courseInfo[round.courseKey][`hole${hole}`].par - 2) singleHoleMetrics[`${round.courseKey}Hole${hole}`].numEagles++
+                if (round[`hole${hole}`].score === courseInfo[round.courseKey][`hole${hole}`].par - 1) singleHoleMetrics[`${round.courseKey}Hole${hole}`].numBirdies++;
+                if (round[`hole${hole}`].score === courseInfo[round.courseKey][`hole${hole}`].par) singleHoleMetrics[`${round.courseKey}Hole${hole}`].numPars++;
+                if (round[`hole${hole}`].score === courseInfo[round.courseKey][`hole${hole}`].par + 1) singleHoleMetrics[`${round.courseKey}Hole${hole}`].numBogeys++;
+                if (round[`hole${hole}`].score >= courseInfo[round.courseKey][`hole${hole}`].par + 2) singleHoleMetrics[`${round.courseKey}Hole${hole}`].numBogeyPlus++;
+                singleHoleMetrics[`${round.courseKey}Hole${hole}`].roundsData.push({
+                    sequence: round.sequence,
+                    date: round.date,
+                    score: round[`hole${hole}`].score,
+                    putts: round[`hole${hole}`].putts,
+                    fir: round[`hole${hole}`].fir,
+                    gir: round[`hole${hole}`].gir,
+                    dtg: round[`hole${hole}`].dtg,
+                    dth: round[`hole${hole}`].dth,
+                    puttLength: round[`hole${hole}`].puttLength,
+                    notes: round[`hole${hole}`].notes,
+                });
+                // Fairways
+                if (round[`hole${hole}`].fir === 'L') singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.l++; // Left of fairway
+                else {
+                    if (round[`hole${hole}`].fir === 'R') singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.r++; // Right of fairway
+                    else {
+                        if (round[`hole${hole}`].fir === 'F') { // Fairway in regulation
+                            singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.f++;
+                        }
+                        else {
+                            if (round[`hole${hole}`].fir === 'X') singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.x++; // Short of fairway/topped/out of bounds
+                            else {
+                                if (round[`hole${hole}`].fir === 'NA') singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.na++;
+                            }
+                        }
+                    }
+                }
+                // Greens
+                if (round[`hole${hole}`].gir === 'G') { // Green in regulation
+                    singleHoleMetrics[`${round.courseKey}Hole${hole}`].greens.g++;
+                } else {
+                    if (round[`hole${hole}`].gir === 'X') singleHoleMetrics[`${round.courseKey}Hole${hole}`].greens.x++; // Green missed
+                    else {
+                        if (round[`hole${hole}`].gir === 'G-1') singleHoleMetrics[`${round.courseKey}Hole${hole}`].greens.gur++; // Green under regulation
+                    }
+                }
+                // CTP
+                if (
+                    round[`hole${hole}`].dth && // DTH value must exist
+                    courseInfo[round.courseKey][`hole${hole}`].par === 3 && // Must be par 3
+                    (round[`hole${hole}`].gir === "G" || round[`hole${hole}`].gir === "G-1") && // Must be GIR or GUR
+                    (round.sequence >= 9 || // Started capturing DTH after 9 rounds
+                        (round[`hole${hole}`].putts === 0 || round[`hole${hole}`].putts === 1) // Chip-in or 1-putt counts towards CTP if sequence is < 9
+                    )
+                ) {
+                    if (!singleHoleMetrics.ctp[`${round.courseKey}Hole${hole}`] || (round[`hole${hole}`].dth < singleHoleMetrics.ctp[`${round.courseKey}Hole${hole}`].dth)) {
+                        singleHoleMetrics.ctp[`${round.courseKey}Hole${hole}`] = {
+                            date: round.date,
+                            course: round.course,
+                            hole: hole,
+                            dth: round[`hole${hole}`].dth,
+                            score: round[`hole${hole}`].score,
+                            distance: courseInfo[round.courseKey][`hole${hole}`].distance
+                        }
+                    }
+                }
+                // Longest Drive and Shortest DTG
+                if (
+                    round[`hole${hole}`].dtg && // DTG value must exist
+                    courseInfo[round.courseKey][`hole${hole}`].par !== 3 // Must not be par 3
+                ) {
+                    if (!singleHoleMetrics.longestDrive[`${round.courseKey}Hole${hole}`] || (round[`hole${hole}`].dtg < singleHoleMetrics.longestDrive[`${round.courseKey}Hole${hole}`].dtg)) {
+                        singleHoleMetrics.longestDrive[`${round.courseKey}Hole${hole}`] = {
+                            date: round.date,
+                            course: round.course,
+                            hole: hole,
+                            dtg: round[`hole${hole}`].dtg,
+                            longestDrive: courseInfo[round.courseKey][`hole${hole}`].distance - round[`hole${hole}`].dtg,
+                            score: round[`hole${hole}`].score,
+                            distance: courseInfo[round.courseKey][`hole${hole}`].distance
+                        }
                     }
                 }
             }
@@ -308,7 +380,7 @@ export const calculateSingleHoleMetrics = (courseInfo, allRounds) => {
     }
 
     for (let hole in Object.keys(singleHoleMetrics)) {
-        const nonHoleMetrics = ["bestCumulativeScoreSingle", "worstCumulativeScoreSingle", "birdies", "bogeyPlus", "mostPutts", "ctp"]
+        const nonHoleMetrics = ["bestCumulativeScoreSingle", "worstCumulativeScoreSingle", "birdies", "bogeyPlus", "mostPutts", "ctp", "longestDrive"];
         if (!nonHoleMetrics.includes(Object.keys(singleHoleMetrics)[hole])) { // Not actually holes
             // Determine which hole had best cumulative total
             if (singleHoleMetrics[Object.keys(singleHoleMetrics)[hole]].cumulativeScoreToPar < singleHoleMetrics.bestCumulativeScoreSingle.cumulativeScoreToPar) { // Store cumulative total to par when lowest
@@ -353,8 +425,13 @@ export const calculateSingleHoleMetrics = (courseInfo, allRounds) => {
                 }
             }
             // Determine which hole has least birdies - There are a number of hole not birdied
+            if (singleHoleMetrics[Object.keys(singleHoleMetrics)[hole]].numBirdies === 0) {
+                singleHoleMetrics.birdies.notBirdied.push(singleHoleMetrics[Object.keys(singleHoleMetrics)[hole]]);
+            }
         }
     }
+
+    console.log("singleHoleMetrics",singleHoleMetrics)
 
     return singleHoleMetrics;
 }
@@ -381,7 +458,7 @@ export const calculateCourseMetrics = (courseInfo, allRounds) => {
 
     for (let round of allRounds) {
         // Best IN round
-        if (courseMetrics[round.courseKey].in > round.in && round.in !== 0) {
+        if (courseMetrics[round.courseKey].in > round.in && round.in !== 0 && round.fullBack9 && !round.scrambleRound) {
             courseMetrics[round.courseKey] = {
                 ...courseMetrics[round.courseKey],
                 inDate: round.date,
@@ -390,7 +467,7 @@ export const calculateCourseMetrics = (courseInfo, allRounds) => {
             }
         }
         // Best OUT round
-        if (courseMetrics[round.courseKey].out > round.out && round.out !== 0) {
+        if (courseMetrics[round.courseKey].out > round.out && round.out !== 0 && round.fullFront9 && !round.scrambleRound) {
             courseMetrics[round.courseKey] = {
                 ...courseMetrics[round.courseKey],
                 outDate: round.date,
@@ -399,7 +476,7 @@ export const calculateCourseMetrics = (courseInfo, allRounds) => {
             }
         }
         // Best total round
-        if (courseMetrics[round.courseKey].total > round.total && round.numHoles === 18) {
+        if (courseMetrics[round.courseKey].total > round.total && round.fullBack9 && round.fullFront9 && !round.scrambleRound) {
             courseMetrics[round.courseKey] = {
                 ...courseMetrics[round.courseKey],
                 totalDate: round.date,
@@ -450,8 +527,6 @@ const calculateHandicaps = (courseInfo, handicapRounds) => {
         }
     }
 
-    console.log("courseInfo",courseInfo)
-
     const handicapData = {
         overall: {
             total: ((tempHandicapData.overall.f9TotalScore / tempHandicapData.overall.f9Rounds) + (tempHandicapData.overall.b9TotalScore / tempHandicapData.overall.b9Rounds) - 72).toFixed(1)
@@ -475,11 +550,13 @@ export const calculateHandicapMetrics = (courseInfo, allRounds) => {
     // 20 most recent rounds contribute to handicap
     const roundsSortedByDescendingDate = allRounds.sort(function(a,b) {return (a.date < b.date) ? 1 : ((b.date < a.date) ? -1 : 0);} );
     let overallHandicapRounds = [];
-    if (roundsSortedByDescendingDate.length <= 4) {
+    if (roundsSortedByDescendingDate.length <= 20) {
         overallHandicapRounds = roundsSortedByDescendingDate;
     } else {
-        for (let i = 0; i < 4; i++) {
-            overallHandicapRounds.push(roundsSortedByDescendingDate[i]);
+        for (let i = 0; overallHandicapRounds.length < 20; i++) {
+            if (!roundsSortedByDescendingDate[i].scrambleRound) { // Scramble rounds should not be included in handicap
+                overallHandicapRounds.push(roundsSortedByDescendingDate[i]);
+            }
         }
     }
     let andersonGlenHandicapRounds = [];

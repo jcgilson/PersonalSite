@@ -59,17 +59,61 @@
     margin-bottom: 2px !important;
 }
 
-/* .golf .displayHoverArrow svg {
-    color: white;
-    display: none;
-} */
-.golf .displayDownArrowAfter:after {
+.golf .displayDownArrowAfter h3:after {
     content: ' \2193';
     color: white;
+    margin-left: 8px;
 }
-.golf .displayUpArrowAfter:after {
+.golf .displayUpArrowAfter h3:after {
     content: ' \2191';
     color: white;
+    margin-left: 8px;
+}
+
+.singleHoleMetricContainer > .expanded {
+    width: 100%;
+}
+
+.holeData {
+    border: 1px solid rgba(256, 256, 256, .1);
+    border-radius: 12px;
+    margin: 30px 36px;
+    min-width: 480px;
+    box-shadow: 0 4px 16px -2px rgba(256, 256, 256, .4) !important;
+}
+
+.holeData.expanded {
+    min-width: 786px;
+}
+
+.holeData .dynamicPanel {
+    max-height: 672px;
+    overflow-y: scroll;
+    position: relative;
+    top: 0;
+}
+
+.holeData .positionSticky {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 0;
+}
+
+.holeData .stickyBackgroundColor {
+    background-color: #026647;
+}
+
+.holeData .width76px {
+    text-align: center;
+    width: 76px;
+}
+
+.holeData .borderTopSmall {
+    border-top: 1px solid white;
+}
+
+.holeData .borderRightSmall {
+    border-right: 1px solid white;
 }
 
 /* Misc. */

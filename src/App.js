@@ -133,7 +133,7 @@ function App() {
           <section className="backgroundOpacity zIndexNegative" />
         </article>
         <main>
-          <Header links={links} setCurrentPage={setCurrentPage} currentPage={currentPage} />
+          {/* <Header links={links} setCurrentPage={setCurrentPage} currentPage={currentPage} /> */}
           {currentPage === "Home" && <Home links={links} setCurrentPage={setCurrentPage} />}
           {currentPage === "Itineraries" && <Itineraries itineraries={itineraries} configuration={configuration} />}
           {currentPage === "National Parks" && <NationalParks />}
@@ -150,7 +150,7 @@ function App() {
               Upload Your Travels
             </button>
           }
-          <Footer />
+          {/* <Footer /> */}
         </main>
         <Modal
           open={modalOpen}
