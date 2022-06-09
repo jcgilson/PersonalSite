@@ -271,16 +271,25 @@ body {
 
 /* Golf Score Colors */
 .backgroundColorEagle {
-    background-color: #FECD31 !important
+    background-color: #FECD31 !important;
 }
 .backgroundColorBirdie {
-    background-color: #87C6A2 !important
+    background-color: #87C6A2 !important;
 }
 .backgroundColorBogey {
-    background-color: #F17780 !important
+    background-color: #F17780 !important;
 }
 .backgroundColorBogeyPlus {
-    background-color: #7BA9CF !important
+    background-color: #7BA9CF !important;
+}
+.backgroundColorEagleRow {
+    background-color: rgba(254, 205, 49, 150) !important;
+}
+.backgroundColorEagleRow td, .backgroundColorEagleRow a {
+    color: black;
+}
+.backgroundColorEagleGlow {
+    box-shadow: 0 4px 16px -2px rgba(254, 205, 49, 200) !important;
 }
 
 @media print {
@@ -301,7 +310,7 @@ body {
 }
 
 .navbar {
-    box-shadow: 0 4px 2px -2px rgb(0 0 0/40%)
+    box-shadow: 0 4px 2px -2px rgb(0 0 0 / 40%)
 }
 
 

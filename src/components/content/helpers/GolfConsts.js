@@ -73,3 +73,49 @@ export const imageSourceMappings = {
     andersonGlenHole17: andersonGlenHole17,
     andersonGlenHole18: andersonGlenHole18
 }
+
+// In order of sheet appearance from upload
+export const courses = [
+    {
+        sequence: 1,
+        displayName: "Anderson Glen",
+        courseKey: "andersonGlen",
+        scoreCardHoleAbbreviation: "AG"
+    },
+    {
+        sequence: 2,
+        displayName: "Gilead Highlands",
+        courseKey: "gileadHighlands",
+        scoreCardHoleAbbreviation: "GH"
+    },
+    {
+        sequence: 3,
+        displayName: "Ironwood Valley",
+        courseKey: "ironwoodValley",
+        scoreCardHoleAbbreviation: "V"
+    },
+    {
+        sequence: 4,
+        displayName: "Fort",
+        courseKey: "fort",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 5,
+        displayName: "Coffin",
+        courseKey: "coffin",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 6,
+        displayName: "Ackerman Allen",
+        courseKey: "ackermanAllen",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 7,
+        displayName: "Plum Creek",
+        courseKey: "plumCreek",
+        scoreCardHoleAbbreviation: ""
+    }
+]

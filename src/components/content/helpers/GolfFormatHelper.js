@@ -256,6 +256,38 @@ export const createScrambleRow = (courseInfo, activeRound) => {
     return scrambleRow;
 }
 
+export const createNetRow = (activeRound, course) => {
+    let netRow = [];
+    for (let hole = 1; hole <= 18; hole++) {
+        if (activeRound[`hole${hole}`]) {
+            let backgroundColorClassName = "paddingTopSmall paddingLeftSmall paddingRightSmall paddingBottomSmall borderRadiusSmall";
+            if (activeRound[`hole${hole}`].netScore > course[`hole${hole}`].par + 1) backgroundColorClassName += " backgroundColorBogeyPlus";
+            if (activeRound[`hole${hole}`].netScore === course[`hole${hole}`].par + 1) backgroundColorClassName += " backgroundColorBogey";
+            if (activeRound[`hole${hole}`].netScore === course[`hole${hole}`].par - 1) backgroundColorClassName += " backgroundColorBirdie";
+            if (activeRound[`hole${hole}`].netScore < course[`hole${hole}`].par - 1) backgroundColorClassName += " backgroundColorEagle";
+            if (hole === 9) {
+                netRow.push(
+                    <>
+                        <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall"><span className={backgroundColorClassName}>{activeRound[`hole${hole}`].netScore}</span></TableCell>
+                        <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.netScore}</TableCell>
+                    </>
+                );
+            } else if (hole === 18) {
+                netRow.push(
+                    <>
+                        <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall"><span className={backgroundColorClassName}>{activeRound[`hole${hole}`].netScore}</span></TableCell>
+                        <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.netScore}</TableCell>
+                    </>
+                );
+            } else {
+                netRow.push(<TableCell key={`${hole}-1`} className="textCenter"><span className={backgroundColorClassName}>{activeRound[`hole${hole}`].netScore}</span></TableCell>);
+            }
+        }
+    }
+
+    return netRow;
+}
+
 export const createFairwaysRow = (activeRound) => {
     let fairwaysRow = [];
     for (let hole = 1; hole <= 18; hole++) {
@@ -488,10 +520,9 @@ const createScorecardHoleRow = (activeRound) => {
 }
 
 export const createScorecard = (courseInfo, activeRound, expandScorecard, setExpandScorecard) => {
-    const { course } = activeRound;
-    const courseKey = course === "Anderson Glen" ? courseInfo.andersonGlen : courseInfo.gileadHighlands;
+    const courseKey = courseInfo[activeRound.courseKey];
     return (
-        <Table className="subTable backgroundColorWhite borderRadiusSmall">
+        <Table className={`subTable backgroundColorWhite borderRadiusSmall${activeRound.aceRound ? " backgroundColorEagleGlow" : ""}`}>
             <TableHead>
                 <TableRow>
                     <TableCell key={1} className="golfTableBorderRightSmall"><b>HOLE</b></TableCell>
@@ -501,7 +532,7 @@ export const createScorecard = (courseInfo, activeRound, expandScorecard, setExp
                             return (
                                 <TableCell key={22 + i} className="textCenter">
                                     <b>
-                                        {activeRound.additionalHoles[`additionalHole${i + 1}`].scoreCardHoleAbbreviation} #{activeRound.additionalHoles[`additionalHole${i + 1}`].hole}
+                                        {activeRound.additionalHoles[`additionalHole${i + 1}`].scoreCardHoleAbbreviation} {activeRound.additionalHoles[`additionalHole${i + 1}`].scoreCardHoleAbbreviation !== "" ? "#" : ""}{activeRound.additionalHoles[`additionalHole${i + 1}`].hole}
                                     </b>
                                 </TableCell>
                             );
@@ -524,6 +555,12 @@ export const createScorecard = (courseInfo, activeRound, expandScorecard, setExp
                             <TableRow key={3}>
                                 <TableCell className="golfTableBorderRightSmall">Strokes</TableCell>
                                 {createScrambleRow(courseInfo, activeRound)}
+                            </TableRow>
+                        }
+                        {activeRound.leagueRound && 
+                            <TableRow key={3}>
+                                <TableCell className="golfTableBorderRightSmall">Net</TableCell>
+                                {createNetRow(activeRound, courseKey)}
                             </TableRow>
                         }
                         <TableRow key={4}>
@@ -663,7 +700,7 @@ export const calculateStats = (courseInfo, allRounds) => {
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightSmall">Best cumulative score to par on a single hole -</h3>
-                <h3 className="strongFont">({singleHoleMetrics.bestCumulativeScoreSingle.cumulativeScoreToPar < 0 ? "-" : singleHoleMetrics.bestCumulativeScoreSingle.cumulativeScoreToPar > 0 ? "+" : ""}{singleHoleMetrics.bestCumulativeScoreSingle.cumulativeScoreToPar}) {singleHoleMetrics.bestCumulativeScoreSingle.course} Par {singleHoleMetrics.bestCumulativeScoreSingle.par} Hole {singleHoleMetrics.bestCumulativeScoreSingle.hole} played {singleHoleMetrics.bestCumulativeScoreSingle.rounds} times</h3>
+                <h3 className="strongFont">({singleHoleMetrics.bestCumulativeScoreSingle.cumulativeScoreToPar > 0 ? "+" : ""}{singleHoleMetrics.bestCumulativeScoreSingle.cumulativeScoreToPar}) {singleHoleMetrics.bestCumulativeScoreSingle.course} Par {singleHoleMetrics.bestCumulativeScoreSingle.par} Hole {singleHoleMetrics.bestCumulativeScoreSingle.hole} played {singleHoleMetrics.bestCumulativeScoreSingle.rounds} times</h3>
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightSmall">Worst cumulative score on a single hole -</h3>
@@ -673,13 +710,15 @@ export const calculateStats = (courseInfo, allRounds) => {
             {/* CTP */}
             <h1 className="marginTopExtraLarge marginBottomLarge">Closest to the Pin</h1>
             {Object.keys(singleHoleMetrics.ctp).map((hole) => {
-                const ctp = singleHoleMetrics.ctp[hole]
-                return (
-                    <div className="flexRow alignCenter marginBottomSmall">
-                        <h3 className="marginRightSmall">{ctp.course} {ctp.hole} ({ctp.distance} yards) -</h3>
-                        <h3 className="strongFont">{ctp.dth} feet ({ctp.date} Score: {ctp.score})</h3>
-                    </div>
-                );
+                const ctp = singleHoleMetrics.ctp[hole];
+                if (ctp.course === "Anderson Glen" || ctp.course === "Gilead Highlands") {
+                    return (
+                        <div className="flexRow alignCenter marginBottomSmall">
+                            <h3 className="marginRightSmall">{ctp.course} {ctp.hole} ({ctp.distance} yards) -</h3>
+                            <h3 className="strongFont">{ctp.dth} feet ({ctp.date} Score: {ctp.score})</h3>
+                        </div>
+                    );
+                }
             })}
 
             {/* Miscellaneous Metrics */}
@@ -735,10 +774,12 @@ export const courseSummary = (courseInfo, allRounds, expandSingleHoleMetric, han
 
     return (
         <div className="singleHoleMetricContainer flexFlowRowWrap marginBottomExtraLarge justifyCenter">
-            {Object.keys(singleHoleMetrics).sort(function(a,b) {return (singleHoleMetrics[a].courseKey > singleHoleMetrics[b].courseKey) ? 1 : ((singleHoleMetrics[b].courseKey > singleHoleMetrics[a].courseKey) ? -1 : 0);} ).map((hole) => {
+            {Object.keys(singleHoleMetrics).sort(function(a,b) {return (singleHoleMetrics[a].courseKey > singleHoleMetrics[b].courseKey || (singleHoleMetrics[a].hole > singleHoleMetrics[b].courseKey && singleHoleMetrics[a].hole < singleHoleMetrics[b].courseKey)) ? 1 : ((singleHoleMetrics[b].courseKey > singleHoleMetrics[a].courseKey) ? -1 : 0);} ).map((hole) => {
                 if (!nonHoleMetrics.includes(hole)) { // Not actually holes
+                    const holeSummaryRef = React.createRef();
+                    const executeScroll = () => holeSummaryRef.current.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
                     return (
-                        <div className={`holeData flexRow${expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? " expanded" : ""}`} key={hole}>
+                        <div ref={holeSummaryRef} id={hole.key} className={`holeData flexRow${expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? " expanded" : ""}`} key={hole.key}>
                             <img src={imageSourceMappings[hole]} style={{ height: `${expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? "700px" : "476px"}`, marginRight: "8px", borderTopLeftRadius: "12px", borderBottomLeftRadius: "12px" }} alt={`${hole}SingleHoleMetric`} />
                             <div className="flexRow width100Percent justifySpaceAround">
                                 {expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole &&
@@ -782,7 +823,7 @@ export const courseSummary = (courseInfo, allRounds, expandSingleHoleMetric, han
                                             <p className="flexRow justifySpaceBetween"><span>Pars: </span> <b>{singleHoleMetrics[hole].numPars}</b></p>
                                             <p className="flexRow justifySpaceBetween"><span>Bogey: </span> <b>{singleHoleMetrics[hole].numBogeys}</b></p>
                                             <p className="flexRow justifySpaceBetween"><span>Bogey+: </span> <b>{singleHoleMetrics[hole].numBogeyPlus}</b></p>
-                                            <p className="flexRow justifySpaceBetween marginTopSmall paddingTopExtraSmall" style={{ borderTop: "1px solid white" }}><span>Cumulative Score: </span> <b>{singleHoleMetrics[hole].cumulativeScoreToPar > 0 ? `+${singleHoleMetrics[hole].cumulativeScoreToPar}` : singleHoleMetrics[hole].cumulativeScoreToPar < 0 ? `-${singleHoleMetrics[hole].cumulativeScoreToPar}` : singleHoleMetrics[hole].cumulativeScoreToPar}</b></p>
+                                            <p className="flexRow justifySpaceBetween marginTopSmall paddingTopExtraSmall" style={{ borderTop: "1px solid white" }}><span>Cumulative Score: </span> <b>{singleHoleMetrics[hole].cumulativeScoreToPar > 0 ? `+${singleHoleMetrics[hole].cumulativeScoreToPar}` : singleHoleMetrics[hole].cumulativeScoreToPar}</b></p>
                                         </div>
                                         <div className="flexColumn marginTopSmall marginBottomExtraSmall">
                                             <h3>Cumulative Metrics</h3>
@@ -830,13 +871,12 @@ export const courseSummary = (courseInfo, allRounds, expandSingleHoleMetric, han
                                             </div>
                                         }
                                     </div>
-                                    {/* <span className="cursorPointer marginBottomSmall" style={{ alignSelf: "flex-end" }} onClick={() => handleSetExpandSingleHoleMetric(hole)}>{expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? "Collapse" : "Expand"}</span> */}
                                 </div>
                             </div>
-                            <span className="cursorPointer marginBottomSmall" style={{ width: "0", position: "relative", top: expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? "670px" : "452px", right: "60px" }} onClick={() => handleSetExpandSingleHoleMetric(hole)}>{expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? "Collapse" : "Expand"}</span>
+                            <span className="cursorPointer marginBottomSmall" style={{ width: "0", position: "relative", top: expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? "670px" : "452px", right: "60px" }} onClick={() => { executeScroll(); handleSetExpandSingleHoleMetric(hole); }}>{expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? "Collapse" : "Expand"}</span>
                         </div>
                     );
-                }
+                } else return null;
             })}
         </div>
     );

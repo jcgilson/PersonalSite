@@ -438,7 +438,8 @@ export const calculateSingleHoleMetrics = (courseInfo, allRounds) => {
 
 export const calculateCourseMetrics = (courseInfo, allRounds) => {
     let courseMetrics = {};
-    for (let course of ["andersonGlen", "gileadHighlands"]) {
+    console.log("courseInfo",courseInfo)
+    for (let course of Object.keys(courseInfo)) {
         courseMetrics[course] = {
             inDate: "",
             in: 100,
@@ -547,24 +548,25 @@ const calculateHandicaps = (courseInfo, handicapRounds) => {
 }
 
 export const calculateHandicapMetrics = (courseInfo, allRounds) => {
-    // 20 most recent rounds contribute to handicap
-    const roundsSortedByDescendingDate = allRounds.sort(function(a,b) {return (a.date < b.date) ? 1 : ((b.date < a.date) ? -1 : 0);} );
+    // 12 most recent rounds contribute to handicap
+    const roundsSortedByDescendingDate = allRounds.sort(function(a,b) {return (a.sequence < b.sequence) ? 1 : ((b.sequence < a.sequence) ? -1 : 0);} );
     let overallHandicapRounds = [];
-    if (roundsSortedByDescendingDate.length <= 20) {
+    
+    if (roundsSortedByDescendingDate.length <= 12) {
         overallHandicapRounds = roundsSortedByDescendingDate;
     } else {
-        for (let i = 0; overallHandicapRounds.length < 20; i++) {
-            if (!roundsSortedByDescendingDate[i].scrambleRound) { // Scramble rounds should not be included in handicap
-                overallHandicapRounds.push(roundsSortedByDescendingDate[i]);
+        for (let i = 0; overallHandicapRounds.length < 12; i++) {
+            if (!roundsSortedByDescendingDate[i].scrambleRound) { // Scramble and non-Blackledge rounds should not be included in handicap
+                if (roundsSortedByDescendingDate[i].courseKey === "andersonGlen" || roundsSortedByDescendingDate[i].courseKey === "gileadHighlands") overallHandicapRounds.push(roundsSortedByDescendingDate[i]);
             }
         }
     }
     let andersonGlenHandicapRounds = [];
     let gileadHighlandsHandicapRounds = [];
-    for (let i = 0; andersonGlenHandicapRounds.length < 20 && roundsSortedByDescendingDate[i]; i++) {
+    for (let i = 0; andersonGlenHandicapRounds.length < 12 && roundsSortedByDescendingDate[i]; i++) {
         if (roundsSortedByDescendingDate[i].courseKey === "andersonGlen") andersonGlenHandicapRounds.push(roundsSortedByDescendingDate[i])
     }
-    for (let i = 0; gileadHighlandsHandicapRounds.length < 20 && roundsSortedByDescendingDate[i]; i++) {
+    for (let i = 0; gileadHighlandsHandicapRounds.length < 12 && roundsSortedByDescendingDate[i]; i++) {
         if (roundsSortedByDescendingDate[i].courseKey === "gileadHighlands") gileadHighlandsHandicapRounds.push(roundsSortedByDescendingDate[i])
     }
 
