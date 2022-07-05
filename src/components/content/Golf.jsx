@@ -12,7 +12,7 @@ import {
 import "../common/shared.css"
 // Helpers
 import {
-    calculateFairways, calculateGreens, calculatePuttLength, createScorecard, calculateStats, courseSummary
+    calculateFairways, calculateGreens, calculatePuttLengths, calculateDthAndDtgTotals, createScorecard, calculateStats, courseSummary
 } from "./helpers/GolfFormatHelper";
 import { courses } from "./helpers/GolfConsts";
 // Images
@@ -37,7 +37,6 @@ const Golf = () => {
      * 
      * 
      * 
-     * 
      */
 
     const [displayUploadButton, setDisplayUploadButton] = useState(true);
@@ -50,6 +49,7 @@ const Golf = () => {
     const [displaySubtable, setDisplaySubtable] = useState(false);
     const [expandScorecard, setExpandScorecard] = useState(false);
     const [expandSingleHoleMetric, setExpandSingleHoleMetric] = useState({ hole: "", expanded: false })
+    const [puttingData, setPuttingData] = useState({})
 
     const fileInputRef = useRef(null);
 
@@ -74,7 +74,6 @@ const Golf = () => {
             const buffer = reader.result;
             excel.xlsx.load(buffer)
                 .then(wkbk => {
-                    // let workSheets = [];
                     let courseData = {
                         // Sample course data:
                         // andersonGlen: {
@@ -103,11 +102,6 @@ const Golf = () => {
                             courseData[course.courseKey][`hole${hole}`].par = workSheetData[column];
                             courseData[course.courseKey][`hole${hole}`].distance = workSheetData[column + 1];
                             courseData[course.courseKey][`hole${hole}`].handicap = workSheetData[column + 2];
-                            // courseData[course.courseKey][`hole${hole}`] = {
-                            //     par: workSheetData[column],
-                            //     distance: workSheetData[column + 1],
-                            //     handicap: workSheetData[column + 2]
-                            // };
 
                             // F9/B9 Yardage and Par
                             if (hole <= 9) {
@@ -135,130 +129,16 @@ const Golf = () => {
                         courseData[course.courseKey].yardage = courseData[course.courseKey].f9Yardage + courseData[course.courseKey].b9Yardage;
                     }
 
-                    // const andersonGlen = wkbk.getWorksheet('Anderson Glen'); - line 77
-                    // const gileadHighlands = wkbk.getWorksheet('Gilead Highlands');
-                    // const ironwoodValley = wkbk.getWorksheet('Ironwood Valley');
-                    // const fort = wkbk.getWorksheet('Fort');
-                    // const coffin = wkbk.getWorksheet('Coffin');
-                    // const ackermanAllen = wkbk.getWorksheet('Ackerman Allen');
-                    // const plumCreek = wkbk.getWorksheet('Plum Creek');
-
-                    // let courseData = {}
-                    // for (let course of courseData) {
-                    //     courseData.
-                    // }
-
-                    // Course Info
-                    // const andersonGlenCourseData = andersonGlen.getRow(40).values; - line 78
-                    // const gileadHighlandsCourseData = gileadHighlands.getRow(40).values;
-                    // const ironwoodValleyCourseData = ironwoodValley.getRow(40).values;
-                    // const fortCourseData = fort.getRow(40).values;
-                    // const coffinCourseData = coffin.getRow(40).values;
-                    // const ackermanAllenCourseData = ackermanAllen.getRow(40).values;
-                    // const plumCreekCourseData = plumCreek.getRow(40).values;
-
-                    // let formattedAndersonGlenData = {};
-                    // let formattedGileadHighlandsData = {};
-                    // let formattedIronwoodValleyData = {};
-                    // let formattedFortData = {};
-                    // let formattedCoffinData = {};
-                    // let formattedAckermanAllenData = {};
-                    // let formattedPlumCreekData = {};
-                    // let column = 2; // Data starts in column 2
-
-                    // for (let hole = 1; hole <= 18; hole++ ) {
-                    //     formattedAndersonGlenData[`hole${hole}`] = {};
-                    //     formattedAndersonGlenData[`hole${hole}`].par = andersonGlenCourseData[column];
-                    //     formattedAndersonGlenData[`hole${hole}`].distance = andersonGlenCourseData[column + 1];
-                    //     formattedAndersonGlenData[`hole${hole}`].handicap = andersonGlenCourseData[column + 2];
-
-                    //     // formattedGileadHighlandsData[`hole${hole}`] = {};
-                    //     // formattedGileadHighlandsData[`hole${hole}`].par = gileadHighlandsCourseData[column];
-                    //     // formattedGileadHighlandsData[`hole${hole}`].distance = gileadHighlandsCourseData[column + 1];
-                    //     // formattedGileadHighlandsData[`hole${hole}`].handicap = gileadHighlandsCourseData[column + 2];
-
-                    //     // formattedIronwoodValleyData[`hole${hole}`] = {};
-                    //     // formattedIronwoodValleyData[`hole${hole}`].par = ironwoodValleyCourseData[column];
-                    //     // formattedIronwoodValleyData[`hole${hole}`].distance = ironwoodValleyCourseData[column + 1];
-                    //     // formattedIronwoodValleyData[`hole${hole}`].handicap = ironwoodValleyCourseData[column + 2];
-
-                    //     // formattedFortData[`hole${hole}`] = {};
-                    //     // formattedFortData[`hole${hole}`].par = fortCourseData[column];
-                    //     // formattedFortData[`hole${hole}`].distance = fortCourseData[column + 1];
-                    //     // formattedFortData[`hole${hole}`].handicap = fortCourseData[column + 2];
-
-                    //     // formattedCoffinoffinData[`hole${hole}`] = {};
-                    //     // formattedCoffinoffinData[`hole${hole}`].par = coffinCourseData[column];
-                    //     // formattedCoffinoffinData[`hole${hole}`].distance = coffinCourseData[column + 1];
-                    //     // formattedCoffinoffinData[`hole${hole}`].handicap = coffinCourseData[column + 2];
-
-                    //     // formattedAckermanAllenData[`hole${hole}`] = {};
-                    //     // formattedAckermanAllenData[`hole${hole}`].par = ackermanAllenCourseData[column];
-                    //     // formattedAckermanAllenData[`hole${hole}`].distance = ackermanAllenCourseData[column + 1];
-                    //     // formattedAckermanAllenData[`hole${hole}`].handicap = ackermanAllenCourseData[column + 2];
-
-                    //     // formattedPlumCreekData[`hole${hole}`] = {};
-                    //     // formattedPlumCreekData[`hole${hole}`].par = plumCreekCourseData[column];
-                    //     // formattedPlumCreekData[`hole${hole}`].distance = plumCreekCourseData[column + 1];
-                    //     // formattedPlumCreekData[`hole${hole}`].handicap = plumCreekCourseData[column + 2];
-
-                    //     // F9/B9 Yardage and Par
-                    //     if (hole <= 9) {
-                    //         if (hole === 1) {
-                    //             formattedAndersonGlenData.f9Par = andersonGlenCourseData[column];
-                    //             formattedAndersonGlenData.f9Yardage = andersonGlenCourseData[column + 1];
-                    //             formattedGileadHighlandsData.f9Par = gileadHighlandsCourseData[column];
-                    //             formattedGileadHighlandsData.f9Yardage = gileadHighlandsCourseData[column + 1];
-                    //             formattedIronwoodValleyData.f9Par = ironwoodValleyCourseData[column];
-                    //             formattedIronwoodValleyData.f9Yardage = ironwoodValleyCourseData[column + 1];
-                    //         } else {
-                    //             formattedAndersonGlenData.f9Par += andersonGlenCourseData[column];
-                    //             formattedAndersonGlenData.f9Yardage += andersonGlenCourseData[column + 1];
-                    //             formattedGileadHighlandsData.f9Par += gileadHighlandsCourseData[column];
-                    //             formattedGileadHighlandsData.f9Yardage += gileadHighlandsCourseData[column + 1];
-                    //             formattedIronwoodValleyData.f9Par += ironwoodValleyCourseData[column];
-                    //             formattedIronwoodValleyData.f9Yardage += ironwoodValleyCourseData[column + 1];
-                    //         }
-                    //     } else {
-                    //         if (hole === 10) {
-                    //             formattedAndersonGlenData.b9Par = andersonGlenCourseData[column];
-                    //             formattedAndersonGlenData.b9Yardage = andersonGlenCourseData[column + 1];
-                    //             formattedGileadHighlandsData.b9Par = gileadHighlandsCourseData[column];
-                    //             formattedGileadHighlandsData.b9Yardage = gileadHighlandsCourseData[column + 1];
-                    //             formattedIronwoodValleyData.b9Par = ironwoodValleyCourseData[column];
-                    //             formattedIronwoodValleyData.b9Yardage = ironwoodValleyCourseData[column + 1];
-                    //         } else {
-                    //             formattedAndersonGlenData.b9Par += andersonGlenCourseData[column];
-                    //             formattedAndersonGlenData.b9Yardage += andersonGlenCourseData[column + 1];
-                    //             formattedGileadHighlandsData.b9Par += gileadHighlandsCourseData[column];
-                    //             formattedGileadHighlandsData.b9Yardage += gileadHighlandsCourseData[column + 1];
-                    //             formattedIronwoodValleyData.b9Par += ironwoodValleyCourseData[column];
-                    //             formattedIronwoodValleyData.b9Yardage += ironwoodValleyCourseData[column + 1];
-                    //         }
-                    //     }
-
-                    //     // Total par and yardages
-                    //     formattedAndersonGlenData.par = formattedAndersonGlenData.f9Par + formattedAndersonGlenData.b9Par;
-                    //     formattedAndersonGlenData.yardage = formattedAndersonGlenData.f9Yardage + formattedAndersonGlenData.b9Yardage;
-                    //     formattedGileadHighlandsData.par = formattedGileadHighlandsData.f9Par + formattedGileadHighlandsData.b9Par;
-                    //     formattedGileadHighlandsData.yardage = formattedGileadHighlandsData.f9Yardage + formattedGileadHighlandsData.b9Yardage;
-                    //     formattedIronwoodValleyData.par = formattedIronwoodValleyData.f9Par + formattedIronwoodValleyData.b9Par;
-                    //     formattedIronwoodValleyData.yardage = formattedIronwoodValleyData.f9Yardage + formattedIronwoodValleyData.b9Yardage;
-
-                    //     column = column + 7; // Skip empty columns
-                    // }
-
-                    console.log("workSheets",workSheets)
-                    console.log("courseData",courseData)
-                    // const courses = [andersonGlen, gileadHighlands, ironwoodValley];
-                    let allRounds = []
+                    let allPutts = [];
+                    let allHoles = [];
+                    let allRounds = [];
                     for (let course of courses) {
-                        console.log("course.courseKey",course.courseKey)
-                        console.log("workSheets[course.courseKey]",workSheets[course.courseKey])
                         workSheets[course.courseKey].eachRow((row, rowNumber) => {
                             if (rowNumber > 1 && rowNumber < 39) { // Excel data starts on row 2
+                                // Round data
                                 const row = workSheets[course.courseKey].getRow(rowNumber).values;
                                 let roundData = {
+                                    // Round details
                                     sequence: parseInt(row[1].split("\n")[row[1].split("\n").length - 1]),
                                     key: `${course.courseKey}${rowNumber - 1}`,
                                     course: course.displayName,
@@ -268,6 +148,7 @@ const Golf = () => {
                                     scrambleRound: row[1].split("\n").includes("Scramble"),
                                     leagueRound: row[1].split("\n").includes("League"),
                                     numHoles: 0,
+                                    // Round metrics
                                     f9Putts: 0,
                                     b9Putts: 0,
                                     putts: 0,
@@ -276,6 +157,14 @@ const Golf = () => {
                                     out: 0,
                                     in: 0,
                                     total: 0,
+                                    // DTG, FPM, DTH for averages
+                                    dtgF9Total: 0,
+                                    fpmF9Total: 0,
+                                    dthF9Total: 0,
+                                    dtgB9Total: 0,
+                                    fpmB9Total: 0,
+                                    dthB9Total: 0,
+                                    // Cumulative scores
                                     numEagles: 0,
                                     numBirdies: 0,
                                     numPar: 0,
@@ -291,35 +180,7 @@ const Golf = () => {
                                         roundData.numHoles++;
 
                                         let score = (roundData.scrambleRound || (roundData.leagueRound && typeof row[columnCount] === 'string'))? parseInt(row[columnCount].split(", ")[0]) : row[columnCount];
-                                        // if (courses[course].name === "Anderson Glen") {
-                                        //     if (formattedAndersonGlenData[`hole${hole}`].par >= score + 2) { // Eagle
-                                        //         if (score === 1) roundData.aceRound = true;
-                                        //         roundData.numEagles++;
-                                        //     }
-                                        //     if (formattedAndersonGlenData[`hole${hole}`].par === score + 1) roundData.numBirdies++; // Birdie
-                                        //     if (formattedAndersonGlenData[`hole${hole}`].par === score) roundData.numPar++; // Par
-                                        //     if (formattedAndersonGlenData[`hole${hole}`].par === score - 1) roundData.numBogey++; // Bogey
-                                        //     if (formattedAndersonGlenData[`hole${hole}`].par <= score - 2) roundData.numBogeyPlus++; // Bogey Plus
-                                        // } else if (courses[course].name === "Gilead Highlands") {
-                                        //     if (formattedGileadHighlandsData[`hole${hole}`].par >= score + 2) { // Eagle
-                                        //         if (score === 1) roundData.aceRound = true;
-                                        //         roundData.numEagles++;
-                                        //     }
-                                        //     if (formattedGileadHighlandsData[`hole${hole}`].par === score + 1) roundData.numBirdies++; // Birdie
-                                        //     if (formattedGileadHighlandsData[`hole${hole}`].par === score) roundData.numPar++; // Par
-                                        //     if (formattedGileadHighlandsData[`hole${hole}`].par === score - 1) roundData.numBogey++; // Bogey
-                                        //     if (formattedGileadHighlandsData[`hole${hole}`].par <= score - 2) roundData.numBogeyPlus++; // Bogey Plus    
-                                        // } else {
-                                        //     if (formattedIronwoodValleyData[`hole${hole}`].par >= score + 2) { // Eagle
-                                        //         if (score === 1) roundData.aceRound = true;
-                                        //         roundData.numEagles++;
-                                        //     }
-                                        //     if (formattedIronwoodValleyData[`hole${hole}`].par === score + 1) roundData.numBirdies++; // Birdie
-                                        //     if (formattedIronwoodValleyData[`hole${hole}`].par === score) roundData.numPar++; // Par
-                                        //     if (formattedIronwoodValleyData[`hole${hole}`].par === score - 1) roundData.numBogey++; // Bogey
-                                        //     if (formattedIronwoodValleyData[`hole${hole}`].par <= score - 2) roundData.numBogeyPlus++; // Bogey Plus    
-                                        // }
-
+                                        
                                         if (courseData[course.courseKey][`hole${hole}`].par >= score + 2) { // Eagle
                                             if (score === 1) roundData.aceRound = true;
                                             roundData.numEagles++;
@@ -329,20 +190,36 @@ const Golf = () => {
                                         if (courseData[course.courseKey][`hole${hole}`].par === score - 1) roundData.numBogey++; // Bogey
                                         if (courseData[course.courseKey][`hole${hole}`].par <= score - 2) roundData.numBogeyPlus++; // Bogey Plus
 
+                                        // Single hole data
                                         roundData[`hole${hole}`] = {
                                             score: score,
                                             putts: row[columnCount + 1],
                                             fir: row[columnCount + 2],
                                             gir: row[columnCount + 3],
                                             dtg: row[columnCount + 4],
+                                            // dtg: typeof row[columnCount + 4] === "number" ? row[columnCount + 4] : parseInt(row[columnCount + 4].split(", ")[1]), // Uses number closest to green
                                             dth: typeof row[columnCount + 5] === "number" ? row[columnCount + 5] : parseInt(row[columnCount + 5].split(", ")[0]),
+                                            // dth: row[columnCount + 5],
                                             puttLength: typeof row[columnCount + 5] === "number" ? row[columnCount + 5] : parseInt(row[columnCount + 5].split(", ")[row[columnCount + 5].split(", ").length - 1]),
                                             notes: row[columnCount + 6] ? row[columnCount + 6] : ""
                                         }
 
+                                        if ((roundData.sequence > 8 || row[columnCount + 1] === 0 || row[columnCount + 1] === 1) && !roundData.scrambleRound && !roundData.leagueRound) {
+                                            allPutts.push({
+                                                round: `${course.courseKey}${rowNumber - 1}`,
+                                                date: row[1].split("\n")[0],
+                                                putts: row[columnCount + 1],
+                                                dth: typeof row[columnCount + 5] === "number" ? row[columnCount + 5] : parseInt(row[columnCount + 5].split(", ")[0]),
+                                                fpm: typeof row[columnCount + 5] === "number" ? row[columnCount + 5] : parseInt(row[columnCount + 5].split(", ")[1]),
+                                            });
+                                        }
+
+                                        // Scramble rounds
                                         if (roundData.scrambleRound) {
                                             roundData[`hole${hole}`].scrambleString = row[columnCount].split(", ")[1];
                                         }
+
+                                        // League rounds
                                         if (roundData.leagueRound) {
                                             if (typeof row[columnCount] === 'string') {
                                                 roundData.netScore = roundData.netScore + parseInt(row[columnCount].split(", ")[1]);
@@ -353,9 +230,14 @@ const Golf = () => {
                                             }
                                         }
 
+                                        // F9/B9 data
                                         if (hole < 10) {
                                             roundData.out = roundData.out + score;
                                             roundData.f9Putts = roundData.f9Putts + row[columnCount + 1];
+                                            // // DTG, FPM, DTH totals for averages (DTG uses number closest to green)
+                                            // roundData.dtgF9Total = roundData.dtgF9Total + (typeof row[columnCount + 4] === "number" ? row[columnCount + 4] : parseInt(row[columnCount + 4].split(", ")[1]));
+                                            // roundData.fpmF9Total = roundData.fpmF9Total + (typeof row[columnCount + 5] === "number" ? row[columnCount + 5] : parseInt(row[columnCount + 5].split(", ")[row[columnCount + 5].split(", ").length - 1]));
+                                            // roundData.dthF9Total = roundData.dthF9Total + (typeof row[columnCount + 5] === "number" ? row[columnCount + 5] : parseInt(row[columnCount + 5].split(", ")[0]));
                                         } else {
                                             roundData.in = roundData.in + score;
                                             roundData.b9Putts = roundData.b9Putts + row[columnCount + 1];
@@ -364,7 +246,6 @@ const Golf = () => {
                                         roundData.putts = roundData.putts + row[columnCount + 1];
 
                                         // CTP for Par 3's (first 8 rounds)
-                                        // const isPar3 = courses[course].name === "Anderson Glen" ? formattedAndersonGlenData[`hole${hole}`].par === 3 : courses[course].name === "Gilead Highlands" ? formattedGileadHighlandsData[`hole${hole}`].par === 3 : formattedIronwoodValleyData[`hole${hole}`].par === 3;
                                         const isPar3 = courseData[course.courseKey][`hole${hole}`].par === 3;
                                         if (
                                             isPar3 &&
@@ -389,12 +270,8 @@ const Golf = () => {
                                         if (row[columnCount]) {
                                             roundData.additionalHoles[`additionalHole${holeCount}`] = {
                                                 course: row[columnCount],
-                                                // courseKey: row[columnCount] === "Anderson Glen" ? "andersonGlen" : row[columnCount] === "Gilead Highlands" ? "gileadHighlands" : "ironwoodValley",
                                                 courseKey: course.courseKey,
-                                                // scoreCardHoleAbbreviation: row[columnCount] === "Anderson Glen" ? "AG" : row[columnCount] === "Gilead Highlands" ? "GH" : "IV",
                                                 scoreCardHoleAbbreviation: courses.find(course => course.displayName === row[columnCount]).scoreCardHoleAbbreviation,
-                                                // row[columnCount] === "Anderson Glen" ? "AG" : row[columnCount] === "Gilead Highlands" ? "GH" : "IV",
-
                                                 hole: row[columnCount + 1],
                                                 score: row[columnCount + 2],
                                                 putts: row[columnCount + 3],
@@ -409,30 +286,35 @@ const Golf = () => {
                                             holeCount++;
                                         }
                                     }
-                                    console.log("roundData.additionalHoles",roundData.additionalHoles)
                                 }
-
     
+                                // Cumulative data
                                 const fairways = calculateFairways(roundData);
                                 roundData.fairways = fairways;
     
                                 const greens = calculateGreens(roundData);
                                 roundData.greens = greens;
     
-                                const puttLength = calculatePuttLength(roundData);
-                                roundData.puttLength = puttLength;
-    
+                                const puttLengths = calculatePuttLengths(roundData);
+                                roundData.puttLengthTotal = puttLengths.total;
+                                roundData.puttLengthF9 = puttLengths.f9;
+                                roundData.puttLengthB9 = puttLengths.b9;
+
+                                const dthAndDtgTotals = calculateDthAndDtgTotals(roundData);
+                                roundData.dthTotal = dthAndDtgTotals.dthTotals.total;
+                                roundData.dthF9 = dthAndDtgTotals.dthTotals.f9;
+                                roundData.dthB9 = dthAndDtgTotals.dthTotals.b9;
+                                roundData.dtgTotal = dthAndDtgTotals.dtgTotals.total;
+                                roundData.dtgF9 = dthAndDtgTotals.dtgTotals.f9;
+                                roundData.dtgB9 = dthAndDtgTotals.dtgTotals.b9;
+
                                 allRounds.push(roundData);
                             }
                         });
                     }
 
-                    // setCourseInfo({
-                    //     andersonGlen: formattedAndersonGlenData,
-                    //     gileadHighlands: formattedGileadHighlandsData,
-                    //     ironwoodValley: formattedIronwoodValleyData
-                    // });
                     setCourseInfo(courseData);
+                    setPuttingData(allPutts);
 
                     allRounds.sort(function(a,b) {return (a.sequence > b.sequence) ? 1 : ((b.sequence > a.sequence) ? -1 : 0);} );
                     setAllRounds(allRounds);
@@ -441,8 +323,6 @@ const Golf = () => {
         setDisplayUploadButton(false);
         setIsLoading(false);
     }
-
-    console.log("courseinfo",courseInfo)
 
     const displayDefaultTable = allRounds.length !== 0;
 
@@ -550,7 +430,7 @@ const Golf = () => {
                                             <TableCell key={5}>{round.putts}</TableCell>
                                             <TableCell key={6}>{round.fairways.f}</TableCell>
                                             <TableCell key={7}>{round.greens.g + round.greens.gur}</TableCell>
-                                            <TableCell key={8}>{round.puttLength}</TableCell>
+                                            <TableCell key={8}>{round.puttLengthTotal}</TableCell>
                                             <TableCell key={9}>{round.numBirdies + round.numEagles}</TableCell>
                                             <TableCell key={10}>{round.numBogeyPlus}</TableCell>
                                         </TableRow>
@@ -573,7 +453,7 @@ const Golf = () => {
             {/* Metrics */}
             {!displayUploadButton && activeTable === "Metrics" &&
                 <div className="marginTopMedium">
-                    {calculateStats(courseInfo, allRounds)}
+                    {calculateStats(courseInfo, allRounds, puttingData)}
                 </div>        
             }
 
@@ -593,13 +473,13 @@ const Golf = () => {
                     <div className="flexRow marginTopMassive">
                         <div className="sectionBorder">
                             <h1>Enter Scorecards</h1>
-                            <img src={scorecard} style={{ width: "400px", marginTop: "8px" }} alt="Scorecard" />
+                            <img src={scorecard} style={{ width: "400px", marginTop: "48px" }} alt="Scorecard" />
                         </div>
                         <div className="sectionBorder">
-                            <h1 className="sectionBorder">Single Hole Metrics</h1>
+                            <h1>Single Hole Metrics</h1>
                             <img src={singleHoleMetrics} style={{ width: "400px", marginTop: "8px" }} alt="Single Hole Metrics" />
                         </div>
-                        <div className="sectionBorder">
+                        <div>
                             <h1 className="sectionBorder">Explore Course Tour</h1>
                         </div>
                     </div>

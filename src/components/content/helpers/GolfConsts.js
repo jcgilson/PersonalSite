@@ -117,5 +117,17 @@ export const courses = [
         displayName: "Plum Creek",
         courseKey: "plumCreek",
         scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 8,
+        displayName: "Buena Vista",
+        courseKey: "buenaVista",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 9,
+        displayName: "Rockledge",
+        courseKey: "rockledge",
+        scoreCardHoleAbbreviation: ""
     }
 ]

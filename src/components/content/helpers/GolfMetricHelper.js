@@ -575,3 +575,125 @@ export const calculateHandicapMetrics = (courseInfo, allRounds) => {
 
     return handicapsData;
 }
+
+export const calculateDrivingMetrics = (courseInfo, allRounds) => {
+    let drivingMetrics = {
+        notInRangeOfGreen: { lowerBound: 0, upperBound: 0, customTitle: "Not in range of green", f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 },
+        lessThan200: { lowerBound: 1, upperBound: 199, customTitle: "< 200", f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 }, // Tops & lay-ups
+        between200and220: { lowerBound: 200, upperBound: 220, f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 },
+        between221and240: { lowerBound: 221, upperBound: 240, f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 },
+        between241and260: { lowerBound: 241, upperBound: 260, f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 },
+        between261and280: { lowerBound: 261, upperBound: 280, f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 },
+        between281and300: { lowerBound: 281, upperBound: 300, f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 },
+        greaterThan300: { lowerBound: 300, upperBound: 1000, customTitle: "300+", f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 },
+        total: { lowerBound: 1000, upperBound: 1000, customTitle: "Total", f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 }
+    };
+
+    for (let round of allRounds) {
+        if (!round.leagueRound && !round.scrambleRound) { // Do not include League & Scramble rounds because of hole distances
+            let individualCourseData = courseInfo[round.courseKey];
+            for (let hole = 1; hole <= 18; hole++ ) {
+                if (round[`hole${hole}`]) {
+                    if (round[`hole${hole}`].fir !== "NA") { // Exclude par 3's
+                        drivingMetrics.total[round[`hole${hole}`].fir.toLowerCase()]++;
+                        drivingMetrics.total.total++;
+
+                        let dtgForCalculation = 1000;
+                        if (
+                            individualCourseData[`hole${hole}`].par === 4 // Par 4 DTG
+                            || (individualCourseData[`hole${hole}`].par === 5 && round[`hole${hole}`].gir === "G-1") // Par 5 G-1
+                        ) {
+                            dtgForCalculation = parseInt(round[`hole${hole}`].dtg); // Use raw DTG
+                        } else {
+                            if (individualCourseData[`hole${hole}`].par === 5 && typeof round[`hole${hole}`].dtg === "string") { // DTG recorded after drive and approach
+                                dtgForCalculation = parseInt(round[`hole${hole}`].dtg.split(", ")[0]); // Use first DTG value in array
+                            }
+                        }
+
+                        if (dtgForCalculation === 1000) { // Not in range of green, cannot calculate driving distance
+                            drivingMetrics.notInRangeOfGreen[round[`hole${hole}`].fir.toLowerCase()]++;
+                            drivingMetrics.notInRangeOfGreen.total++;
+                            if (round[`hole${hole}`].gir === "G-1" || round[`hole${hole}`].gir === "G") {
+                                drivingMetrics.notInRangeOfGreen[`${round[`hole${hole}`].fir.toLowerCase()}Gir`]++;
+                            }
+                        } else {
+                            const driveDistance = parseInt(individualCourseData[`hole${hole}`].distance) - dtgForCalculation;
+                            
+                            let drivingMetricRange = "";
+                            if (driveDistance < 200) { drivingMetricRange = "lessThan200"; } else {
+                            if (220 > driveDistance && driveDistance >= 200) { drivingMetricRange = "between200and220"; } else {
+                            if (240 > driveDistance && driveDistance >= 220) { drivingMetricRange = "between221and240"; } else { 
+                            if (260 > driveDistance && driveDistance >= 240) { drivingMetricRange = "between241and260"; } else { 
+                            if (280 > driveDistance && driveDistance >= 260) { drivingMetricRange = "between261and280"; } else {
+                            if (300 > driveDistance && driveDistance >= 280) { drivingMetricRange = "between281and300"; } else {
+                            if (driveDistance >= 300) { drivingMetricRange = "greaterThan300"; }}}}}}}
+
+                            if (drivingMetricRange === "") {
+                                console.log(`INVALID DTG VALUE FOR ROUND ${round.key.toUpperCase()}, HOLE ${hole}:`, round[`hole${hole}`].dtg);
+                            } else {
+                                drivingMetrics[drivingMetricRange][round[`hole${hole}`].fir.toLowerCase()]++;
+                                drivingMetrics[drivingMetricRange].total++;
+                                if (round[`hole${hole}`].gir === "G-1" || round[`hole${hole}`].gir === "G") {
+                                    drivingMetrics[drivingMetricRange][`${round[`hole${hole}`].fir.toLowerCase()}Gir`]++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return drivingMetrics;
+}
+
+export const calculatePuttingMetrics = (puttingData) => {
+    // Sample putt = {
+    //     round,
+    //     date,
+    //     putts,
+    //     dth,
+    //     fpm
+    // }
+
+    const puttingMetrics = {
+        totalPutts: 0,
+        makeByDistance: {
+            // from3: {
+            //     distance: 3,
+            //     totalPutts: 7,
+            //     num0Putts: 0,
+            //     num1Putts: 2,
+            //     num2Putts: 4,
+            //     num3Putts: 1,
+            // }
+        },
+        threePuttByDistance: {},
+        longestPutts: {},
+    };
+
+    console.log("puttingData",puttingData)
+
+    for (let putt of puttingData) {
+        // console.log("putt",putt)
+        if (putt.dth === 0 || putt.dth % 3 === 0) {
+            if (puttingMetrics.makeByDistance[`from${putt.dth}`]) {
+                puttingMetrics.makeByDistance[`from${putt.dth}`][`num${putt.putts}Putts`]++;
+                puttingMetrics.makeByDistance[`from${putt.dth}`].totalPutts++;
+            } else { // Add putt by distance
+                puttingMetrics.makeByDistance[`from${putt.dth}`] = {
+                    distance: putt.dth,
+                    totalPutts: 1,
+                    num0Putts: putt.putts === 0 ? 1 : 0,
+                    num1Putts: putt.putts === 1 ? 1 : 0,
+                    num2Putts: putt.putts === 2 ? 1 : 0,
+                    num3Putts: putt.putts === 3 ? 1 : 0,
+                    num4Putts: putt.putts > 3 ? 1 : 0
+                }
+            }
+            puttingMetrics.totalPutts++;
+        }
+    }
+
+    return puttingMetrics;
+}

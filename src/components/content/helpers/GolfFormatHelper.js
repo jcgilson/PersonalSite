@@ -1,8 +1,11 @@
 import React from "react";
-import { Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
+import { Table, TableHead, TableBody, TableRow, TableCell, Tooltip } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
 import {
     calculateConsecutiveOnePutts, calculateMostPutts, calculateLeastPutts, calculateLargestScoreDisparity,
-    calculateSingleHoleMetrics, calculateCourseMetrics, calculateHandicapMetrics
+    calculateSingleHoleMetrics, calculateCourseMetrics, calculateHandicapMetrics, calculatePuttingMetrics,
+    // calculateApproachMetrics,
+    calculateDrivingMetrics
 } from './GolfMetricHelper';
 // Consts
 import { imageSourceMappings } from "./GolfConsts";
@@ -29,7 +32,7 @@ export const calculateFairways = (round) => {
                         if (round[`hole${hole}`].fir === 'X') fairways.x++; // Short of fairway/topped/out of bounds
                         else {
                             if (round[`hole${hole}`].fir === 'NA') fairways.na++;
-                            else console.log(`INVALID FIR VALUE FOR HOLE ${hole}: `,round[`hole${hole}`].fir);
+                            else console.log(`INVALID FIR VALUE FOR HOLE ${hole}: `, round[`hole${hole}`].fir);
                         }
                     }
                 }
@@ -55,7 +58,7 @@ export const calculateGreens = (round) => {
                 if (round[`hole${hole}`].gir === 'X') greens.x++; // Green missed
                 else {
                     if (round[`hole${hole}`].gir === 'G-1') greens.gur++; // Green under regulation
-                    else console.log(`INVALID GIR VALUE FOR HOLE ${hole}: `,round[`hole${hole}`].gir);
+                    else console.log(`INVALID GIR VALUE FOR HOLE ${hole}: `, round[`hole${hole}`].gir);
                 }
             }
         }
@@ -64,18 +67,62 @@ export const calculateGreens = (round) => {
     return greens;
 }
 
-export const calculatePuttLength = (round) => {
-    let puttLength = 0;
+export const calculatePuttLengths = (round) => {
+    let puttLengths = {
+        total: 0,
+        f9: 0,
+        b9: 0
+    };
     for (let hole = 1; hole <= 18; hole++) {
         if (round[`hole${hole}`]) {
-            puttLength = puttLength + round[`hole${hole}`].puttLength;
+            if (hole < 10) {
+                puttLengths.f9 = puttLengths.f9 + round[`hole${hole}`].puttLength;
+            } else {
+                puttLengths.b9 = puttLengths.b9 + round[`hole${hole}`].puttLength;
+            }
+            puttLengths.total = puttLengths.total + round[`hole${hole}`].puttLength;
             if (typeof round[`hole${hole}`].puttLength !== "number") {
-                console.log(`INVALID PUTT LENGTH VALUE FOR HOLE ${hole}: `,round[`hole${hole}`].puttLength);
+                console.log(`INVALID PUTT LENGTH VALUE FOR HOLE ${hole}: `, round[`hole${hole}`].puttLength);
             }
         }
     }
 
-    return puttLength;
+    return puttLengths;
+}
+
+export const calculateDthAndDtgTotals = (round) => {
+    let dthTotals = {
+        total: 0,
+        f9: 0,
+        b9: 0
+    };
+    let dtgTotals = {
+        total: 0,
+        f9: 0,
+        b9: 0
+    };
+    for (let hole = 1; hole <= 18; hole++) {
+        if (round[`hole${hole}`]) {
+            // console.log("typeof round[`hole${hole}`].dth !== number:",typeof round[`hole${hole}`].dth)
+            if (hole < 10) {
+                dthTotals.f9 = dthTotals.f9 + (typeof round[`hole${hole}`].dth === "number" ? round[`hole${hole}`].gir !== "G-1" ? round[`hole${hole}`].dth : 0 : parseInt(round[`hole${hole}`].dth.split(", ")[1]));
+                dtgTotals.f9 = dtgTotals.f9 + (typeof round[`hole${hole}`].dtg === "number" ? round[`hole${hole}`].dtg : parseInt(round[`hole${hole}`].dtg.split(", ")[round[`hole${hole}`].dtg.split(", ").length - 1]));
+            } else {
+                dthTotals.b9 = dthTotals.b9 + (typeof round[`hole${hole}`].dth === "number" ? round[`hole${hole}`].gir !== "G-1" ? round[`hole${hole}`].dth : 0 : parseInt(round[`hole${hole}`].dth.split(", ")[1]));
+                dtgTotals.b9 = dtgTotals.b9 + (typeof round[`hole${hole}`].dtg === "number" ? round[`hole${hole}`].dtg : parseInt(round[`hole${hole}`].dtg.split(", ")[round[`hole${hole}`].dtg.split(", ").length - 1]));
+            }
+            dthTotals.total = dthTotals.total + (typeof round[`hole${hole}`].dth === "number" ? round[`hole${hole}`].gir !== "G-1" ? round[`hole${hole}`].dth : 0 : parseInt(round[`hole${hole}`].dth.split(", ")[1]));
+            dtgTotals.total = dtgTotals.total + (typeof round[`hole${hole}`].dtg === "number" ? round[`hole${hole}`].dtg : parseInt(round[`hole${hole}`].dtg.split(", ")[round[`hole${hole}`].dtg.split(", ").length - 1]));
+            // if (typeof round[`hole${hole}`].dth !== "number" && ) {
+            //     console.log(`INVALID DTH VALUE FOR HOLE ${hole}: `, round[`hole${hole}`].dth);
+            // }
+            // if (typeof round[`hole${hole}`].dtg !== "number") {
+            //     console.log(`INVALID DTH VALUE FOR HOLE ${hole}: `, round[`hole${hole}`].dth);
+            // }
+        }
+    }
+
+    return { dthTotals, dtgTotals };
 }
 
 export const createParRow = (courseInfo, activeRound) => {
@@ -213,6 +260,7 @@ export const createScrambleRow = (courseInfo, activeRound) => {
     for (let hole = 1; hole <= 18; hole++) {
         if (hole <= 9) {
             for (let stroke in activeRound[`hole${hole}`].scrambleString) {
+                // TODO: break down round by stroke Used X number of drives from Player Y)
                 // if (stroke === 1) {
                 //     if ()
                 // }
@@ -366,15 +414,15 @@ export const createDTGRow = (activeRound) => {
                 dtgRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].dtg}</TableCell>
-                        <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">AVG: {activeRound.f9DTG}</TableCell>
+                        <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">AVG: {(activeRound.dtgF9 / 9).toFixed(1)}</TableCell>
                     </>
                 );
             } else if (hole === 18) {
                 dtgRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].dtg}</TableCell>
-                        <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">AVG: {activeRound.f9DTG}</TableCell>
-                        {activeRound.hole1 && <TableCell key={`${hole}-3`} className="textCenter">AVG: {activeRound.totalDTG}</TableCell>} {/* Display total row only when front 9 is also played */}
+                        <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">AVG: {(activeRound.dtgB9 / 9).toFixed(1)}</TableCell>
+                        {activeRound.hole1 && <TableCell key={`${hole}-3`} className="textCenter">AVG: {(activeRound.dtgTotal / 18).toFixed(1)}</TableCell>} {/* Display total row only when front 9 is also played */}
                     </>
                 );
             } else {
@@ -401,15 +449,15 @@ export const createFPMRow = (activeRound) => {
                 fpmRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].puttLength}</TableCell>
-                        <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.f9PuttTotal} (AVG: {(activeRound.f9PuttTotal / 9).toFixed(1)})</TableCell>
+                        <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.puttLengthF9} (AVG: {(activeRound.puttLengthF9 / 9).toFixed(1)})</TableCell>
                     </>
                 );
             } else if (hole === 18) {
                 fpmRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].puttLength}</TableCell>
-                        <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.b9PuttTotal} (AVG: {(activeRound.b9PuttTotal / 9).toFixed(1)})</TableCell>
-                        {activeRound.hole1 && <TableCell key={`${hole}-3`} className="textCenter">{activeRound.f9PuttTotal + activeRound.b9PuttTotal} (AVG: {((activeRound.f9PuttTotal + activeRound.b9PuttTotal) / 18).toFixed(1)})</TableCell>} {/* Display total row only when front 9 is also played */}
+                        <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.puttLengthB9} (AVG: {(activeRound.puttLengthB9 / 9).toFixed(1)})</TableCell>
+                        {activeRound.hole1 && <TableCell key={`${hole}-3`} className="textCenter">{activeRound.puttLengthF9 + activeRound.puttLengthB9} (AVG: {((activeRound.puttLengthF9 + activeRound.puttLengthB9) / 18).toFixed(1)})</TableCell>} {/* Display total row only when front 9 is also played */}
                     </>
                 );
             } else {
@@ -435,15 +483,15 @@ export const createDTHRow = (activeRound) => {
                 dthRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].dth}</TableCell>
-                        <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.f9PuttTotal} (AVG: {(activeRound.f9PuttTotal / 9).toFixed(1)})</TableCell>
+                        <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.dthF9} (AVG: {(activeRound.dthF9 / 9).toFixed(1)})</TableCell>
                     </>
                 );
             } else if (hole === 18) {
                 dthRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].dth}</TableCell>
-                        <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.b9PuttTotal} (AVG: {(activeRound.b9PuttTotal / 9).toFixed(1)})</TableCell>
-                        {activeRound.hole1 && <TableCell key={`${hole}-3`} className="textCenter">{activeRound.f9PuttTotal + activeRound.b9PuttTotal} (AVG: {((activeRound.f9PuttTotal + activeRound.b9PuttTotal) / 18).toFixed(1)})</TableCell>} {/* Display total row only when front 9 is also played */}
+                        <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.dthB9} (AVG: {(activeRound.dthB9 / 9).toFixed(1)})</TableCell>
+                        {activeRound.hole1 && <TableCell key={`${hole}-3`} className="textCenter">{activeRound.dthF9 + activeRound.dthB9} (AVG: {((activeRound.dthF9 + activeRound.dthB9) / 18).toFixed(1)})</TableCell>} {/* Display total row only when front 9 is also played */}
                     </>
                 );
             } else {
@@ -629,13 +677,146 @@ export const createScorecard = (courseInfo, activeRound, expandScorecard, setExp
     );
 }
 
-export const calculateStats = (courseInfo, allRounds) => {
+export const createDrivingTable = (drivingMetrics) => {
+    const distances = Object.keys(drivingMetrics).sort(function(a,b) { return ( a.lowerBound > b.lowerBound ? 1 : a.lowerBound < b.lowerBound ? -1 : 0); });
+
+    return (
+        <Table className="golfTable subTable backgroundColorWhite borderRadiusSmall">
+            <TableHead>
+                <TableRow>
+                    <TableCell key={1} className="golfTableBorderRightSmall"><b>Distance (yards)</b></TableCell>
+                    <TableCell key={1} className="golfTableBorderRightSmall textCenter flexRow alignCenter"><b>Miscue</b><Tooltip disableFocusListener disableTouchListener title="Top/Layup/Long" placement="top" className="alignCenter"><InfoIcon fontSize="small"/></Tooltip></TableCell> {/* Could condense title to have parentheses for GIR % */}
+                    <TableCell key={1} className="golfTableBorderRightSmall textCenter"><b>Left</b></TableCell>
+                    <TableCell key={1} className="golfTableBorderRightSmall textCenter"><b>FIR</b></TableCell>
+                    <TableCell key={1} className="golfTableBorderRightSmall textCenter"><b>Right</b></TableCell> {/* Add right border */}
+                    <TableCell key={1} className="golfTableBorderRightSmall textCenter"><b>Miscue to GIR %</b></TableCell>
+                    <TableCell key={1} className="golfTableBorderRightSmall textCenter"><b>Left to GIR</b></TableCell>
+                    <TableCell key={1} className="golfTableBorderRightSmall textCenter"><b>FIR to GIR</b></TableCell>
+                    <TableCell key={1} className="golfTableBorderRightSmall textCenter"><b>Right to GIR</b></TableCell> {/* Add right border */}
+                    <TableCell key={1} className="golfTableBorderRightSmall textCenter"><b>Accuracy %</b></TableCell>
+                    <TableCell key={1} className="golfTableBorderRightSmall textCenter"><b>Distribution %</b></TableCell>
+                    <TableCell key={1} className="golfTableBorderRightSmall textCenter"><b>Total</b></TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                {distances.map(distance => {
+                    return (
+                        <TableRow key={distance}>
+                            <TableCell className="golfTableBorderRightSmall"><b>{drivingMetrics[distance].customTitle || `${drivingMetrics[distance].lowerBound} - ${drivingMetrics[distance].upperBound}`}</b></TableCell>
+                            <TableCell className="golfTableBorderRightSmall textCenter">{drivingMetrics[distance].x} ({(drivingMetrics[distance].x / drivingMetrics[distance].total * 100).toFixed(1)})</TableCell>
+                            <TableCell className="golfTableBorderRightSmall textCenter">{drivingMetrics[distance].l} ({(drivingMetrics[distance].l / drivingMetrics[distance].total * 100).toFixed(1)})</TableCell>
+                            <TableCell className="golfTableBorderRightSmall textCenter">{drivingMetrics[distance].f} ({(drivingMetrics[distance].f / drivingMetrics[distance].total * 100).toFixed(1)})</TableCell>
+                            <TableCell className="golfTableBorderRightSmall textCenter">{drivingMetrics[distance].r} ({(drivingMetrics[distance].r / drivingMetrics[distance].total * 100).toFixed(1)})</TableCell> {/* Add right border */}
+                            <TableCell className="golfTableBorderRightSmall textCenter">{drivingMetrics[distance].xGir} ({drivingMetrics[distance].x !== 0 ? (drivingMetrics[distance].xGir / drivingMetrics[distance].x * 100).toFixed(1) : "0.0"})</TableCell> {/* Prevent NaN's when 0 xGir */}
+                            <TableCell className="golfTableBorderRightSmall textCenter">{drivingMetrics[distance].lGir} ({(drivingMetrics[distance].lGir / drivingMetrics[distance].l * 100).toFixed(1)})</TableCell>
+                            <TableCell className="golfTableBorderRightSmall textCenter">{drivingMetrics[distance].fGir} ({(drivingMetrics[distance].fGir / drivingMetrics[distance].f * 100).toFixed(1)})</TableCell>
+                            <TableCell className="golfTableBorderRightSmall textCenter">{drivingMetrics[distance].rGir} ({(drivingMetrics[distance].rGir / drivingMetrics[distance].r * 100).toFixed(1)})</TableCell> {/* Add right border */}
+                            <TableCell className="golfTableBorderRightSmall textCenter">{(drivingMetrics[distance].f / drivingMetrics[distance].total * 100).toFixed(1)}</TableCell>
+                            <TableCell className="golfTableBorderRightSmall textCenter">{(drivingMetrics[distance].total / drivingMetrics.total.total * 100).toFixed(1)}</TableCell>
+                            <TableCell className="golfTableBorderRightSmall textCenter">{drivingMetrics[distance].total}</TableCell>
+                        </TableRow>
+                    );
+                })}
+            </TableBody>
+        </Table>
+    );
+}
+
+export const createPuttingTable = (puttingMetrics) => {
+    const distances = Object.keys(puttingMetrics.makeByDistance).sort(
+        function(a,b) {
+            return (
+                parseInt(a.substring(4, a.length)) > parseInt(b.substring(4, b.length))
+                    ? 1 : (parseInt(a.substring(4, a.length)) < parseInt(b.substring(4, b.length))
+                        ? -1 : 0)
+            );
+        }
+    );
+
+    return (
+        <Table className="golfTable subTable backgroundColorWhite borderRadiusSmall">
+            <TableHead>
+                <TableRow>
+                    <TableCell key={1} className="golfTableBorderRightSmall"><b>Distance (feet)</b></TableCell>
+                    {distances.map(distance => {
+                        return <TableCell key={distance} className="textCenter golfTableBorderRightSmall"><b>{distance.substring(4, distance.length)}</b></TableCell>
+                    })}
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                <TableRow key={1}>
+                    <TableCell className="golfTableBorderRightSmall"><b>Total putts</b></TableCell>
+                    {distances.map(distance => {
+                        return <TableCell key={distance} className="textCenter golfTableBorderRightSmall">{puttingMetrics.makeByDistance[distance].totalPutts}</TableCell>
+                    })}
+                </TableRow>
+                <TableRow key={2}>
+                    <TableCell className="golfTableBorderRightSmall"><b>Distribution by range %</b></TableCell>
+                    {distances.map(distance => {
+                        return <TableCell key={distance} className="textCenter golfTableBorderRightSmall">{(puttingMetrics.makeByDistance[distance].totalPutts / puttingMetrics.totalPutts * 100).toFixed(1)}</TableCell>
+                    })}
+                </TableRow>                
+                <TableRow key={3}>
+                    <TableCell className="golfTableBorderRightSmall"><b>Total made</b></TableCell>
+                    {distances.map(distance => {
+                        return <TableCell key={distance} className="textCenter golfTableBorderRightSmall">{distance === "from0" ? puttingMetrics.makeByDistance[distance].num0Putts : puttingMetrics.makeByDistance[distance].num1Putts}</TableCell>
+                    })}
+                </TableRow>
+                <TableRow key={4}>
+                    <TableCell className="golfTableBorderRightSmall"><b>2-Putts</b></TableCell>
+                    {distances.map(distance => {
+                        return <TableCell key={distance} className="textCenter golfTableBorderRightSmall">{distance === "from0" ? "NA" : puttingMetrics.makeByDistance[distance].num2Putts}</TableCell>
+                    })}
+                </TableRow>
+                <TableRow key={5}>
+                    <TableCell className="golfTableBorderRightSmall"><b>3-Putts</b></TableCell>
+                    {distances.map(distance => {
+                        return <TableCell key={distance} className="textCenter golfTableBorderRightSmall">{distance === "from0" ? "NA" : puttingMetrics.makeByDistance[distance].num3Putts}</TableCell>
+                    })}
+                </TableRow>
+                {/* <TableRow key={6}>
+                    <TableCell className="golfTableBorderRightSmall"><b>4-Putts</b></TableCell>
+                    {distances.map(distance => {
+                        return <TableCell key={distance} className="textCenter golfTableBorderRightSmall">{distance === "from0" ? "NA" : puttingMetrics.makeByDistance[distance].num4Putts}</TableCell>
+                    })}
+                </TableRow> */}
+                <TableRow key={7}>
+                    <TableCell className="golfTableBorderRightSmall"><b>Make %</b></TableCell>
+                    {distances.map(distance => {
+                        return <TableCell key={distance} className="textCenter golfTableBorderRightSmall">{distance === "from0" ? "100" : (puttingMetrics.makeByDistance[distance].num1Putts / puttingMetrics.makeByDistance[distance].totalPutts * 100).toFixed(1)}</TableCell>
+                    })}
+                </TableRow>
+                <TableRow key={8}>
+                    <TableCell className="golfTableBorderRightSmall"><b>2-Putt %</b></TableCell>
+                    {distances.map(distance => {
+                        return <TableCell key={distance} className="textCenter golfTableBorderRightSmall">{distance === "from0" ? "NA" : (puttingMetrics.makeByDistance[distance].num2Putts / puttingMetrics.makeByDistance[distance].totalPutts * 100).toFixed(1)}</TableCell>
+                    })}
+                </TableRow>
+                <TableRow key={9}>
+                    <TableCell className="golfTableBorderRightSmall"><b>3-Putt %</b></TableCell>
+                    {distances.map(distance => {
+                        return <TableCell key={distance} className="textCenter golfTableBorderRightSmall">{distance === "from0" ? "NA" : (puttingMetrics.makeByDistance[distance].num3Putts / puttingMetrics.makeByDistance[distance].totalPutts * 100).toFixed(1)}</TableCell>
+                    })}
+                </TableRow>
+                {/* <TableRow key={10}>
+                    <TableCell className="golfTableBorderRightSmall"><b>4-Putt %</b></TableCell>
+                    {distances.map(distance => {
+                        return <TableCell key={distance} className="textCenter golfTableBorderRightSmall">{distance === "from0" ? "NA" : (puttingMetrics.makeByDistance[distance].num4Putts / puttingMetrics.makeByDistance[distance].totalPutts * 100).toFixed(1)}</TableCell>
+                    })}
+                </TableRow> */}
+            </TableBody>
+        </Table>
+    );
+}
+
+export const calculateStats = (courseInfo, allRounds, puttingData) => {
 
     const singleHoleMetrics = calculateSingleHoleMetrics(courseInfo, allRounds);
     const courseMetrics = calculateCourseMetrics(courseInfo, allRounds);
     const handicapMetrics = calculateHandicapMetrics(courseInfo, allRounds);
-
-    console.log("singleHoleMetrics",singleHoleMetrics)
+    const puttingMetrics = calculatePuttingMetrics(puttingData);
+    // const approachMetrics = calculateApproachMetrics(allRounds); // Import above
+    const drivingMetrics = calculateDrivingMetrics(courseInfo, allRounds);
 
     return (
         <>
@@ -718,6 +899,8 @@ export const calculateStats = (courseInfo, allRounds) => {
                             <h3 className="strongFont">{ctp.dth} feet ({ctp.date} Score: {ctp.score})</h3>
                         </div>
                     );
+                } else {
+                    return null;
                 }
             })}
 
@@ -763,6 +946,18 @@ export const calculateStats = (courseInfo, allRounds) => {
                 <h3 className="marginRightSmall">Most miscues in 9 holes & 18 holes -</h3>
                 
             </div> */}
+
+            {/* Driving */}
+            <h1 className="marginTopExtraLarge marginBottomLarge">Driving</h1>
+            <div className="flexRow alignCenter marginBottomSmall">
+                {createDrivingTable(drivingMetrics)}
+            </div>
+
+            {/* Putting */}
+            <h1 className="marginTopExtraLarge marginBottomLarge">Putting</h1>
+            <div className="flexRow alignCenter marginBottomSmall">
+                {createPuttingTable(puttingMetrics)}
+            </div>
         </>
     );
 }
@@ -805,7 +1000,7 @@ export const courseSummary = (courseInfo, allRounds, expandSingleHoleMetric, han
                                                     <div className="width76px borderRightSmall paddingTopSmall paddingBottomSmall">{round.gir}</div>
                                                     <div className="width76px borderRightSmall paddingTopSmall paddingBottomSmall">{round.dtg}</div>
                                                     <div className="width76px borderRightSmall paddingTopSmall paddingBottomSmall">{round.dth}</div>
-                                                    <div className="width76px borderRightSmall paddingTopSmall paddingBottomSmall">{round.puttLength}</div>
+                                                    <div className="width76px borderRightSmall paddingTopSmall paddingBottomSmall">{round.puttLengthTotal}</div>
                                                     <div className="width76px paddingTopSmall paddingBottomSmall">{round.notes}</div>
                                                 </div>
                                             )

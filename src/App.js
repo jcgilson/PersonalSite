@@ -1,13 +1,13 @@
 import React, { useState, useRef } from 'react';
 // Components
-import Header from './components/common/Header';
+// import Header from './components/common/Header';
 import Home from './components/common/Home';
 import Itineraries from './components/content/Itineraries';
 import NationalParks from './components/content/NationalParks';
 // import Gallery from './components/content/Gallery';
 import Golf from './components/content/Golf';
 import Resources from './components/content/Resources';
-import Footer from './components/common/Footer';
+// import Footer from './components/common/Footer';
 // MUI
 import { Modal } from '@mui/material';
 // CSS
@@ -125,7 +125,7 @@ function App() {
     handleCloseModal();
   }
 
-  console.log("configuration",configuration)
+  // console.log("configuration",configuration)
 
   return (
       <div className={getAppBackgroundClassName()}>
