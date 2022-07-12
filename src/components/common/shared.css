@@ -86,11 +86,11 @@
 }
 
 .holeData {
-    border: 1px solid rgba(256, 256, 256, .1);
+    border: 1px solid rgba(256, 256, 256, .3);
     border-radius: 12px;
     margin: 30px 36px;
     min-width: 480px;
-    box-shadow: 0 4px 16px -2px rgba(256, 256, 256, .4) !important;
+    box-shadow: 0 1px 8px -2px rgba(256, 256, 256, .6) !important;
 }
 
 .holeData.expanded {
@@ -111,6 +111,7 @@
 }
 
 .holeData .stickyBackgroundColor {
+    background-image: url('../../images/leather-texture.png'); /* https://www.transparenttextures.com/ */
     background-color: #026647;
 }
 
@@ -126,6 +127,86 @@
 .holeData .borderRightSmall {
     border-right: 1px solid white;
 }
+
+.holeData #singleHoleMetricsSankey, #holeSankey {
+    margin-top: 18px;
+    /* transform: rotate(90deg); */
+}
+.holeData #singleHoleMetricsSankey path, #holeSankey path {
+    fill-opacity: 0.6;
+    fill: rgba(0, 0, 0, 0.7);
+}
+.holeData #singleHoleMetricsSankey text, #holeSankey text {
+    fill: white;
+}
+.holeData #singleHoleMetricsSankey rect, #holeSankey rect {
+    fill-opacity: 0.8;
+    fill: white;
+}
+#cumulativePie svg rect:first-of-type {
+    fill: rgba(0,0,0,0);
+}
+#cumulativePie svg g text { /* Text color within pie chart */
+    fill: black;
+}
+#cumulativePie svg g g text { /* Key text color */
+    fill: white;
+}
+#cumulativePie svg g path { /* Pie chart border color */
+    stroke: black;
+}
+#cumulativePie svg g:nth-of-type(1) g:nth-of-type(1) circle { /* Key circle fill - Eagle */
+    fill: #FECD31;
+}
+#cumulativePie svg g:nth-of-type(1) g:nth-of-type(2) circle { /* Key circle fill - Birdie */
+    fill: #87C6A2;
+}
+#cumulativePie svg g:nth-of-type(1) g:nth-of-type(3) circle { /* Key circle fill - Par */
+    fill: white;
+}
+#cumulativePie svg g:nth-of-type(1) g:nth-of-type(4) circle { /* Key circle fill - Bogey */
+    fill: #F17780;
+}
+#cumulativePie svg g:nth-of-type(1) g:nth-of-type(5) circle { /* Key circle fill - Double Bogey+ */
+    fill: #7BA9CF;
+}
+#cumulativePie svg g:nth-of-type(2) path { /* Eagle */
+    fill: #FECD31;
+}
+#cumulativePie svg g:nth-of-type(3) path { /* Birdie */
+    fill: #87C6A2;
+}
+#cumulativePie svg g:nth-of-type(4) path { /* Double */
+    fill: #7BA9CF;
+}
+#cumulativePie svg g:nth-of-type(5) path { /* Bogey */
+    fill: #F17780;
+}
+#cumulativePie svg g:nth-of-type(6) path { /* Par */
+    fill: white;
+}
+#cumulativePie svg g:nth-of-type(7) text { /* Popup label */
+    padding: 6px !important;
+    fill: black;
+}
+/* .holeData #singleHoleMetricsSankey rect:first-of-type,
+.holeData #singleHoleMetricsSankey rect:nth-last-child(5) {
+    fill: #7ABD7E;
+}
+.holeData #singleHoleMetricsSankey rect:last-of-type,
+.holeData #singleHoleMetricsSankey rect:nth-last-child(2) {
+    fill: #FF6961;
+} */
+
+/* Scorecard entry */
+.scoreCardEntry h3, .scoreCardEntry span {
+    font-size: 14px !important;
+    font-family: "Arial" !important;
+}
+.scoreCardEntry svg.selected {
+    color: rgba(252,227,0,0.9) !important;
+}
+
 
 /* Misc. */
 .underlined {

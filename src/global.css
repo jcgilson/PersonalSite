@@ -361,8 +361,8 @@ body {
     flex-direction: column
 }
 .flexFlowRowNoWrap {
-    display: flex;
-    flex-flow: row nowrap
+    display: flex !important;
+    flex-flow: row nowrap  !important
 }
 .flexFlowRowWrap {
     display: flex;
@@ -558,6 +558,9 @@ a, button, div, input, small, span, td, th {
 .whiteFont {
     color: #fff !important
 }
+.lighterFont {
+    opacity: 0.5;
+}
 .actionFont:hover, .altActionFont:hover {
     cursor: pointer !important
 }
@@ -598,6 +601,20 @@ button.small, .mapbox button {
     width: -webkit-fit-content;
     width: -moz-fit-content;
     width: fit-content
+}
+
+/* MUI inputs */
+.MuiInputLabel-root, .MuiFormLabel-root, .MuiSelect-icon {
+    color: white !important;
+}
+.css-1480iag-MuiInputBase-root-MuiInput-root:before, .css-1480iag-MuiInputBase-root-MuiInput-root:after {
+    border-bottom: 1px solid white !important;
+}
+.MuiOutlinedInput-notchedOutline {
+    border-color: white !important;
+}
+.MuiInputBase-input, .MuiFormLabel-root, .MuiOutlinedInput-notchedOutline span, .MuiInputLabel-animated.MuiInputLabel-shrink {
+    font-family: var(--fontStyle-Secondary) !important;
 }
 
 /* Misc. */

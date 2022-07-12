@@ -11,6 +11,8 @@
 .color026647 {
     width: 100vw !important;
     min-height: 100vh !important;
+    /* background-image: radial-gradient(#26755C, #026647); */
+    background-image: url('./images/leather-texture.png'); /* https://www.transparenttextures.com/ */
     background-color: #026647;
     position: absolute;
     top: 0;

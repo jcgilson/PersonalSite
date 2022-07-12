@@ -1,13 +1,13 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 // MUI
 // import { Modal } from '@mui/material';
 // Components
 // import Map from './Map';
 // MUI
 import {
-    Table, TableHead, TableBody, TableRow, TableCell, Radio, RadioGroup, FormControl, FormControlLabel, CircularProgress
+    Table, TableHead, TableBody, TableRow, TableCell, Radio, RadioGroup, FormControl, FormControlLabel, CircularProgress, TextField, InputLabel, MenuItem, Select
 } from '@mui/material';
-// import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { Check, Close, TurnSlightLeft, TurnSlightRight, LooksOne, LooksTwo, Looks3, Looks4, RemoveCircle, AddCircle } from '@mui/icons-material';
 // CSS
 import "../common/shared.css"
 // Helpers
@@ -47,11 +47,33 @@ const Golf = () => {
     const [tableSort, setTableSort] = useState({ method: 'formattedDate', order: 'ascending' });
     const [activeRound, setActiveRound] = useState({});
     const [displaySubtable, setDisplaySubtable] = useState(false);
+    const [activeScorecardEntry, setActiveScorecardEntry] = useState("");
+    const [scorecardEntryData, setScorecardEntryData] = useState({});
     const [expandScorecard, setExpandScorecard] = useState(false);
-    const [expandSingleHoleMetric, setExpandSingleHoleMetric] = useState({ hole: "", expanded: false })
-    const [puttingData, setPuttingData] = useState({})
+    const [expandSingleHoleMetric, setExpandSingleHoleMetric] = useState({ hole: "", expanded: false });
+    const [puttingData, setPuttingData] = useState({});
 
     const fileInputRef = useRef(null);
+
+    useEffect(() => {
+        const scorecardData = {};
+        console.log("activeScorecardEntry",activeScorecardEntry)
+        console.log("courseInfo activeScorecardEntry",courseInfo[activeScorecardEntry])
+        for (let hole = 1; hole <= 18; hole++) {
+            scorecardData[`hole${hole}`] = {
+                score: activeScorecardEntry === "" ? 100 : courseInfo[activeScorecardEntry][`hole${hole}`].par, // Default score to par
+                numPutts: 2,
+                f: "f",
+                g: "g",
+                dtg: 1000,
+                dth: 1000,
+                ftm: 1000,
+                // ...
+            };
+        }
+        setScorecardEntryData(scorecardData);
+    }, [activeScorecardEntry]);
+
 
     const importFile = (e) => {
         setIsLoading(true);
@@ -99,6 +121,7 @@ const Golf = () => {
                         let column = 2; // Data starts on line 2
                         for (let hole = 1; hole <= 18; hole++ ) {
                             courseData[course.courseKey][`hole${hole}`] = {};
+                            courseData[course.courseKey][`hole${hole}`].hole = hole;
                             courseData[course.courseKey][`hole${hole}`].par = workSheetData[column];
                             courseData[course.courseKey][`hole${hole}`].distance = workSheetData[column + 1];
                             courseData[course.courseKey][`hole${hole}`].handicap = workSheetData[column + 2];
@@ -211,6 +234,8 @@ const Golf = () => {
                                                 putts: row[columnCount + 1],
                                                 dth: typeof row[columnCount + 5] === "number" ? row[columnCount + 5] : parseInt(row[columnCount + 5].split(", ")[0]),
                                                 fpm: typeof row[columnCount + 5] === "number" ? row[columnCount + 5] : parseInt(row[columnCount + 5].split(", ")[1]),
+                                                gir: roundData[`hole${hole}`].gir,
+                                                scoreToPar: score - courseData[course.courseKey][`hole${hole}`].par
                                             });
                                         }
 
@@ -384,6 +409,19 @@ const Golf = () => {
         }
     }
 
+    console.log("scorecardEntryData",scorecardEntryData)
+    // scorecardEntryData[`hole${hole}`] && scorecardEntryData[`hole${hole}`].numPutts && scorecardEntryData[`hole${hole}`].numPutts === 1
+
+    const updateScorecardEntryData = (value, field, hole) => {
+        setScorecardEntryData({
+            ...scorecardEntryData,
+            [`${hole}`]: {
+                ...scorecardEntryData[hole],
+                [`${field}`]: value
+            }
+        });
+    }
+
     return (
 		<div className="flexColumn alignCenter marginTopMedium marginBottomMassive golf">
 			{/* <h1 className="serifFont marginBottomMedium">Golf</h1> */}
@@ -392,7 +430,7 @@ const Golf = () => {
             {!displayUploadButton &&
                 <FormControl>
                     <RadioGroup row defaultValue={activeTable} onChange={handleActiveTableChange}>
-                        {["Summary", "Anderson Glen", "Gilead Highlands", "Metrics", "Course Tour"].map((tab, i) => {
+                        {["Summary", "Anderson Glen", "Gilead Highlands", "Metrics", "Course Tour", "Enter Scorecard"].map((tab, i) => {
                             return <FormControlLabel key={i} control={<Radio color="default" />} value={tab} label={tab} className="marginRightLarge" />
                         })}
                     </RadioGroup>
@@ -400,7 +438,7 @@ const Golf = () => {
             }
 
             {/* Default summary view */}
-            {displayDefaultTable && activeTable !== "Metrics" && activeTable !== "Course Tour" &&
+            {displayDefaultTable && activeTable !== "Metrics" && activeTable !== "Course Tour" && activeTable !== "Enter Scorecard" &&
                 <Table style={{ maxWidth: "80vw" }} className="golfTable">
                     <TableHead>
                         <TableRow className="flexRow">
@@ -467,6 +505,82 @@ const Golf = () => {
                 </div>
             }
 
+            {!displayUploadButton && activeTable === "Enter Scorecard" &&
+                <>
+                    <div className="marginTopMedium marginBottomMedium">
+                        <FormControl>
+                            <InputLabel>Course</InputLabel>
+                            <Select
+                                id="courseSelection"
+                                // value={courseSelection}
+                                label="Course"
+                                onChange={(e) => setActiveScorecardEntry(e.target.value)}
+                                style={{width: "300px"}}
+                            >
+                                {/* Sort by display name */}
+                                {courses.sort((a,b) => a.displayName > b.displayName ? 1 : b.displayName > a.displayName ? -1 : 0).map(course => { return (<MenuItem value={course.courseKey}>{course.displayName}</MenuItem>)})}
+                            </Select>
+                        </FormControl>
+                    </div>
+                    {activeScorecardEntry !== "" &&
+                        <div className="scoreCardEntry flexFlowRowWrap justifyCenter">
+                            {Object.keys(courseInfo[activeScorecardEntry]).map(hole => {
+                                if (hole.includes("hole")) {
+                                    return (
+                                        <div className="flexColumn marginTopExtraLarge marginRightLarge marginLeftLarge marginBottomExtraLarge">
+                                            <h1>Hole {courseInfo[activeScorecardEntry][hole].hole}</h1>
+                                            <h5 className="lighterFont">Par {courseInfo[activeScorecardEntry][hole].par} | {courseInfo[activeScorecardEntry][hole].distance} yds | {courseInfo[activeScorecardEntry][hole].hole} HDCP</h5>
+                                            <div className="marginTopMedium flexFlowRowNoWrap justifySpaceBetween alignCenter">
+                                                <h3 className="marginRightLarge">Score</h3>
+                                                <div className="flexFlowRowNoWrap justifySpaceBetween alignCenter">
+                                                    <RemoveCircle onClick={() => updateScorecardEntryData(scorecardEntryData[hole].score - 1, "score", hole)} />
+                                                    <span className="marginLeftSmall marginRightSmall">{scorecardEntryData[hole].score}</span>
+                                                    <AddCircle onClick={() => updateScorecardEntryData(scorecardEntryData[hole].score + 1, "score", hole)} />
+                                                </div>
+                                            </div>
+                                            <div className="flexFlowRowNoWrap justifySpaceBetween alignCenter marginTopMedium">
+                                                <h3 className="marginRightLarge">Putts</h3>
+                                                <div className="flexFlowRowNoWrap">
+                                                    <LooksOne onClick={() => updateScorecardEntryData(1, "numPutts", hole)} className={`whiteFont${scorecardEntryData[hole].numPutts === 1 ? " selected" : ""}`} />
+                                                    <LooksTwo onClick={() => updateScorecardEntryData(2, "numPutts", hole)} className={`whiteFont${scorecardEntryData[hole].numPutts === 2 ? " selected" : ""}`} />
+                                                    <Looks3 onClick={() => updateScorecardEntryData(3, "numPutts", hole)} className={`whiteFont${scorecardEntryData[hole].numPutts === 3 ? " selected" : ""}`} />
+                                                    <Looks4 onClick={() => updateScorecardEntryData(4, "numPutts", hole)} className={`whiteFont${scorecardEntryData[hole].numPutts === 4 ? " selected" : ""}`} />
+                                                </div>
+                                            </div>
+                                            {courseInfo[activeScorecardEntry][hole].par !== 3 ?
+                                                <div className="flexFlowRowNoWrap justifySpaceBetween alignCenter marginTopMedium">
+                                                    <h3 className="marginRightLarge">FIR</h3>
+                                                    <div className="flexFlowRowNoWrap">
+                                                        <TurnSlightLeft onClick={() => updateScorecardEntryData("l", "f", hole)} className={`whiteFont${scorecardEntryData[hole].f === "l" ? " selected" : ""}`} />
+                                                        <Check onClick={() => updateScorecardEntryData("f", "f", hole)} className={`whiteFont${scorecardEntryData[hole].f === "f" ? " selected" : ""}`} />
+                                                        <TurnSlightRight onClick={() => updateScorecardEntryData("r", "f", hole)} className={`whiteFont${scorecardEntryData[hole].f === "r" ? " selected" : ""}`} />
+                                                        <Close onClick={() => updateScorecardEntryData("x", "f", hole)} className={`whiteFont${scorecardEntryData[hole].f === "x" ? " selected" : ""}`} />
+                                                    </div>
+                                                </div>
+                                                :
+                                                <div className="flexRow justifySpaceBetween paddingTopMedium paddingBottomSmall"><span>—</span><span>—</span></div>
+                                            }
+                                            <div className="flexFlowRowNoWrap justifySpaceBetween alignCenter marginTopMedium">
+                                                <h3 className="marginRightLarge">GIR</h3>
+                                                <div className="flexFlowRowNoWrap">
+                                                    <Check onClick={() => updateScorecardEntryData("g", "g", hole)} className={`whiteFont marginRightExtraLarge paddingRightExtraSmall${scorecardEntryData[hole].g === "g" ? " selected" : ""}`} />
+                                                    <Close onClick={() => updateScorecardEntryData("x", "g", hole)} className={`whiteFont${scorecardEntryData[hole].g === "x" ? " selected" : ""}`} />
+                                                </div>
+                                            </div>
+                                            {/* <TextField id="dtg" label="DTG" variant="standard" />
+                                            <TextField id="dth" label="DTH" variant="standard" />
+                                            <TextField id="fpm" label="FPM" variant="standard" />
+                                            <TextField id="notes" label="Notes" variant="standard" /> */}
+                                        </div>
+                                    );
+                                } else return null;
+                            })}
+                        </div>
+                    }
+                </>
+            }
+
+            {/* Helper Text */}
             {displayUploadButton &&
                 <>
                     <span className="massiveFont marginTopMassive paddingTopMassive">There is currently no data to display. Please upload stats below.</span>
@@ -499,6 +613,7 @@ const Golf = () => {
                 </>
             }
 
+            {/* Loader */}
             {isLoading && <div><CircularProgress /></div>}
 		</div>
     )

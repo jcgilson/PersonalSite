@@ -248,6 +248,18 @@ export const calculateSingleHoleMetrics = (courseInfo, allRounds) => {
         //     worstScoreToPar: 2,
         //     numBirdies: 1,
         //     numBogeyPlus: 0
+        //     roundsData: [{
+        //        sequence: sequence,
+        //        date: date,
+        //        score: 4,
+        //        putts: 2,
+        //        fir: F,
+        //        gir: G,
+        //        dtg: 100,
+        //        dth: 6,
+        //        puttLength: 3,
+        //        notes: ""
+        //     }, ...]
         // }
     };
     
@@ -460,6 +472,7 @@ export const calculateCourseMetrics = (courseInfo, allRounds) => {
     for (let round of allRounds) {
         // Best IN round
         if (courseMetrics[round.courseKey].in > round.in && round.in !== 0 && round.fullBack9 && !round.scrambleRound) {
+            console.log("round",round)
             courseMetrics[round.courseKey] = {
                 ...courseMetrics[round.courseKey],
                 inDate: round.date,
@@ -635,6 +648,7 @@ export const calculateDrivingMetrics = (courseInfo, allRounds) => {
                                 drivingMetrics[drivingMetricRange].total++;
                                 if (round[`hole${hole}`].gir === "G-1" || round[`hole${hole}`].gir === "G") {
                                     drivingMetrics[drivingMetricRange][`${round[`hole${hole}`].fir.toLowerCase()}Gir`]++;
+                                    drivingMetrics.total[`${round[`hole${hole}`].fir.toLowerCase()}Gir`]++;
                                 }
                             }
                         }
@@ -653,11 +667,36 @@ export const calculatePuttingMetrics = (puttingData) => {
     //     date,
     //     putts,
     //     dth,
-    //     fpm
+    //     fpm,
+    //     scoreToPar,
+    //     gir
     // }
 
-    const puttingMetrics = {
+    let puttingMetrics = {
         totalPutts: 0,
+        allPutts: {
+            totalByScore: {
+                num0Putts: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 },
+                num1Putts: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 },
+                num2Putts: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 },
+                num3Putts: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 },
+                byScore: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 }
+            },
+            gir: {
+                num0Putts: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 },
+                num1Putts: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 },
+                num2Putts: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 },
+                num3Putts: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 },
+                byScore: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 }
+            },
+            nonGir: {
+                num0Putts: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 },
+                num1Putts: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 },
+                num2Putts: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 },
+                num3Putts: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 },
+                byScore: { total: 0, scoreMinus2: 0, scoreMinus1: 0, score0: 0, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0 }
+            }
+        },
         makeByDistance: {
             // from3: {
             //     distance: 3,
@@ -672,10 +711,7 @@ export const calculatePuttingMetrics = (puttingData) => {
         longestPutts: {},
     };
 
-    console.log("puttingData",puttingData)
-
     for (let putt of puttingData) {
-        // console.log("putt",putt)
         if (putt.dth === 0 || putt.dth % 3 === 0) {
             if (puttingMetrics.makeByDistance[`from${putt.dth}`]) {
                 puttingMetrics.makeByDistance[`from${putt.dth}`][`num${putt.putts}Putts`]++;
@@ -691,7 +727,23 @@ export const calculatePuttingMetrics = (puttingData) => {
                     num4Putts: putt.putts > 3 ? 1 : 0
                 }
             }
+            if (putt.gir === "G" || putt.gir === "G-1") {
+                puttingMetrics.allPutts.gir.byScore.total++;
+                puttingMetrics.allPutts.gir[`num${putt.putts}Putts`].total++;
+                // puttingMetrics.allPutts.gir.byScore[`score${putt.scoreToPar < 0 ? "Minus" : ""}${Math.abs(putt.scoreToPar)}`].total++;
+                puttingMetrics.allPutts.gir[`num${putt.putts}Putts`][`score${putt.scoreToPar < 0 ? "Minus" : ""}${Math.abs(putt.scoreToPar)}`]++;
+            } else {
+                puttingMetrics.allPutts.nonGir.byScore.total++;
+                puttingMetrics.allPutts.nonGir[`num${putt.putts}Putts`].total++;
+                // puttingMetrics.allPutts.nonGir.byScore[`score${putt.scoreToPar < 0 ? "Minus" : ""}${Math.abs(putt.scoreToPar)}`].total++;
+                puttingMetrics.allPutts.nonGir[`num${putt.putts}Putts`][`score${putt.scoreToPar < 0 ? "Minus" : ""}${Math.abs(putt.scoreToPar)}`]++;
+            }
+            puttingMetrics.allPutts.totalByScore.total++;
+            puttingMetrics.allPutts.totalByScore[`num${putt.putts}Putts`].total++;
             puttingMetrics.totalPutts++;
+            puttingMetrics.allPutts.totalByScore.byScore[`score${putt.scoreToPar < 0 ? "Minus" : ""}${Math.abs(putt.scoreToPar)}`]++;
+            puttingMetrics.allPutts.totalByScore[`num${putt.putts}Putts`][`score${putt.scoreToPar < 0 ? "Minus" : ""}${Math.abs(putt.scoreToPar)}`]++;
+
         }
     }
 

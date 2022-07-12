@@ -9,6 +9,9 @@ import {
 } from './GolfMetricHelper';
 // Consts
 import { imageSourceMappings } from "./GolfConsts";
+import { courses } from "./GolfConsts";
+// Components
+import { Chart } from "react-google-charts"; // Google Charts: https://developers.google.com/chart/interactive/docs/gallery/sankey
 
 
 export const calculateFairways = (round) => {
@@ -73,7 +76,10 @@ export const calculatePuttLengths = (round) => {
         f9: 0,
         b9: 0
     };
+    // TODO: Scorecard putt length incorrect - maybe just front 9
+    // console.log("\n\nSTART")
     for (let hole = 1; hole <= 18; hole++) {
+        // console.log("hole",hole)
         if (round[`hole${hole}`]) {
             if (hole < 10) {
                 puttLengths.f9 = puttLengths.f9 + round[`hole${hole}`].puttLength;
@@ -85,7 +91,10 @@ export const calculatePuttLengths = (round) => {
                 console.log(`INVALID PUTT LENGTH VALUE FOR HOLE ${hole}: `, round[`hole${hole}`].puttLength);
             }
         }
+        // console.log("puttLengths",puttLengths)
     }
+
+    // console.log("\n\nFINAL puttLengths",puttLengths,"\n\n")
 
     return puttLengths;
 }
@@ -722,6 +731,103 @@ export const createDrivingTable = (drivingMetrics) => {
     );
 }
 
+const createCumulativeGraphs = (drivingMetrics, puttingMetrics) => {
+    const sankeyGraphDistance = drivingMetrics.total;
+    const totalGir = sankeyGraphDistance.lGir + sankeyGraphDistance.fGir + sankeyGraphDistance.rGir + sankeyGraphDistance.xGir;
+    const totalMissedGreen = sankeyGraphDistance.total - totalGir;
+    const totalByScore = puttingMetrics.allPutts.totalByScore;
+
+    console.log("puttingMetrics",puttingMetrics)
+    
+    const sankeyGraphData = [
+        ["From", "To", "Weight"],
+        // Driving data
+        [`F: ${sankeyGraphDistance.f} (${sankeyGraphDistance.fGir} to G, ${sankeyGraphDistance.total - sankeyGraphDistance.fGir} to X)`, `G: ${totalGir}`, sankeyGraphDistance.fGir],
+        [`L: ${sankeyGraphDistance.l}`, `G: ${totalGir}`, sankeyGraphDistance.lGir],
+        [`R: ${sankeyGraphDistance.r}`, `G: ${totalGir}`, sankeyGraphDistance.rGir],
+        [`F: ${sankeyGraphDistance.f} (${sankeyGraphDistance.fGir} to G, ${sankeyGraphDistance.total - sankeyGraphDistance.fGir} to X)`, `X GIR: ${totalMissedGreen}`, sankeyGraphDistance.total - sankeyGraphDistance.fGir],
+        [`L: ${sankeyGraphDistance.l}`, `X GIR: ${totalMissedGreen}`, sankeyGraphDistance.total - sankeyGraphDistance.lGir],
+        [`R: ${sankeyGraphDistance.r}`, `X GIR: ${totalMissedGreen}`, sankeyGraphDistance.total - sankeyGraphDistance.rGir],
+
+        // Putting data
+        [`G: ${totalGir}`, `1 Putts: ${totalByScore.num1Putts.total}`, totalByScore.num1Putts.total],
+        [`G: ${totalGir}`, `2 Putts: ${totalByScore.num2Putts.total}`, totalByScore.num2Putts.total],
+        [`G: ${totalGir}`, `3 Putts: ${totalByScore.num3Putts.total}`, totalByScore.num3Putts.total],
+        [`X GIR: ${totalMissedGreen}`, `1 Putts: ${totalByScore.num1Putts.total}`, totalByScore.num1Putts.total],
+        [`X GIR: ${totalMissedGreen}`, `2 Putts: ${totalByScore.num2Putts.total}`, totalByScore.num2Putts.total],
+        [`X GIR: ${totalMissedGreen}`, `3 Putts: ${totalByScore.num3Putts.total}`, totalByScore.num3Putts.total],
+    ];
+
+    // Score data - GIR
+    const scoreToParLabelMap = {
+        scoreMinus2: "Eagle",
+        scoreMinus1: "Birdie",
+        score0: "Par",
+        score1: "Bogey",
+        score2: "Double",
+        score3: "Triple",
+        // score4: "Quad"
+    }
+    let pieChartData = [["Hole", "Score Distribution to Par"]];
+    for (let score of Object.keys(scoreToParLabelMap)) {
+        for (let i = 0; i < 4; i++) {
+            if (totalByScore[`num${i}Putts`][score] !== 0) {
+                sankeyGraphData.push([`${i} Putts: ${totalByScore[`num${i}Putts`].total}`, `${scoreToParLabelMap[score]}: ${totalByScore.byScore[score]}`, totalByScore.byScore[score]]);
+            }
+        }
+        if (score === "score2") {
+            pieChartData.push(["Double Bogey+", totalByScore.byScore.score2 + totalByScore.byScore.score3]);
+        } else {
+            if (score !== "score3") {
+                pieChartData.push([scoreToParLabelMap[score], totalByScore.byScore[score]]);
+            }
+        }
+    }
+
+    if (sankeyGraphDistance.xGir) {
+        sankeyGraphData.push([`X: ${sankeyGraphDistance.x}`, `X GIR: ${totalMissedGreen}`, sankeyGraphDistance.total - sankeyGraphDistance.g]);
+        sankeyGraphData.push([`X: ${sankeyGraphDistance.x}`, `G: ${totalGir}`, sankeyGraphDistance.xGir]);
+    }
+
+    return (
+        <div>
+            <div id="holeSankey">
+                <Chart
+                    chartType="Sankey"
+                    width="100%"
+                    // height="400px"
+                    data={sankeyGraphData}
+                    options={{
+                        sankey: {
+                            // link: { color: { fill: "#d799ae" } },
+                            // node: {
+                            //     colors: ["#a61d4c"],
+                            //     label: { color: "#871b47" },
+                            // },
+                            // iterations: 0
+                        }
+                    }}
+                />
+            </div>
+            <div className="marginTopSmall marginBottomLarge flexRow justifySpaceBetween">
+                <h3>Driving</h3>
+                <h3>Approach</h3>
+                <h3>Putting</h3>
+                <h3>Scoring</h3>
+            </div>
+            <h1>Score Distibution</h1>
+            <div id="cumulativePie">
+                <Chart
+                    chartType="PieChart"
+                    data={pieChartData}
+                    options={{is3D: true, backgroundColor: "#00000000" }}
+                    width="600px"
+                />
+            </div>
+        </div>
+    )
+}
+
 export const createPuttingTable = (puttingMetrics) => {
     const distances = Object.keys(puttingMetrics.makeByDistance).sort(
         function(a,b) {
@@ -818,6 +924,9 @@ export const calculateStats = (courseInfo, allRounds, puttingData) => {
     // const approachMetrics = calculateApproachMetrics(allRounds); // Import above
     const drivingMetrics = calculateDrivingMetrics(courseInfo, allRounds);
 
+    console.log("singleHoleMetrics",singleHoleMetrics)
+    console.log("courseMetrics",courseMetrics)
+
     return (
         <>
             {/* Handicap Metrics */}
@@ -838,53 +947,77 @@ export const calculateStats = (courseInfo, allRounds, puttingData) => {
             {/* Best Anderson Glen */}
             <h1 className="marginTopExtraLarge marginBottomLarge">Best Anderson Glen</h1>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Best score on Front 9 -</h3>
+                <h3 className="marginRightExtraSmall">Best score on Front 9 -</h3>
                 <h3 className="strongFont">({courseMetrics.andersonGlen.out}) {courseMetrics.andersonGlen.outDate} {courseMetrics.andersonGlen.outPutts} putts</h3>
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Best score on Back 9 -</h3>
+                <h3 className="marginRightExtraSmall">Best score on Back 9 -</h3>
                 <h3 className="strongFont">({courseMetrics.andersonGlen.in}) {courseMetrics.andersonGlen.inDate} {courseMetrics.andersonGlen.inPutts} putts</h3>
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Best score on 18 holes -</h3>
+                <h3 className="marginRightExtraSmall">Best score on 18 holes -</h3>
                 <h3 className="strongFont">({courseMetrics.andersonGlen.totalOut} + {courseMetrics.andersonGlen.totalIn} = {courseMetrics.andersonGlen.total}) {courseMetrics.andersonGlen.totalDate} {courseMetrics.andersonGlen.totalPutts} putts</h3>
             </div>
 
             {/* Best Gilelad Highlands */}
             <h1 className="marginTopExtraLarge marginBottomLarge">Best Gilead Highlands</h1>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Best score on Front 9 -</h3>
+                <h3 className="marginRightExtraSmall">Best score on Front 9 -</h3>
                 <h3 className="strongFont">({courseMetrics.gileadHighlands.out}) {courseMetrics.gileadHighlands.outDate} {courseMetrics.gileadHighlands.outPutts} putts</h3>
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Best score on Back 9 -</h3>
+                <h3 className="marginRightExtraSmall">Best score on Back 9 -</h3>
                 <h3 className="strongFont">({courseMetrics.gileadHighlands.in}) {courseMetrics.gileadHighlands.inDate} {courseMetrics.gileadHighlands.inPutts} putts</h3>
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Best score on 18 holes -</h3>
+                <h3 className="marginRightExtraSmall">Best score on 18 holes -</h3>
                 <h3 className="strongFont">({courseMetrics.gileadHighlands.totalOut} + {courseMetrics.gileadHighlands.totalIn} = {courseMetrics.gileadHighlands.total}) {courseMetrics.gileadHighlands.totalDate} {courseMetrics.gileadHighlands.totalPutts} putts</h3>
             </div>
+
+            {/* Other Course Records */}
+            <h1 className="marginTopExtraLarge marginBottomLarge">Other Course Records <span>(F9 - B9)</span></h1>
+            {Object.keys(courseMetrics).map(courseMetric => {
+                if (courseMetric !== "andersonGlen" && courseMetric !== "gileadHighlands") {
+                    const courseName = courses.find(course => course.courseKey === courseMetric).displayName;
+                    let scoreString = "";
+                    if (courseMetrics[courseMetric].out === 100) {
+                        scoreString = `${courseMetrics[courseMetric].in} (B9)`;
+                    } else {
+                        if (courseMetrics[courseMetric].in === 100) {
+                            scoreString = `${courseMetrics[courseMetric].out} (F9)`;
+                        } else {
+                            scoreString = `${courseMetrics[courseMetric].total} (${courseMetrics[courseMetric].out} - ${courseMetrics[courseMetric].in})`;
+                        }
+                    }
+                    return (
+                        <div className="flexRow alignCenter marginBottomSmall">
+                            <h3 className="marginRightExtraSmall">{courseName} -</h3>
+                            <h3 className="strongFont">{scoreString}</h3>
+                        </div> 
+                    )
+                } else return null;
+            })}
 
             {/* Single Hole Metrics */}
             <h1 className="marginTopExtraLarge marginBottomLarge">Single Hole Metrics</h1>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Most birdies on a single hole -</h3>
+                <h3 className="marginRightExtraSmall">Most birdies on a single hole -</h3>
                 <h3 className="strongFont">({singleHoleMetrics.birdies.mostBirdies}) {singleHoleMetrics.birdies.mostBirdiesCourse} Par {singleHoleMetrics.birdies.mostBirdiesPar} Hole {singleHoleMetrics.birdies.mostBirdiesHole} played {singleHoleMetrics.birdies.mostBirdiesRounds} times</h3>
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Least bogey+ on a single hole -</h3>
+                <h3 className="marginRightExtraSmall">Least bogey+ on a single hole -</h3>
                 <h3 className="strongFont">({singleHoleMetrics.bogeyPlus.leastBogeyPlus}) {singleHoleMetrics.bogeyPlus.leastBogeyPlusCourse} Par {singleHoleMetrics.bogeyPlus.leastBogeyPlusPar} Hole {singleHoleMetrics.bogeyPlus.leastBogeyPlusHole} played {singleHoleMetrics.bogeyPlus.leastBogeyPlusRounds} times</h3>
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Most bogey+ on a single hole -</h3>
+                <h3 className="marginRightExtraSmall">Most bogey+ on a single hole -</h3>
                 <h3 className="strongFont">({singleHoleMetrics.bogeyPlus.mostBogeyPlus}) {singleHoleMetrics.bogeyPlus.mostBogeyPlusCourse} Par {singleHoleMetrics.bogeyPlus.mostBogeyPlusPar} Hole {singleHoleMetrics.bogeyPlus.mostBogeyPlusHole} played {singleHoleMetrics.bogeyPlus.mostBogeyPlusRounds} times</h3>
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Best cumulative score to par on a single hole -</h3>
+                <h3 className="marginRightExtraSmall">Best cumulative score to par on a single hole -</h3>
                 <h3 className="strongFont">({singleHoleMetrics.bestCumulativeScoreSingle.cumulativeScoreToPar > 0 ? "+" : ""}{singleHoleMetrics.bestCumulativeScoreSingle.cumulativeScoreToPar}) {singleHoleMetrics.bestCumulativeScoreSingle.course} Par {singleHoleMetrics.bestCumulativeScoreSingle.par} Hole {singleHoleMetrics.bestCumulativeScoreSingle.hole} played {singleHoleMetrics.bestCumulativeScoreSingle.rounds} times</h3>
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Worst cumulative score on a single hole -</h3>
+                <h3 className="marginRightExtraSmall">Worst cumulative score on a single hole -</h3>
                 <h3 className="strongFont">({singleHoleMetrics.worstCumulativeScoreSingle.cumulativeScoreToPar < 0 ? "-" : singleHoleMetrics.worstCumulativeScoreSingle.cumulativeScoreToPar > 0 ? "+" : ""}{singleHoleMetrics.worstCumulativeScoreSingle.cumulativeScoreToPar}) {singleHoleMetrics.worstCumulativeScoreSingle.course} Par {singleHoleMetrics.worstCumulativeScoreSingle.par} Hole {singleHoleMetrics.worstCumulativeScoreSingle.hole} played {singleHoleMetrics.worstCumulativeScoreSingle.rounds} times</h3>
             </div>
 
@@ -895,7 +1028,7 @@ export const calculateStats = (courseInfo, allRounds, puttingData) => {
                 if (ctp.course === "Anderson Glen" || ctp.course === "Gilead Highlands") {
                     return (
                         <div className="flexRow alignCenter marginBottomSmall">
-                            <h3 className="marginRightSmall">{ctp.course} {ctp.hole} ({ctp.distance} yards) -</h3>
+                            <h3 className="marginRightExtraSmall">{ctp.course} {ctp.hole} ({ctp.distance} yards) -</h3>
                             <h3 className="strongFont">{ctp.dth} feet ({ctp.date} Score: {ctp.score})</h3>
                         </div>
                     );
@@ -907,19 +1040,19 @@ export const calculateStats = (courseInfo, allRounds, puttingData) => {
             {/* Miscellaneous Metrics */}
             <h1 className="marginTopExtraLarge marginBottomLarge">Miscellaneous Metrics</h1>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Most consecutive 1 putts -</h3>
+                <h3 className="marginRightExtraSmall">Most consecutive 1 putts -</h3>
                 {calculateConsecutiveOnePutts(allRounds)}
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Most putts in 9 holes & 18 holes -</h3>
+                <h3 className="marginRightExtraSmall">Most putts in 9 holes & 18 holes -</h3>
                 {calculateMostPutts(allRounds)}
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Least putts in 9 holes & 18 holes -</h3>
+                <h3 className="marginRightExtraSmall">Least putts in 9 holes & 18 holes -</h3>
                 {calculateLeastPutts(allRounds)}
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
-                <h3 className="marginRightSmall">Largest score disparity between front 9 and back 9 -</h3>
+                <h3 className="marginRightExtraSmall">Largest score disparity between front 9 and back 9 -</h3>
                 {calculateLargestScoreDisparity(allRounds)}
             </div>
             {/* <div className="flexRow alignCenter marginBottomSmall">
@@ -952,25 +1085,158 @@ export const calculateStats = (courseInfo, allRounds, puttingData) => {
             <div className="flexRow alignCenter marginBottomSmall">
                 {createDrivingTable(drivingMetrics)}
             </div>
-
+            
             {/* Putting */}
             <h1 className="marginTopExtraLarge marginBottomLarge">Putting</h1>
             <div className="flexRow alignCenter marginBottomSmall">
                 {createPuttingTable(puttingMetrics)}
             </div>
+
+            <h1 className="marginTopExtraLarge marginBottomLarge">Hole Flow</h1>
+            {createCumulativeGraphs(drivingMetrics, puttingMetrics)}
         </>
     );
 }
 
-export const courseSummary = (courseInfo, allRounds, expandSingleHoleMetric, handleSetExpandSingleHoleMetric) => {
+const createSingleHoleGraph = (courseInfo, singleHoleMetrics) => {
+    let scoringMetrics = {
+        gir: { score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0, score7: 0, score8: 0, score9: 0, score0: 0 },
+        nonGir: { score1: 0, score2: 0, score3: 0, score4: 0, score5: 0, score6: 0, score7: 0, score8: 0, score9: 0, score0: 0 }
+    }
 
+    let drivingMetrics = {
+        notInRangeOfGreen: { lowerBound: 0, upperBound: 0, customTitle: "Not in range of green", f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 },
+        lessThan200: { lowerBound: 1, upperBound: 199, customTitle: "< 200", f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 }, // Tops & lay-ups
+        between200and220: { lowerBound: 200, upperBound: 220, f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 },
+        between221and240: { lowerBound: 221, upperBound: 240, f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 },
+        between241and260: { lowerBound: 241, upperBound: 260, f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 },
+        between261and280: { lowerBound: 261, upperBound: 280, f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 },
+        between281and300: { lowerBound: 281, upperBound: 300, f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 },
+        greaterThan300: { lowerBound: 300, upperBound: 1000, customTitle: "300+", f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 },
+        total: { lowerBound: 1000, upperBound: 1000, customTitle: "Total", f: 0, l: 0, r: 0, x: 0, xGir: 0, lGir: 0, fGir: 0, rGir: 0, total: 0 }
+    };
+
+    let individualCourseData = courseInfo[singleHoleMetrics.courseKey][`hole${singleHoleMetrics.hole}`];
+    for (let round of singleHoleMetrics.roundsData) {
+        if (round.fir !== "NA") { // Exclude par 3's
+            drivingMetrics.total[round.fir.toLowerCase()]++;
+            drivingMetrics.total.total++;
+
+            let dtgForCalculation = 1000;
+            if (
+                individualCourseData.par === 4 // Par 4 DTG
+                || (individualCourseData.par === 5 && round.gir === "G-1") // Par 5 G-1
+            ) {
+                dtgForCalculation = parseInt(round.dtg); // Use raw DTG
+            } else {
+                if (individualCourseData.par === 5 && typeof round.dtg === "string") { // DTG recorded after drive and approach
+                    dtgForCalculation = parseInt(round.dtg.split(", ")[0]); // Use first DTG value in array
+                }
+            }
+
+            if (dtgForCalculation === 1000) { // Not in range of green, cannot calculate driving distance
+                drivingMetrics.notInRangeOfGreen[round.fir.toLowerCase()]++;
+                drivingMetrics.notInRangeOfGreen.total++;
+                if (round.gir === "G-1" || round.gir === "G") {
+                    drivingMetrics.notInRangeOfGreen[`${round.fir.toLowerCase()}Gir`]++;
+                    scoringMetrics.gir[`score${round.score}`]++;
+                } else {
+                    scoringMetrics.nonGir[`score${round.score}`]++;
+                }
+            } else {
+                const driveDistance = parseInt(individualCourseData.distance) - dtgForCalculation;
+                
+                let drivingMetricRange = "";
+                if (driveDistance < 200) { drivingMetricRange = "lessThan200"; } else {
+                if (220 > driveDistance && driveDistance >= 200) { drivingMetricRange = "between200and220"; } else {
+                if (240 > driveDistance && driveDistance >= 220) { drivingMetricRange = "between221and240"; } else { 
+                if (260 > driveDistance && driveDistance >= 240) { drivingMetricRange = "between241and260"; } else { 
+                if (280 > driveDistance && driveDistance >= 260) { drivingMetricRange = "between261and280"; } else {
+                if (300 > driveDistance && driveDistance >= 280) { drivingMetricRange = "between281and300"; } else {
+                if (driveDistance >= 300) { drivingMetricRange = "greaterThan300"; }}}}}}}
+
+                if (drivingMetricRange === "") {
+                    console.log(`INVALID DTG VALUE FOR ROUND ${round.key.toUpperCase()}, HOLE ${singleHoleMetrics.hole}:`, round.dtg);
+                } else {
+                    drivingMetrics[drivingMetricRange][round.fir.toLowerCase()]++;
+                    drivingMetrics[drivingMetricRange].total++;
+                    if (round.gir === "G-1" || round.gir === "G") {
+                        drivingMetrics[drivingMetricRange][`${round.fir.toLowerCase()}Gir`]++;
+                        drivingMetrics.total[`${round.fir.toLowerCase()}Gir`]++;
+                        scoringMetrics.gir[`score${round.score}`]++;
+                    } else {
+                        scoringMetrics.nonGir[`score${round.score}`]++;
+                    }
+                }
+            }
+        } else { // Scoring metrics for par 3s
+            if (round.gir === "G") {
+                drivingMetrics.total.fGir++;
+                scoringMetrics.gir[`score${round.score}`]++;
+            } else {
+                scoringMetrics.nonGir[`score${round.score}`]++;
+            }
+            drivingMetrics.total.total++;
+        }
+    }
+
+    const sankeyGraphDistance = drivingMetrics.total;
+    const totalGir = sankeyGraphDistance.lGir + sankeyGraphDistance.fGir + sankeyGraphDistance.rGir + sankeyGraphDistance.xGir;
+    const totalMissedGreen = sankeyGraphDistance.total - totalGir;
+    const sankeyGraphData = [["Fairway", "To", "Green"]];
+
+    // FIR
+    if (singleHoleMetrics.par !== 3) {
+        sankeyGraphData.push([`FIR: ${sankeyGraphDistance.f}`, `GIR: ${totalGir}`, sankeyGraphDistance.fGir]);
+        sankeyGraphData.push([`FIR: ${sankeyGraphDistance.f}`, `X: ${totalMissedGreen}`, sankeyGraphDistance.total - sankeyGraphDistance.lGir]);
+        sankeyGraphData.push([`Left: ${sankeyGraphDistance.l}`, `GIR: ${totalGir}`, sankeyGraphDistance.lGir]);
+        sankeyGraphData.push([`Right: ${sankeyGraphDistance.r}`, `GIR: ${totalGir}`, sankeyGraphDistance.rGir]);
+        sankeyGraphData.push([`Left: ${sankeyGraphDistance.l}`, `X: ${totalMissedGreen}`, sankeyGraphDistance.total - sankeyGraphDistance.fGir]);
+        sankeyGraphData.push([`Right: ${sankeyGraphDistance.r}`, `X: ${totalMissedGreen}`, sankeyGraphDistance.total - sankeyGraphDistance.rGir]);
+        // Non-FIR
+        if (sankeyGraphDistance.x !== 0) {
+            sankeyGraphData.push([`Miscue: ${sankeyGraphDistance.x}`, `GIR: ${totalGir}`, typeof sankeyGraphDistance.xGir == "number" ? sankeyGraphDistance.xGir : 0]);
+            sankeyGraphData.push([`Miscue: ${sankeyGraphDistance.x}`, `X: ${totalMissedGreen}`, sankeyGraphDistance.total - sankeyGraphDistance.xGir]);
+        }
+    }
+
+    // Score distibution
+    for (let score of Object.keys(scoringMetrics.gir)) {
+        if (scoringMetrics.gir[score] !== 0) {
+            sankeyGraphData.push([`GIR: ${totalGir}`, `${score.substring(score.length - 1, score.length)}: ${scoringMetrics.gir[score] + scoringMetrics.nonGir[score]}`, scoringMetrics.gir[score]]);
+        }
+        if (scoringMetrics.nonGir[score] !== 0) {
+            sankeyGraphData.push([`X: ${totalMissedGreen}`, `${score.substring(score.length - 1, score.length)}: ${scoringMetrics.gir[score] + scoringMetrics.nonGir[score]}`, scoringMetrics.nonGir[score]]);
+        }
+    }
+
+    return (
+        <Chart
+            chartType="Sankey"
+            width="220px"
+            data={sankeyGraphData}
+            options={{
+                // sankey: {
+                //     link: { color: { fill: "#d799ae" } },
+                //     node: {
+                //         colors: ["#a61d4c"],
+                //         label: { color: "#871b47" },
+                //     }
+                // }
+            }}
+        />
+    )
+}
+
+export const courseSummary = (courseInfo, allRounds, expandSingleHoleMetric, handleSetExpandSingleHoleMetric) => {
     const singleHoleMetrics = calculateSingleHoleMetrics(courseInfo, allRounds);
     const nonHoleMetrics = ["bestCumulativeScoreSingle", "worstCumulativeScoreSingle", "birdies", "bogeyPlus", "mostPutts", "ctp", "longestDrive"];
-
+    
     return (
         <div className="singleHoleMetricContainer flexFlowRowWrap marginBottomExtraLarge justifyCenter">
             {Object.keys(singleHoleMetrics).sort(function(a,b) {return (singleHoleMetrics[a].courseKey > singleHoleMetrics[b].courseKey || (singleHoleMetrics[a].hole > singleHoleMetrics[b].courseKey && singleHoleMetrics[a].hole < singleHoleMetrics[b].courseKey)) ? 1 : ((singleHoleMetrics[b].courseKey > singleHoleMetrics[a].courseKey) ? -1 : 0);} ).map((hole) => {
-                if (!nonHoleMetrics.includes(hole)) { // Not actually holes
+                if (!nonHoleMetrics.includes(hole) && (singleHoleMetrics[hole].courseKey === "andersonGlen" || singleHoleMetrics[hole].courseKey === "gileadHighlands")) { // Not actually holes
+                // if (!nonHoleMetrics.includes(hole)) { // Not actually holes - could include all holes with above line
                     const holeSummaryRef = React.createRef();
                     const executeScroll = () => holeSummaryRef.current.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
                     return (
@@ -1047,22 +1313,29 @@ export const courseSummary = (courseInfo, allRounds, expandSingleHoleMetric, han
                                             </div>
                                         </div>
                                         {singleHoleMetrics[hole].par !== 3 &&
-                                            <div className="flexColumn marginTopSmall marginBottomExtraSmall">
-                                                <h3>Fairways</h3>
-                                                <div className="flexRow justifySpaceBetween">
-                                                    <div className="flexColumn">
-                                                        <p>Left:</p>
-                                                        <b>{singleHoleMetrics[hole].fairways.l}</b>
-                                                    </div>
-                                                    <div className="flexColumn">
-                                                        <p>FIR:</p>
-                                                        <b>{singleHoleMetrics[hole].fairways.f}</b>
-                                                    </div>
-                                                    <div className="flexColumn">
-                                                        <p>Right:</p>
-                                                        <b>{singleHoleMetrics[hole].fairways.r}</b>
+                                            <>
+                                                <div className="flexColumn marginTopSmall marginBottomExtraSmall">
+                                                    <h3>Fairways</h3>
+                                                    <div className="flexRow justifySpaceBetween">
+                                                        <div className="flexColumn">
+                                                            <p>Left:</p>
+                                                            <b>{singleHoleMetrics[hole].fairways.l}</b>
+                                                        </div>
+                                                        <div className="flexColumn">
+                                                            <p>FIR:</p>
+                                                            <b>{singleHoleMetrics[hole].fairways.f}</b>
+                                                        </div>
+                                                        <div className="flexColumn">
+                                                            <p>Right:</p>
+                                                            <b>{singleHoleMetrics[hole].fairways.r}</b>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            </>
+                                        }
+                                        {expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole &&
+                                            <div id="singleHoleMetricsSankey">
+                                                {createSingleHoleGraph(courseInfo, singleHoleMetrics[hole])}
                                             </div>
                                         }
                                     </div>
