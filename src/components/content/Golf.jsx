@@ -17,6 +17,7 @@ import {
 import { courses } from "./helpers/GolfConsts";
 // Images
 import scorecard from "../../images/scorecard.png";
+import metrics from "../../images/metrics.png";
 import singleHoleMetrics from "../../images/singleHoleMetrics.png";
 
 const Excel = require('exceljs');
@@ -44,7 +45,7 @@ const Golf = () => {
     const [allRounds, setAllRounds] = useState([]);
     const [courseInfo, setCourseInfo] = useState({});
     const [activeTable, setActiveTable] = useState('Summary');
-    const [tableSort, setTableSort] = useState({ method: 'formattedDate', order: 'ascending' });
+    const [tableSort, setTableSort] = useState({ method: 'formattedDate', order: 'descending' });
     const [activeRound, setActiveRound] = useState({});
     const [displaySubtable, setDisplaySubtable] = useState(false);
     const [activeScorecardEntry, setActiveScorecardEntry] = useState("");
@@ -338,6 +339,8 @@ const Golf = () => {
                         });
                     }
 
+                    console.log("courseData",courseData)
+
                     setCourseInfo(courseData);
                     setPuttingData(allPutts);
 
@@ -525,6 +528,20 @@ const Golf = () => {
                     {activeScorecardEntry !== "" &&
                         <div className="scoreCardEntry flexFlowRowWrap justifyCenter">
                             {Object.keys(courseInfo[activeScorecardEntry]).map(hole => {
+                                
+                                // for (let hole = 1; hole <= 18; hole++) {
+                                //     scorecardData[`hole${hole}`] = {
+                                //         score: activeScorecardEntry === "" ? 100 : courseInfo[activeScorecardEntry][`hole${hole}`].par, // Default score to par
+                                //         numPutts: 2,
+                                //         f: "f",
+                                //         g: "g",
+                                //         dtg: 1000,
+                                //         dth: 1000,
+                                //         ftm: 1000,
+                                //         // ...
+                                //     };
+                                // }
+
                                 if (hole.includes("hole")) {
                                     return (
                                         <div className="flexColumn marginTopExtraLarge marginRightLarge marginLeftLarge marginBottomExtraLarge">
@@ -567,10 +584,10 @@ const Golf = () => {
                                                     <Close onClick={() => updateScorecardEntryData("x", "g", hole)} className={`whiteFont${scorecardEntryData[hole].g === "x" ? " selected" : ""}`} />
                                                 </div>
                                             </div>
-                                            {/* <TextField id="dtg" label="DTG" variant="standard" />
+                                            <TextField id="dtg" label="DTG" variant="standard" />
                                             <TextField id="dth" label="DTH" variant="standard" />
                                             <TextField id="fpm" label="FPM" variant="standard" />
-                                            <TextField id="notes" label="Notes" variant="standard" /> */}
+                                            <TextField id="notes" label="Notes" variant="standard" />
                                         </div>
                                     );
                                 } else return null;
@@ -586,15 +603,16 @@ const Golf = () => {
                     <span className="massiveFont marginTopMassive paddingTopMassive">There is currently no data to display. Please upload stats below.</span>
                     <div className="flexRow marginTopMassive">
                         <div className="sectionBorder">
-                            <h1>Enter Scorecards</h1>
-                            <img src={scorecard} style={{ width: "400px", marginTop: "48px" }} alt="Scorecard" />
+                            <h1>View Scorecards</h1>
+                            <img src={scorecard} style={{ width: "400px" }} className="marginTopSmall" alt="Scorecard" />
                         </div>
                         <div className="sectionBorder">
-                            <h1>Single Hole Metrics</h1>
-                            <img src={singleHoleMetrics} style={{ width: "400px", marginTop: "8px" }} alt="Single Hole Metrics" />
+                            <h1>Hole History</h1>
+                            <img src={singleHoleMetrics} style={{ width: "400px" }} className="marginTopSmall" alt="Single Hole Metrics" />
                         </div>
-                        <div>
-                            <h1 className="sectionBorder">Explore Course Tour</h1>
+                        <div className="sectionBorder">
+                            <h1>Overall Metrics</h1>
+                            <img src={metrics} style={{ width: "500px" }} className="marginTopSmall" alt="Single Hole Metrics" />
                         </div>
                     </div>
                     <button

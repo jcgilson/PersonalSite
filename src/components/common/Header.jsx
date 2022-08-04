@@ -1,5 +1,5 @@
 import React from "react";
-import tiktokLogo from '../../images/tiktok.png';
+// import tiktokLogo from '../../images/tiktok.png';
 // import nameLogo from '../../images/nameLogo.png';
 
 const Header = (props) => {
@@ -23,8 +23,8 @@ const Header = (props) => {
         <nav className="width80Percent marginAuto flexRow justifySpaceBetween alignCenter paddingTopSmall paddingBottomSmall">
             {/* <img src={nameLogo} style={{ height: '60px' }} alt="tiktok logo" /> */}
             <a className="flexRow alignCenter cursorPointer removeTextDecoration" href="https://www.tiktok.com/@jack.gilson" target="_blank" rel="noreferrer">
-                <img src={tiktokLogo} style={{ height: '30px' }} alt="tiktok logo" />
-                <h2 className="marginLeftSmall">jack.gilson</h2>
+                {/* <img src={tiktokLogo} style={{ height: '30px' }} alt="tiktok logo" /> */}
+                <h2 className="marginLeftSmall">Jack Gilson</h2>
             </a>
             <section className="flexRow">
                 {navLinks()}

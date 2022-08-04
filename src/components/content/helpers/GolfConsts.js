@@ -129,5 +129,11 @@ export const courses = [
         displayName: "Rockledge",
         courseKey: "rockledge",
         scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 10,
+        displayName: "Bayberry Hills",
+        courseKey: "bayberryHills",
+        scoreCardHoleAbbreviation: ""
     }
 ]
