@@ -138,14 +138,14 @@ export const createParRow = (courseInfo, activeRound) => {
     let parRow = [];
     for (let hole = 1; hole <= 18; hole++) {
         if (activeRound[`hole${hole}`]) {
-            if (hole === 9) {
+            if (hole === 9 && activeRound.fullFront9 && activeRound.fullFront9) {
                 parRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{courseInfo[activeRound.courseKey][`hole${hole}`].par}</TableCell>
                         <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{courseInfo[activeRound.courseKey].f9Par}</TableCell>
                     </>
                 );
-            } else if (hole === 18) {
+            } else if (hole === 18 && activeRound.fullBack9) {
                 parRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{courseInfo[activeRound.courseKey][`hole${hole}`].par}</TableCell>
@@ -179,14 +179,14 @@ export const createScoreRow = (courseInfo, activeRound, course) => {
             if (activeRound[`hole${hole}`].score === course[`hole${hole}`].par - 1) backgroundColorClassName += " backgroundColorBirdie";
             if (activeRound[`hole${hole}`].score < course[`hole${hole}`].par - 1) backgroundColorClassName += " backgroundColorEagle";
 
-            if (hole === 9) {
+            if (hole === 9 && activeRound.fullFront9) {
                 scoreRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall"><span className={backgroundColorClassName}>{activeRound[`hole${hole}`].score}</span></TableCell>
                         <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.out}</TableCell>
                     </>
                 );
-            } else if (hole === 18) {
+            } else if (hole === 18 && activeRound.fullBack9) {
                 scoreRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall"><span className={backgroundColorClassName}>{activeRound[`hole${hole}`].score}</span></TableCell>
@@ -224,14 +224,14 @@ export const createPuttsRow = (activeRound) => {
             if (activeRound[`hole${hole}`].putts === 1) backgroundColorClassName += " backgroundColorBirdie";
             if (activeRound[`hole${hole}`].putts === 0) backgroundColorClassName += " backgroundColorEagle";
 
-            if (hole === 9) {
+            if (hole === 9 && activeRound.fullFront9) {
                 puttsRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall"><span className={backgroundColorClassName}>{activeRound[`hole${hole}`].putts}</span></TableCell>
                         <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.f9Putts}</TableCell>
                     </>
                 );
-            } else if (hole === 18) {
+            } else if (hole === 18 && activeRound.fullBack9) {
                 puttsRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall"><span className={backgroundColorClassName}>{activeRound[`hole${hole}`].putts}</span></TableCell>
@@ -285,14 +285,14 @@ export const createScrambleRow = (courseInfo, activeRound) => {
             }
         }
         if (activeRound[`hole${hole}`]) {
-            if (hole === 9) {
+            if (hole === 9 && activeRound.fullFront9) {
                 scrambleRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall"><small>{activeRound[`hole${hole}`].scrambleString}</small></TableCell>
                         <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">J: <b>{strokeMapping.f9.j}</b> M: <b>{strokeMapping.f9.m}</b> N: <b>{strokeMapping.f9.n}</b></TableCell>
                     </>
                 );
-            } else if (hole === 18) {
+            } else if (hole === 18 && activeRound.fullBack9) {
                 scrambleRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall"><small>{activeRound[`hole${hole}`].scrambleString}</small></TableCell>
@@ -322,14 +322,14 @@ export const createNetRow = (activeRound, course) => {
             if (activeRound[`hole${hole}`].netScore === course[`hole${hole}`].par + 1) backgroundColorClassName += " backgroundColorBogey";
             if (activeRound[`hole${hole}`].netScore === course[`hole${hole}`].par - 1) backgroundColorClassName += " backgroundColorBirdie";
             if (activeRound[`hole${hole}`].netScore < course[`hole${hole}`].par - 1) backgroundColorClassName += " backgroundColorEagle";
-            if (hole === 9) {
+            if (hole === 9 && activeRound.fullFront9) {
                 netRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall"><span className={backgroundColorClassName}>{activeRound[`hole${hole}`].netScore}</span></TableCell>
                         <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.netScore}</TableCell>
                     </>
                 );
-            } else if (hole === 18) {
+            } else if (hole === 18 && activeRound.fullBack9) {
                 netRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall"><span className={backgroundColorClassName}>{activeRound[`hole${hole}`].netScore}</span></TableCell>
@@ -349,14 +349,14 @@ export const createFairwaysRow = (activeRound) => {
     let fairwaysRow = [];
     for (let hole = 1; hole <= 18; hole++) {
         if (activeRound[`hole${hole}`]) {
-            if (hole === 9) {
+            if (hole === 9 && activeRound.fullFront9) {
                 fairwaysRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].fir}</TableCell>
                         <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.fairways.f9}</TableCell>
                     </>
                 );
-            } else if (hole === 18) {
+            } else if (hole === 18 && activeRound.fullBack9) {
                 fairwaysRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].fir}</TableCell>
@@ -384,14 +384,14 @@ export const createGreensRow = (activeRound) => {
     let greensRow = [];
     for (let hole = 1; hole <= 18; hole++) {
         if (activeRound[`hole${hole}`]) {
-            if (hole === 9) {
+            if (hole === 9 && activeRound.fullFront9) {
                 greensRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].gir}</TableCell>
                         <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.greens.f9}</TableCell>
                     </>
                 );
-            } else if (hole === 18) {
+            } else if (hole === 18 && activeRound.fullBack9) {
                 greensRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].gir}</TableCell>
@@ -419,14 +419,14 @@ export const createDTGRow = (activeRound) => {
     let dtgRow = [];
     for (let hole = 1; hole <= 18; hole++) {
         if (activeRound[`hole${hole}`]) {
-            if (hole === 9) {
+            if (hole === 9 && activeRound.fullFront9) {
                 dtgRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].dtg}</TableCell>
                         <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">AVG: {(activeRound.dtgF9 / 9).toFixed(1)}</TableCell>
                     </>
                 );
-            } else if (hole === 18) {
+            } else if (hole === 18 && activeRound.fullBack9) {
                 dtgRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].dtg}</TableCell>
@@ -454,14 +454,14 @@ export const createFPMRow = (activeRound) => {
     let fpmRow = [];
     for (let hole = 1; hole <= 18; hole++) {
         if (activeRound[`hole${hole}`]) {
-            if (hole === 9) {
+            if (hole === 9 && activeRound.fullFront9) {
                 fpmRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].puttLength}</TableCell>
                         <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.puttLengthF9} (AVG: {(activeRound.puttLengthF9 / 9).toFixed(1)})</TableCell>
                     </>
                 );
-            } else if (hole === 18) {
+            } else if (hole === 18 && activeRound.fullBack9) {
                 fpmRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].puttLength}</TableCell>
@@ -488,14 +488,14 @@ export const createDTHRow = (activeRound) => {
     let dthRow = [];
     for (let hole = 1; hole <= 18; hole++) {
         if (activeRound[`hole${hole}`]) {
-            if (hole === 9) {
+            if (hole === 9 && activeRound.fullFront9) {
                 dthRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].dth}</TableCell>
                         <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.dthF9} (AVG: {(activeRound.dthF9 / 9).toFixed(1)})</TableCell>
                     </>
                 );
-            } else if (hole === 18) {
+            } else if (hole === 18 && activeRound.fullBack9) {
                 dthRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].dth}</TableCell>
@@ -523,14 +523,14 @@ export const createNotesRow = (activeRound) => {
     let notesRow = [];
     for (let hole = 1; hole <= 18; hole++) {
         if (activeRound[`hole${hole}`]) {
-            if (hole === 9) {
+            if (hole === 9 && activeRound.fullFront9) {
                 notesRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall"><small>{activeRound[`hole${hole}`].notes}</small></TableCell>
                         <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall"></TableCell>
                     </>
                 );
-            } else if (hole === 18) {
+            } else if (hole === 18 && activeRound.fullBack9) {
                 notesRow.push(
                     <>
                         <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall"><small>{activeRound[`hole${hole}`].notes}</small></TableCell>

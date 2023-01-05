@@ -135,5 +135,41 @@ export const courses = [
         displayName: "Bayberry Hills",
         courseKey: "bayberryHills",
         scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 11,
+        displayName: "Airways",
+        courseKey: "airways",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 12,
+        displayName: "Tallwood",
+        courseKey: "tallwood",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 13,
+        displayName: "Blue Fox Run",
+        courseKey: "blueFoxRun",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 14,
+        displayName: "Kettle Brook",
+        courseKey: "kettleBrook",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 15,
+        displayName: "Portland West",
+        courseKey: "portlandWest",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 16,
+        displayName: "Keney Park",
+        courseKey: "keneyPark",
+        scoreCardHoleAbbreviation: ""
     }
 ]

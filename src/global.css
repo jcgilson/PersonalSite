@@ -566,7 +566,20 @@ a, button, div, input, small, span, td, th {
 }
 
 button {
+    padding: 8px 12px;
+    font-size: 18px;
+    background-color: white;
     border: none !important;
+    color: black;
+    border-radius: 48px;
+    min-width: 96px;
+    min-height: 24px;
+}
+.massiveButton {
+    padding: 16px 24px;
+    font-size: 18px !important;
+    min-width: 96px;
+    min-height: 24px; 
 }
 /* button {
     min-width: 96px !important;
