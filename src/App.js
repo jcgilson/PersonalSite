@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 // Components
-// import Header from './components/common/Header';
+import Header from './components/common/Header';
 import Home from './components/common/Home';
 import Itineraries from './components/content/Itineraries';
 import NationalParks from './components/content/NationalParks';
@@ -133,7 +133,7 @@ function App() {
           <section className="backgroundOpacity zIndexNegative" />
         </article>
         <main>
-          {/* <Header links={links} setCurrentPage={setCurrentPage} currentPage={currentPage} /> */}
+          <Header links={links} setCurrentPage={setCurrentPage} currentPage={currentPage} />
           {currentPage === "Home" && <Home links={links} setCurrentPage={setCurrentPage} />}
           {currentPage === "Itineraries" && <Itineraries itineraries={itineraries} configuration={configuration} />}
           {currentPage === "National Parks" && <NationalParks />}

@@ -620,10 +620,10 @@ const Golf = () => {
                                                         <Close onClick={() => updateScorecardEntryData("X", "g", hole)} className={`whiteFont${scorecardEntryData[hole].g === "X" ? " selected" : ""}`} />
                                                     </div>
                                                 </div>
-                                                <TextField id="dtg" label="DTG" variant="standard" onChange={(e) => updateScorecardEntryData(e.target.value, "dtg", hole)} />
+                                                {/* <TextField id="dtg" label="DTG" variant="standard" onChange={(e) => updateScorecardEntryData(e.target.value, "dtg", hole)} />
                                                 <TextField id="dth" label="DTH" variant="standard" onChange={(e) => updateScorecardEntryData(e.target.value, "dth", hole)} />
                                                 <TextField id="fpm" label="FPM" variant="standard" onChange={(e) => updateScorecardEntryData(e.target.value, "fpm", hole)} />
-                                                <TextField id="notes" label="Notes" variant="standard" onChange={(e) => updateScorecardEntryData(e.target.value, "notes", hole)} />
+                                                <TextField id="notes" label="Notes" variant="standard" onChange={(e) => updateScorecardEntryData(e.target.value, "notes", hole)} /> */}
                                             </div>
                                         );
                                     } else return null;

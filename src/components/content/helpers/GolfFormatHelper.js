@@ -632,22 +632,7 @@ export const createScorecard = (courseInfo, activeRound, expandScorecard, setExp
                             <TableCell className="golfTableBorderRightSmall">GIR</TableCell>
                             {createGreensRow(activeRound)}
                         </TableRow>
-                        <TableRow key={7}>
-                            <TableCell className="golfTableBorderRightSmall">DTG</TableCell>
-                            {createDTGRow(activeRound)}
-                        </TableRow>
-                        <TableRow key={8}>
-                            <TableCell className="golfTableBorderRightSmall">FPM</TableCell>
-                            {createFPMRow(activeRound)}
-                        </TableRow>
-                        <TableRow key={9}>
-                            <TableCell className="golfTableBorderRightSmall">DTH</TableCell>
-                            {createDTHRow(activeRound)}
-                        </TableRow>
-                        <TableRow key={10}>
-                            <TableCell className="golfTableBorderRightSmall">Notes</TableCell>
-                            {createNotesRow(activeRound)}
-                        </TableRow>
+                        
                     </>
                 }
                 <TableRow key={11} className="noMarginTop noMarginBottom">
