@@ -171,5 +171,11 @@ export const courses = [
         displayName: "Keney Park",
         courseKey: "keneyPark",
         scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 17,
+        displayName: "South Suburban",
+        courseKey: "southSuburban",
+        scoreCardHoleAbbreviation: ""
     }
 ]
