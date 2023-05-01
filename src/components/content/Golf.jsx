@@ -134,7 +134,10 @@ const Golf = () => {
                     let workSheets = {};
                     for (let course of courses) {
                         workSheets[course.courseKey] = wkbk.getWorksheet(course.displayName);
-                        if (!workSheets[course.courseKey]) console.log("Course name does not match worksheet")
+                        if (!workSheets[course.courseKey]) {
+                            console.log("Course name does not match worksheet");
+                            return;
+                        }
                         const workSheetData = workSheets[course.courseKey].getRow(2).values;
                         courseData[course.courseKey] = {};
                         let column = 2; // Data starts on line 2
@@ -233,11 +236,6 @@ const Golf = () => {
                                         if (courseData[course.courseKey][`hole${hole}`].par === score - 1) roundData.numBogey++; // Bogey
                                         if (courseData[course.courseKey][`hole${hole}`].par <= score - 2) roundData.numBogeyPlus++; // Bogey Plus
                                         
-                                        // console.log("course.courseKey",course.courseKey)
-                                        // console.log("rowNumber",rowNumber)
-                                        // console.log("hole",hole)
-                                        // console.log("row[columnCount + 5]",row[columnCount + 5])
-
                                         // Single hole data
                                         roundData[`hole${hole}`] = {
                                             score: score,

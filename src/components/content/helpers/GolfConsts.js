@@ -176,6 +176,24 @@ export const courses = [
         sequence: 17,
         displayName: "South Suburban",
         courseKey: "southSuburban",
+        scoreCardHoleAbbreviation: "SS"
+    },
+    {
+        sequence: 18,
+        displayName: "South Suburban - Par 3",
+        courseKey: "southSuburbanPar3",
+        scoreCardHoleAbbreviation: "SSP3"
+    },
+    {
+        sequence: 19,
+        displayName: "Kennedy",
+        courseKey: "kennedy",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 20,
+        displayName: "Littleton",
+        courseKey: "littleton",
         scoreCardHoleAbbreviation: ""
     }
 ]

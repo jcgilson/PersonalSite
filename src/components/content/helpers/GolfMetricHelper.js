@@ -565,12 +565,13 @@ export const calculateHandicapMetrics = (courseInfo, allRounds) => {
     const roundsSortedByDescendingDate = allRounds.sort(function(a,b) {return (a.sequence < b.sequence) ? 1 : ((b.sequence < a.sequence) ? -1 : 0);} );
     let overallHandicapRounds = [];
     
-    if (roundsSortedByDescendingDate.length <= 12) {
+    if (roundsSortedByDescendingDate.length <= 9) {
         overallHandicapRounds = roundsSortedByDescendingDate;
     } else {
-        for (let i = 0; overallHandicapRounds.length < 12; i++) {
-            if (!roundsSortedByDescendingDate[i].scrambleRound) { // Scramble and non-Blackledge rounds should not be included in handicap
-                if (roundsSortedByDescendingDate[i].courseKey === "andersonGlen" || roundsSortedByDescendingDate[i].courseKey === "gileadHighlands") overallHandicapRounds.push(roundsSortedByDescendingDate[i]);
+        for (let i = 0; overallHandicapRounds.length < 9; i++) {
+            if (!roundsSortedByDescendingDate[i].scrambleRound) { // Scramble rounds should not be included in handicap
+                // if (roundsSortedByDescendingDate[i].courseKey === "andersonGlen" || roundsSortedByDescendingDate[i].courseKey === "gileadHighlands") // Non-Blackledge rounds should not be included in handicap
+                overallHandicapRounds.push(roundsSortedByDescendingDate[i]);
             }
         }
     }

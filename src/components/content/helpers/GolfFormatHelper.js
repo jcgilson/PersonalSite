@@ -35,7 +35,7 @@ export const calculateFairways = (round) => {
                         if (round[`hole${hole}`].fir === 'X') fairways.x++; // Short of fairway/topped/out of bounds
                         else {
                             if (round[`hole${hole}`].fir === 'NA') fairways.na++;
-                            else console.log(`INVALID FIR VALUE FOR HOLE ${hole}: `, round[`hole${hole}`].fir);
+                            else console.log(`INVALID FIR VALUE FOR ROUND ${round.key} HOLE ${hole}: `, round[`hole${hole}`].fir);
                         }
                     }
                 }
@@ -61,7 +61,7 @@ export const calculateGreens = (round) => {
                 if (round[`hole${hole}`].gir === 'X') greens.x++; // Green missed
                 else {
                     if (round[`hole${hole}`].gir === 'G-1') greens.gur++; // Green under regulation
-                    else console.log(`INVALID GIR VALUE FOR HOLE ${hole}: `, round[`hole${hole}`].gir);
+                    else console.log(`INVALID GIR VALUE FOR ROUND ${round.key} HOLE ${hole}: `, round[`hole${hole}`].gir);
                 }
             }
         }
