@@ -658,6 +658,12 @@ button.small, .mapbox button {
 table {
     border-collapse: collapse
 }
+.hideBorderBottom td {
+    border-bottom: 0px !important;
+}
+.pageLinks {
+    
+}
 
 @media print {
     .noprint {

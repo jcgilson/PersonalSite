@@ -33,6 +33,22 @@
 }
 
 /* Golf Page */
+.marginBottomMassive.golf {
+    margin-bottom: 124px !important;
+}
+.filterDropdownContainer {
+    position: fixed;
+    bottom: 24px;    
+}
+.filterDropdownContainer .MuiFormControl-root .MuiFilledInput-root {
+    background-color: rgba(256, 256, 256, 0.9);
+}
+.filterDropdownContainer label, .filterDropdownContainer svg, .filterDropdownContainer .MuiFormControl-root .MuiSelect-select.MuiSelect-filled {
+    color: black !important;
+}
+.filterDropdownContainer .MuiPaper-root li span.MuiListItemText-root {
+    font-family: var(--fontFamily-Serif) !important
+}
 .sectionBorder {
     display: flex;
     flex-direction: column;
@@ -51,6 +67,10 @@
 .golf h1, .golf h2, .golf h3, .golf h4, .golf h5, .golf h6,
 .golf span, .golf th, .golf td, .golf div, .golf p, .golf a {
     color: white;
+}
+
+.golf .subTable.negativeMarginTop {
+    margin-top: -20px !important;
 }
 
 .golf .subTable h1, .golf .subTable h2, .golf .subTable h3, .golf .subTable h4,
@@ -89,7 +109,8 @@
     border: 1px solid rgba(256, 256, 256, .3);
     border-radius: 12px;
     margin: 30px 36px;
-    min-width: 480px;
+    /* min-width: 480px; */
+    min-width: 320px;
     box-shadow: 0 1px 8px -2px rgba(256, 256, 256, .6) !important;
 }
 

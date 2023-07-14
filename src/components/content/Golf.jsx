@@ -5,9 +5,11 @@ import React, { useState, useEffect, useRef } from "react";
 // import Map from './Map';
 // MUI
 import {
-    Table, TableHead, TableBody, TableRow, TableCell, Radio, RadioGroup, FormControl, FormControlLabel, CircularProgress, TextField, InputLabel, MenuItem, Select
+    Table, TableHead, TableBody, TableRow, TableCell, Radio, RadioGroup, FormControl, FormControlLabel, CircularProgress, TextField,
+    InputLabel, MenuItem, Select, OutlinedInput, ListItemText, Checkbox, Modal
 } from '@mui/material';
-import { Check, Close, TurnSlightLeft, TurnSlightRight, LooksOne, LooksTwo, Looks3, Looks4, RemoveCircle, AddCircle } from '@mui/icons-material';
+import { SelectChangeEvent } from '@mui/material/Select';
+import { Check, Close, TurnSlightLeft, TurnSlightRight, LooksOne, LooksTwo, Looks3, Looks4, RemoveCircle, AddCircle, RoomRounded } from '@mui/icons-material';
 // CSS
 import "../common/shared.css"
 // Helpers
@@ -21,13 +23,15 @@ import metrics from "../../images/metrics.png";
 import singleHoleMetrics from "../../images/singleHoleMetrics.png";
 
 const Excel = require('exceljs');
+// const reader = require('xlsx');
+
 
 const Golf = () => {
 
     /**
      * TODO
      * 
-     * Find all instances of array of 2 courses and make into CONST file
+     * Find all instances of array of 2 Backledge courses and make into CONST file
      * 
      * Features:
      * Avg DTG/FPM/DTM
@@ -37,14 +41,21 @@ const Golf = () => {
      * 
      * 
      * 
-     * 
      */
 
+    //  Configurable state
+    const [activePage, setActivePage] = useState('Golf Rounds');
+    const [yearFilter, setYearFilter] = useState(2023); // Can set default year here
+
+    // Internal state
     const [displayUploadButton, setDisplayUploadButton] = useState(true);
+    const [filters, setFilters] = useState(["2023"]);
+    const [courseTours, setCourseTours] = useState(["South Suburban"]);
     const [isLoading, setIsLoading] = useState(false);
     const [allRounds, setAllRounds] = useState([]);
+    const [displayedRounds, setDisplayedRounds] = useState([]);
     const [courseInfo, setCourseInfo] = useState({});
-    const [activeTable, setActiveTable] = useState('Summary');
+    const [roundYears, setRoundYears] = useState([]);
     const [tableSort, setTableSort] = useState({ method: 'formattedDate', order: 'descending' });
     const [activeRound, setActiveRound] = useState({});
     const [displaySubtable, setDisplaySubtable] = useState(false);
@@ -53,13 +64,17 @@ const Golf = () => {
     const [expandScorecard, setExpandScorecard] = useState(false);
     const [expandSingleHoleMetric, setExpandSingleHoleMetric] = useState({ hole: "", expanded: false });
     const [puttingData, setPuttingData] = useState({});
+    const [displayHelpModal, setDisplayHelpModal] = useState(false);
+    const pinnedCourse = "South Suburban"; // Course pinned atop scorecard entry
+
+    console.log("scorecardEntryData",scorecardEntryData)
 
     const fileInputRef = useRef(null);
 
     useEffect(() => {
         const scorecardData = {};
-        console.log("activeScorecardEntry",activeScorecardEntry)
-        console.log("courseInfo activeScorecardEntry",courseInfo[activeScorecardEntry])
+        // console.log("activeScorecardEntry",activeScorecardEntry)
+        // console.log("courseInfo activeScorecardEntry",courseInfo[activeScorecardEntry])
         for (let hole = 1; hole <= 18; hole++) {
             scorecardData[`hole${hole}`] = {
                 score: activeScorecardEntry === "" ? 100 : courseInfo[activeScorecardEntry][`hole${hole}`].par, // Default score to par
@@ -76,9 +91,47 @@ const Golf = () => {
         setScorecardEntryData(scorecardData);
     }, [activeScorecardEntry]);
 
+    useEffect(() => {
+        let tempRounds = allRounds;
+        console.log("tempRounds1",tempRounds)
+        if (tempRounds.length > 0) {
+            if (filters.includes(mostRecentRoundYear) && !filters.includes("All Years")) {
+                for (let round of tempRounds) {
+                    console.log("\n typeof round.date",typeof round.date)
+                    console.log("round.date",round.date)
+                    console.log("round.date",round.date.substring(round.date.length - 1, round.date.length))
+                }
+                tempRounds = tempRounds.filter(round => round.date && round.date.substring(round.date.length - 1, round.date.length) === mostRecentRoundYear.substring(mostRecentRoundYear.length - 1, mostRecentRoundYear));
+            }
+            if (filters.includes("Full Rounds")) {
+                tempRounds = tempRounds.filter(round => round.fullFront9 && round.fullBack9);
+            }
+            setDisplayedRounds(tempRounds)
+        }
+        console.log("tempRounds2",tempRounds)
+    }, [filters]);
+
+    const handleSetYearFilter = (filter) => {
+        const filterYear = parseInt(filter);
+        if (filterYear >= 2022 && filterYear < 2100 && filterYear !== yearFilter) {
+            const newRounds = [];
+            for (let round of allRounds) {
+                const yearSuffix = round.date.split("/")[2]
+                if ((2000 + parseInt(yearSuffix)) == filterYear) {
+                    newRounds.push(round);
+                }
+            }
+            setDisplayedRounds(newRounds);
+        } else {
+            if (filter === "") {
+                setDisplayedRounds(allRounds);
+            }
+        }
+        setYearFilter(filterYear);
+    }
     
-    console.log("activeScorecardEntry",activeScorecardEntry)
-    console.log("scorecardEntryData",scorecardEntryData)
+    // console.log("activeScorecardEntry",activeScorecardEntry)
+    // console.log("scorecardEntryData",scorecardEntryData)
 
     // Try to insert new user data
     // const createAccount = (newUserData) => {
@@ -92,6 +145,8 @@ const Golf = () => {
     const insertRound = (scorecardEntryData) => {
         // Insert data into Mongo for username and password
     }
+
+    console.log("courseInfo",courseInfo)
 
     const importFile = (e) => {
         setIsLoading(true);
@@ -140,6 +195,7 @@ const Golf = () => {
                         }
                         const workSheetData = workSheets[course.courseKey].getRow(2).values;
                         courseData[course.courseKey] = {};
+                        courseData[course.courseKey].displayName = course.displayName;
                         let column = 2; // Data starts on line 2
                         for (let hole = 1; hole <= 18; hole++ ) {
                             courseData[course.courseKey][`hole${hole}`] = {};
@@ -214,7 +270,10 @@ const Golf = () => {
                                     numBirdies: 0,
                                     numPar: 0,
                                     numBogey: 0,
-                                    numBogeyPlus: 0
+                                    numBogeyPlus: 0,
+                                    // Total Score
+                                    coursePar: 0,
+                                    scoreToPar: 0
                                 };
 
                                 if (roundData.leagueRound) roundData.netScore = 0;
@@ -235,6 +294,16 @@ const Golf = () => {
                                         if (courseData[course.courseKey][`hole${hole}`].par === score) roundData.numPar++; // Par
                                         if (courseData[course.courseKey][`hole${hole}`].par === score - 1) roundData.numBogey++; // Bogey
                                         if (courseData[course.courseKey][`hole${hole}`].par <= score - 2) roundData.numBogeyPlus++; // Bogey Plus
+
+                                        roundData.coursePar = roundData.coursePar + courseData[course.courseKey][`hole${hole}`].par;
+                                        roundData.scoreToPar =  roundData.scoreToPar + score - courseData[course.courseKey][`hole${hole}`].par
+
+                                        // console.log("typeof", parseInt(row[columnCount + 5].split(", ")[0]))
+                                        // console.log("row[columnCount + 5]",row[columnCount + 5])
+
+                                        if (typeof row[columnCount + 5] !== "number" && typeof parseInt(row[columnCount + 5].split(", ")[0]) !== "number") {
+                                            console.log(`INVALID FPM VALUE FOR ROUND ${roundData.key} HOLE ${hole}`, parseInt(row[columnCount + 5].split(", ")[0]),"")
+                                        }
                                         
                                         // Single hole data
                                         roundData[`hole${hole}`] = {
@@ -340,7 +409,9 @@ const Golf = () => {
                                 }
     
                                 // Cumulative data
-                                console.log("roundData",roundData)
+                                setRoundYears(roundYears.push(roundData.formattedDate))
+
+                                // console.log("roundData",roundData)
                                 const fairways = calculateFairways(roundData);
                                 roundData.fairways = fairways;
     
@@ -365,24 +436,63 @@ const Golf = () => {
                         });
                     }
 
-                    console.log("courseData",courseData)
+                    // Sort rounds by descending date
+                    allRounds.sort(function(a, b){
+                        const aDate = a.date.split('/');
+                        const aYear = parseInt(aDate[2]);
+                        const aMonth = parseInt(aDate[0]);
+                        const aDay = parseInt(aDate[1]);
+
+                        const bDate = b.date.split('/');
+                        const bYear = parseInt(bDate[2]);
+                        const bMonth = parseInt(bDate[0]);
+                        const bDay = parseInt(bDate[1]);
+
+                        let order = 0;
+                        if (aYear > bYear) {
+                            order = -1;
+                        } else if (aYear === bYear) {
+                            if (aMonth > bMonth) {
+                                order = -1;
+                            } else if (aMonth === bMonth) {
+                                if (aDay > bDay) {
+                                    order = -1;
+                                }
+                            }
+                        }
+
+                        return order
+                    });
+
+
+                    // Filter by yearFilter state
+                    const displayedRounds = [];
+                    if (typeof yearFilter === "number") {
+                        for (let round of allRounds) {
+                            const yearSuffix = round.date.split("/")[2]
+                            if ((2000 + parseInt(yearSuffix)) == yearFilter) {
+                                displayedRounds.push(round)
+                            }
+                        }
+                    }
 
                     setCourseInfo(courseData);
                     setPuttingData(allPutts);
-
-                    allRounds.sort(function(a,b) {return (a.sequence > b.sequence) ? 1 : ((b.sequence > a.sequence) ? -1 : 0);} );
-                    console.log("allRounds",allRounds)
+                    
+                    // console.log("allRounds",allRounds)
                     setAllRounds(allRounds);
+                    setDisplayedRounds(displayedRounds);
+                    setTableSort({ method: 'formattedDate', order: 'descending' });
                 });
-        };
+            };
         setDisplayUploadButton(false);
         setIsLoading(false);
     }
 
-    const displayDefaultTable = allRounds.length !== 0;
+    const displayDefaultPage = displayedRounds.length !== 0;
 
-    const handleActiveTableChange = (e = null) => {
-        setActiveTable(e && e.target && e.target.value ? e.target.value : "Summary");
+    const handleActivePageChange = (e = null) => {
+        setActivePage(e && e.target && e.target.value ? e.target.value : "Golf Rounds");
     }
 
     const displayRoundDetails = (round) => {
@@ -402,32 +512,33 @@ const Golf = () => {
             newSortOrder = tableSort.order === 'ascending' ? 'descending' : 'ascending';
             if (tableSort.order === 'ascending') { // Sort rounds descending
                 if (method === 'fir') {
-                    sortedRounds = allRounds.sort(function(a,b) {return (a.fairways.f < b.fairways.f) ? 1 : ((b.fairways.f < a.fairways.f) ? -1 : 0);} );
+                    sortedRounds = displayedRounds.sort(function(a,b) {return (a.fairways.f < b.fairways.f) ? 1 : ((b.fairways.f < a.fairways.f) ? -1 : 0);} );
                 } else if (method === 'gir') {
-                    sortedRounds = allRounds.sort(function(a,b) {return (a.greens.g + a.greens.gur < b.greens.g + b.greens.gur) ? 1 : ((b.greens.g + b.greens.gur < a.greens.g + a.greens.gur) ? -1 : 0);} );
+                    sortedRounds = displayedRounds.sort(function(a,b) {return (a.greens.g + a.greens.gur < b.greens.g + b.greens.gur) ? 1 : ((b.greens.g + b.greens.gur < a.greens.g + a.greens.gur) ? -1 : 0);} );
                 } else {
-                    sortedRounds = allRounds.sort(function(a,b) {return (a[method] < b[method]) ? 1 : ((b[method] < a[method]) ? -1 : 0);} );
+                    sortedRounds = displayedRounds.sort(function(a,b) {return (a[method] < b[method]) ? 1 : ((b[method] < a[method]) ? -1 : 0);} );
                 }
             } else { // Sort rounds ascending
                 if (method === 'fir') {
-                    sortedRounds = allRounds.sort(function(a,b) {return (a.fairways.f > b.fairways.f) ? 1 : ((b.fairways.f > a.fairways.f) ? -1 : 0);} );
+                    sortedRounds = displayedRounds.sort(function(a,b) {return (a.fairways.f > b.fairways.f) ? 1 : ((b.fairways.f > a.fairways.f) ? -1 : 0);} );
                 } else if (method === 'gir') {
-                    sortedRounds = allRounds.sort(function(a,b) {return (a.greens.g + a.greens.gur > b.greens.g + b.greens.gur) ? 1 : ((b.greens.g + b.greens.gur > a.greens.g + a.greens.gur) ? -1 : 0);} );
+                    sortedRounds = displayedRounds.sort(function(a,b) {return (a.greens.g + a.greens.gur > b.greens.g + b.greens.gur) ? 1 : ((b.greens.g + b.greens.gur > a.greens.g + a.greens.gur) ? -1 : 0);} );
                 } else {
-                    sortedRounds = allRounds.sort(function(a,b) {return (a[method] > b[method]) ? 1 : ((b[method] > a[method]) ? -1 : 0);} );
+                    sortedRounds = displayedRounds.sort(function(a,b) {return (a[method] > b[method]) ? 1 : ((b[method] > a[method]) ? -1 : 0);} );
                 }
             }
         } else { // New sort method selected
             if (method === 'fir') {
-                sortedRounds = allRounds.sort(function(a,b) {return (a.fairways.f > b.fairways.f) ? 1 : ((b.fairways.f > a.fairways.f) ? -1 : 0);} );
+                sortedRounds = displayedRounds.sort(function(a,b) {return (a.fairways.f > b.fairways.f) ? 1 : ((b.fairways.f > a.fairways.f) ? -1 : 0);} );
             } else if (method === 'gir') {
-                sortedRounds = allRounds.sort(function(a,b) {return (a.greens.g + a.greens.gur > b.greens.g + b.greens.gur) ? 1 : ((b.greens.g + b.greens.gur > a.greens.g + a.greens.gur) ? -1 : 0);} );
+                sortedRounds = displayedRounds.sort(function(a,b) {return (a.greens.g + a.greens.gur > b.greens.g + b.greens.gur) ? 1 : ((b.greens.g + b.greens.gur > a.greens.g + a.greens.gur) ? -1 : 0);} );
             } else {
-                sortedRounds = allRounds.sort(function(a,b) {return (a[method] > b[method]) ? 1 : ((b[method] > a[method]) ? -1 : 0);} );
+                sortedRounds = displayedRounds.sort(function(a,b) {return (a[method] > b[method]) ? 1 : ((b[method] > a[method]) ? -1 : 0);} );
             }
         }
         setTableSort({ method, order: newSortOrder });
-        setAllRounds(sortedRounds);
+        console.log("sortedRounds",sortedRounds)
+        setDisplayedRounds(sortedRounds);
     }
 
     const handleSetExpandSingleHoleMetric = (hole) => {
@@ -452,33 +563,175 @@ const Golf = () => {
         });
     }
 
+    console.log("activeScorecardEntry",activeScorecardEntry)
     const submitScorecard = () => {
+        console.log("scorecardEntryData being submitted:",scorecardEntryData)
+  
+        // // Reading our test file
+        // const file = reader.readFile('../../GolfEdit.xlsx')
+        
+        // let data = []
+        
+        // const sheets = file.SheetNames
+        
+        // for(let i = 0; i < sheets.length; i++)
+        // {
+        // const temp = reader.utils.sheet_to_json(
+        //         file.Sheets[file.SheetNames[i]])
+        // temp.forEach((res) => {
+        //     data.push(res)
+        // })
+        // }
+        
+        // Printing data
+        // console.log(data)
+        // const workbook = new Excel.Workbook();
+        
+        // const pathName = '../../GolfEdit.xlsx';
+        // console.log("workbook",workbook)
+        // workbook.xlsx.readFile(pathName).then(() => {
+
+        //     const worksheet = workbook.getWorksheet(scorecardEntryData);
+        //     worksheet.eachRow(function(row, rowNumber) {
+        //         console.log('Row ' + rowNumber + ' = ' + JSON.stringify(row.values));
+        //         //Do whatever you want to do with this row like inserting in db, etc
+        //     });
+    
+        
+            // const c1 = ws.getColumn(1);
+            
+            // c1.eachCell(c => {
+        
+            //     console.log(c.value);
+            // });
+        
+            // const c2 = ws.getColumn(2);
+            
+            // c2.eachCell(c => {
+        
+            //     console.log(c.value);
+            // });
+        // }).catch(err => {
+        //     console.log(err.message);
+        // });
+            // .then(function() {
+            //     const worksheet = workbook.getWorksheet(activeScorecardEntry);
+            //     console.log("worksheet",worksheet)
+            //     // worksheet.eachRow(function(row, rowNumber) {
+            //     //     console.log('Row ' + rowNumber + ' = ' + JSON.stringify(row.values));
+            //     //     //Do whatever you want to do with this row like inserting in db, etc
+            //     // });
+            //     // for (let i = 4; i < 1000; i++) {
+            //     //     const currentRow = worksheet.getRow(i)
+            //     //     console.log("currentRow",currentRow)
+            //     //     if
+            //     //     row.getCell(1).value = "hello"; // A5's value set to 5
+
+            //     // }
+            //     // // var row = worksheet.getRow(5);
+            //     // // row.getCell(1).value = 5; // A5's value set to 5
+            //     // row.commit();
+            //     // return workbook.xlsx.writeFile('new.xlsx');
+            // })
+        // Insert into Excel
+        // const row = worksheet.addRow({id: 1, name: 'John Doe', age: 35});
+
         // Insert into mongo
         setScorecardEntryData({});
-        handleActiveTableChange();
+        handleActivePageChange();
+
     }
+
+    const filterOptions = []
+    const roundsSortedByDate = allRounds.length > 0 ? allRounds.sort(function(a, b){
+        const aDate = a.date.split('/');
+        const aYear = parseInt(aDate[2]);
+        const aMonth = parseInt(aDate[0]);
+        const aDay = parseInt(aDate[1]);
+
+        const bDate = b.date.split('/');
+        const bYear = parseInt(bDate[2]);
+        const bMonth = parseInt(bDate[0]);
+        const bDay = parseInt(bDate[1]);
+
+        let order = 0;
+        if (aYear > bYear) {
+            order = -1;
+        } else if (aYear === bYear) {
+            if (aMonth > bMonth) {
+                order = -1;
+            } else if (aMonth === bMonth) {
+                if (aDay > bDay) {
+                    order = -1;
+                }
+            }
+        }
+
+        return order
+    }) : null;
+    // console.log("roundsSortedByDate",roundsSortedByDate)
+    const mostRecentRoundDate = allRounds.length > 0 ? roundsSortedByDate[0].date.split("/") : [];
+    const mostRecentRoundYear = `20${mostRecentRoundDate[2]}`;
+    if (mostRecentRoundDate !== []) filterOptions.push(mostRecentRoundYear);
+    filterOptions.push(
+        'All Years',
+        'Full Rounds'
+    );
+    
+    const courseTourOptions = [
+        "South Suburban",
+        "Gilead Highlands",
+        "Anderson Glen",
+        "Signature Holes"
+    ];
+
+    const handleFilterChange = (event: SelectChangeEvent<typeof filters>) => {
+        const { target: { value } } = event;
+        setFilters(typeof value === 'string' ? value.split(',') : value);
+    };
+
+    const handleCourseTourChange = (event: SelectChangeEvent<typeof courseTours>) => {
+        const { target: { value } } = event;
+        setCourseTours(typeof value === 'string' ? value.split(',') : value);
+    };
+
+    // console.log("displayedRounds",displayedRounds)
 
     return (
 		<div className="flexColumn alignCenter marginTopMedium marginBottomMassive golf">
 			{/* <h1 className="serifFont marginBottomMedium">Golf</h1> */}
-			<h1 className="serifFont marginBottomMedium marginTopMedium">Golf</h1>
+			{/* <h1 className="serifFont marginBottomMedium marginTopMedium">Golf</h1> */}
 
             {!displayUploadButton &&
-                <FormControl>
-                    <RadioGroup row defaultValue={activeTable} onChange={handleActiveTableChange}>
-                        {["Summary", "Anderson Glen", "Gilead Highlands", "Metrics", "Course Tour", "Enter Scorecard"].map((tab, i) => {
-                            return <FormControlLabel key={i} control={<Radio color="default" />} checked={activeTable === tab} value={tab} label={tab} className="marginRightLarge" />
-                        })}
-                    </RadioGroup>
-                </FormControl>
+                <div className="pageLinks">
+                    {[
+                        "Golf Rounds",
+                        // "Anderson Glen",
+                        // "Gilead Highlands",
+                        "Metrics",
+                        "Course Tour",
+                        "Enter Scorecard"
+                    ].map((page, i) => {
+                        return <a key={i} onClick={() => setActivePage(page)} className={`pageLinkFont${page === activePage ? " active" : ""}`} className="marginRightLarge">{page}</a>
+                    })}
+                </div>
             }
 
-            {/* Default summary view */}
-            {displayDefaultTable && activeTable !== "Metrics" && activeTable !== "Course Tour" && activeTable !== "Enter Scorecard" &&
+            {/* Default Golf Rounds view */}
+            {displayDefaultPage && activePage !== "Metrics" && activePage !== "Course Tour" && activePage !== "Enter Scorecard" &&
                 <Table style={{ maxWidth: "80vw" }} className="golfTable">
                     <TableHead>
                         <TableRow className="flexRow">
-                            <TableCell key={1} className="distribute10 altActionFont"></TableCell>
+                            <TableCell key={1} className="distribute10 altActionFont"><TextField id="standard-basic" defaultValue={yearFilter} label="Year" variant="standard" onChange={(e) => { 
+                                // console.log("e.target.value",e.target.value)
+                                // console.log("typeof e.target.value",typeof e.target.value)
+                                // console.log("parseInt(e.target.value)",parseInt(e.target.value))
+                                // if (parseInt(e.target.value) >= 2022 && 
+                                //         parseInt(e.target.value) < 2100) {
+                                //     setYearFilter(parseInt(e.target.value)) 
+                                    handleSetYearFilter(e.target.value)
+                                // }
+                            }} /></TableCell>
                             <TableCell key={2} className={`distribute10 altActionFont ${tableSort.method === "formattedDate" ? tableSort.order === "ascending" || tableSort.order === "" ? "displayDownArrowAfter" : "displayUpArrowAfter" : ""}`} onClick={() => changeSortMethod("formattedDate")}><h3>Date</h3></TableCell>
                             <TableCell key={3} className={`distribute10 altActionFont ${tableSort.method === "course" ? tableSort.order === "ascending" ? "displayDownArrowAfter" : "displayUpArrowAfter" : ""}`} onClick={() => changeSortMethod("course")}><h3>Course</h3></TableCell>
                             <TableCell key={4} className={`distribute10 altActionFont ${tableSort.method === "total" ? tableSort.order === "ascending" ? "displayDownArrowAfter" : "displayUpArrowAfter" : ""}`} onClick={() => changeSortMethod("total")}><h3>Score</h3></TableCell>
@@ -491,16 +744,16 @@ const Golf = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {(activeTable === "Summary" || activeTable === "Anderson Glen" || activeTable === "Gilead Highlands") && allRounds.map((round, i) => {
-                            if ((activeTable === "Summary" || activeTable === round.course) && !round.partialFront9 && !round.partialBack9 && !round.scrambleRound && !round.additionalHoles) {
+                        {(activePage === "Golf Rounds" || activePage === "Anderson Glen" || activePage === "Gilead Highlands") && displayedRounds.map((round, i) => {
+                            if ((activePage === "Golf Rounds" || activePage === round.course) && !round.partialFront9 && !round.partialBack9 && !round.scrambleRound && !round.additionalHoles) {
                                 const roundTotalDisplay = round.scrambleRound ? `${round.total}*` : (round.fullFront9 || round.fullBack9) ? round.total : "DNF";
                                 return (
                                     <>
-                                        <TableRow className={round.aceRound ? "backgroundColorEagleRow" : ""} key={i}>
+                                        <TableRow className={round.aceRound ? `backgroundColorEagleRow ${displaySubtable && activeRound.course === round.course && activeRound.key === round.key ? " hideBorderBottom" : ""}` : `${displaySubtable && activeRound.course === round.course && activeRound.key === round.key ? " hideBorderBottom" : ""}`} key={i}>
                                             <TableCell key={1}><span className={round.aceRound ? "blackFont" : ""} onClick={() => displayRoundDetails(round)}>{displaySubtable && activeRound.course === round.course && activeRound.key === round.key ? "Collapse" : "Scorecard"}</span></TableCell>
                                             <TableCell key={2}>{round.date}</TableCell>
                                             <TableCell key={3}>{round.course}</TableCell>
-                                            <TableCell key={4}>{roundTotalDisplay}</TableCell>
+                                            <TableCell key={4}>{roundTotalDisplay} <small className="marginBottomSmall paddingLeftExtraSmall">({round.scoreToPar > 0 ? `+${round.scoreToPar}` : round.scoreToPar < 0 ? round.scoreToPar : "E"})</small></TableCell>
                                             <TableCell key={5}>{round.putts}</TableCell>
                                             <TableCell key={6}>{round.fairways.f}</TableCell>
                                             <TableCell key={7}>{round.greens.g + round.greens.gur}</TableCell>
@@ -525,23 +778,24 @@ const Golf = () => {
             }
 
             {/* Metrics */}
-            {!displayUploadButton && activeTable === "Metrics" &&
+            {!displayUploadButton && activePage === "Metrics" &&
                 <div className="marginTopMedium">
-                    {calculateStats(courseInfo, allRounds, puttingData)}
+                    {/* {calculateStats(courseInfo, allRounds, puttingData)} */}
+                    {calculateStats(courseInfo, allRounds, puttingData, displayedRounds)}
                 </div>        
             }
 
             {/* Course Tour */}
-            {!displayUploadButton && activeTable === "Course Tour" &&
+            {!displayUploadButton && activePage === "Course Tour" &&
                 <div className="flexColumn justifyCenter">
                     {/* Each hole summary, best score */}
-                    {courseSummary(courseInfo, allRounds, expandSingleHoleMetric, handleSetExpandSingleHoleMetric)}
+                    {courseSummary(courseInfo, allRounds, expandSingleHoleMetric, handleSetExpandSingleHoleMetric, courseTours)}
                     {/* YouTube tour */}
-                    <iframe className="marginAuto" width="800" height="450" title="Course Tour" src="https://www.youtube.com/embed/8QFAY7l-TAg?autoplay=0&mute=1" />
+                    {/* <iframe className="marginAuto" width="800" height="450" title="Course Tour" src="https://www.youtube.com/embed/8QFAY7l-TAg?autoplay=0&mute=1" /> */}
                 </div>
             }
 
-            {!displayUploadButton && activeTable === "Enter Scorecard" &&
+            {!displayUploadButton && activePage === "Enter Scorecard" &&
                 <>
                     <div className="marginTopMedium marginBottomMedium">
                         <FormControl>
@@ -554,7 +808,7 @@ const Golf = () => {
                                 style={{width: "300px"}}
                             >
                                 {/* Sort by display name */}
-                                {courses.sort((a,b) => a.displayName > b.displayName ? 1 : b.displayName > a.displayName ? -1 : 0).map(course => { return (<MenuItem value={course.courseKey}>{course.displayName}</MenuItem>)})}
+                                {courses.sort((a,b) => ((a.displayName > b.displayName) || a.display === pinnedCourse) ? 1 : ((b.displayName > a.displayName) || b.display === pinnedCourse) ? -1 : 0).map(course => { return (<MenuItem value={course.courseKey} key={course.courseKey}>{course.displayName}</MenuItem>)})}
                             </Select>
                         </FormControl>
                     </div>
@@ -620,17 +874,96 @@ const Golf = () => {
                                                 </div>
                                                 <TextField id="dtg" label="DTG" variant="standard" onChange={(e) => updateScorecardEntryData(e.target.value, "dtg", hole)} />
                                                 <TextField id="dth" label="DTH" variant="standard" onChange={(e) => updateScorecardEntryData(e.target.value, "dth", hole)} />
-                                                <TextField id="fpm" label="FPM" variant="standard" onChange={(e) => updateScorecardEntryData(e.target.value, "fpm", hole)} />
+                                                {/* <TextField id="fpm" label="FPM" variant="standard" onChange={(e) => updateScorecardEntryData(e.target.value, "fpm", hole)} /> */}
                                                 <TextField id="notes" label="Notes" variant="standard" onChange={(e) => updateScorecardEntryData(e.target.value, "notes", hole)} />
                                             </div>
                                         );
                                     } else return null;
                                 })}
                             </div>
-                            <button className="marginTopExtraLarge" onClick={() => submitScorecard()}>Submit</button>
+                            <div className="width100Percent justifyCenter marginTopExtraLarge">
+                                <button onClick={() => setDisplayHelpModal(true)} className="marginRightMedium">Help</button>
+                                <button onClick={() => submitScorecard()}>Submit</button>
+                            </div>
                         </div>
                     }
                 </>
+            }
+
+            <Modal
+                open={displayHelpModal}
+                // onClose={() => setDisplayHelpModal(false)}
+            >
+                <div className="backgroundColorWhite flexColumn" style={{ margin: "25vh auto", width: "50%", padding: "16px", borderRadius: "8px" }}>
+                    <h2 className="marginBottomMedium strongFont">Scorecard help</h2>
+                    <p className="flexColumn">
+                        <span className="marginBottomMedium"><b>DTG:</b> Distance to Green. After a tee shot, enter distance to green remaining (avoid values over 250 yards unless the green is hit on the next shot). For Par 5's, enter 2 values separated by a comma and a space. Example: "250, 75"</span>
+                        <span className="marginBottomMedium"><b>DTH:</b> Distance to Hole. Once putting, enter distance (in increments of 3 feet until approach shot is within 3 feet) to the hole and number of feet of putt made separated by a comma and a space. Example: "39, 6"</span>
+                        <span className="marginBottomMedium"><b>Notes:</b> Enter any miscues or shot selections, separated by a comma and a space. Example: "LB, BR, 3P"</span>
+                        <b>Notes examples:</b>
+                        <table className="marginLeftMedium">
+                            <tr><td style={{ width: "36px" }}>BB:</td><td>Breakfast ball</td></tr>
+                            <tr><td>M:</td><td>Mulligan</td></tr>
+                            <tr><td>T:</td><td>Topped drive</td></tr>
+                            <tr><td>LB:</td><td>Lost ball</td></tr>
+                            <tr><td>P:</td><td>Punch shot</td></tr>
+                            <tr><td>S:</td><td>Sand shot</td></tr>
+                            <tr><td>CC:</td><td>Double chip</td></tr>
+                            <tr><td>CCC:</td><td>Triple chip</td></tr>
+                            <tr><td>BR:</td><td>Bump and run</td></tr>
+                            <tr><td>2BR:</td><td>Double bump and run</td></tr>
+                            <tr><td>3P:</td><td>3 putt</td></tr>
+                            <tr><td>4P:</td><td>4 putt</td></tr>
+                            {/* <tr><td></td><td></td></tr> */}
+                        </table>
+                    </p>
+                </div>
+            </Modal>
+
+            {!displayUploadButton && activePage !== "Enter Scorecard" && activePage !== "Course Tour" &&
+                <div className="filterDropdownContainer margin0Auto justifyCenter">
+                    <FormControl sx={{ m: 1, width: 300 }} variant="filled">
+                        <InputLabel id="demo-multiple-checkbox-label">Select Filters</InputLabel>
+                        <Select
+                            labelId="demo-multiple-checkbox-label"
+                            id="demo-multiple-checkbox"
+                            multiple
+                            value={filters}
+                            onChange={handleFilterChange}
+                            renderValue={(selected) => selected.join(', ')}
+                        >
+                            {filterOptions.map((filter) => (
+                                <MenuItem key={filter} value={filter}>
+                                    <Checkbox checked={filters.indexOf(filter) > -1} />
+                                    <ListItemText primary={filter} />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </div>
+            }
+
+            {!displayUploadButton && activePage === "Course Tour" &&
+                <div className="filterDropdownContainer width100Percent justifyCenter">
+                    <FormControl sx={{ m: 1, width: 300 }} variant="filled">
+                        <InputLabel id="demo-multiple-checkbox-label">Select Filters</InputLabel>
+                        <Select
+                            labelId="demo-multiple-checkbox-label"
+                            id="demo-multiple-checkbox"
+                            multiple
+                            value={courseTours}
+                            onChange={handleCourseTourChange}
+                            renderValue={(selected) => selected.join(', ')}
+                        >
+                            {courseTourOptions.map((courseTour) => (
+                                <MenuItem key={courseTour} value={courseTour}>
+                                    <Checkbox checked={courseTours.indexOf(courseTour) > -1} />
+                                    <ListItemText primary={courseTour} />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </div>
             }
 
             {/* Helper Text */}

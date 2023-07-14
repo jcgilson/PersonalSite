@@ -120,19 +120,20 @@ export const calculateLeastPutts = (allRounds) => {
     let leastPuttsCourse18 = "";
 
     for (let round of allRounds) {
-        if (round.f9Putts !== 0 && round.f9Putts < leastPutts9) {
+        // console.log("round",round)
+        if (round.fullFront9 && round.f9Putts !== 0 && round.f9Putts < leastPutts9 && !round.scrambleRound) {
             leastPutts9 = round.f9Putts;
             leastPuttsDate9 = round.date;
             leastPuttsCourse9 = round.course;
             leastPuttFrontOrBack9 = "Front 9";
         }
-        if (round.b9Putts !== 0 && round.b9Putts < leastPutts9) {
+        if (round.fullBack9 && round.b9Putts !== 0 && round.b9Putts < leastPutts9 && !round.scrambleRound) {
             leastPutts9 = round.b9Putts;
             leastPuttsDate9 = round.date;
             leastPuttsCourse9 = round.course;
             leastPuttFrontOrBack9 = "Back 9";
         }
-        if (round.numHoles === 18 && round.putts < leastPutts18) {
+        if (round.fullFront9 && round.fullBack9 && round.numHoles === 18 && round.putts < leastPutts18 && !round.scrambleRound) {
             leastPutts18 = round.putts;
             leastPuttsDate18 = round.date;
             leastPuttsCourse18 = round.course;
@@ -266,6 +267,7 @@ export const calculateSingleHoleMetrics = (courseInfo, allRounds) => {
     for (let round of allRounds) {
         for (let hole = 1; hole <= 18; hole++ ) {
             if (round[`hole${hole}`]) {
+                // console.log("round[`hole${hole}`].dtg",round[`hole${hole}`].dtg)
                 if (singleHoleMetrics[`${round.courseKey}Hole${hole}`] === undefined) {
                     singleHoleMetrics[`${round.courseKey}Hole${hole}`] = { // Initial fields for hole
                         course: round.course,
@@ -287,8 +289,8 @@ export const calculateSingleHoleMetrics = (courseInfo, allRounds) => {
                         numBogeyPlus: 0,
                         putts: round[`hole${hole}`].putts,
                         dth: round[`hole${hole}`].dth ? round[`hole${hole}`].dth : null, // dth not captured for all rounds
-                        fairways: { l: 0, r: 0, f: 0, x: 0, na: 0 },
-                        greens: { g: 0, x: 0, gur: 0 },
+                        fairways: { l: 0, r: 0, f: 0, x: 0, na: 0, lScoreToPar: 0, rScoreToPar: 0, fScoreToPar: 0 },
+                        greens: { g: 0, x: 0, gur: 0, gScoreToPar: 0, xScoreToPar: 0, gurScoreToPar: 0 },
                         puttLength: round[`hole${hole}`].puttLength,
                         handicap: courseInfo[round.courseKey][`hole${hole}`].handicap,
                         roundsData: []
@@ -326,12 +328,17 @@ export const calculateSingleHoleMetrics = (courseInfo, allRounds) => {
                     notes: round[`hole${hole}`].notes,
                 });
                 // Fairways
-                if (round[`hole${hole}`].fir === 'L') singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.l++; // Left of fairway
-                else {
-                    if (round[`hole${hole}`].fir === 'R') singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.r++; // Right of fairway
-                    else {
+                if (round[`hole${hole}`].fir === 'L') {
+                    singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.l++; // Left of fairway
+                    singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.lScoreToPar = singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.lScoreToPar + round[`hole${hole}`].score - courseInfo[round.courseKey][`hole${hole}`].par;
+                } else {
+                    if (round[`hole${hole}`].fir === 'R') {
+                        singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.r++; // Right of fairway
+                        singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.rScoreToPar = singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.rScoreToPar + round[`hole${hole}`].score - courseInfo[round.courseKey][`hole${hole}`].par;
+                    } else {
                         if (round[`hole${hole}`].fir === 'F') { // Fairway in regulation
                             singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.f++;
+                            singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.fScoreToPar = singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.fScoreToPar + round[`hole${hole}`].score - courseInfo[round.courseKey][`hole${hole}`].par;
                         }
                         else {
                             if (round[`hole${hole}`].fir === 'X') singleHoleMetrics[`${round.courseKey}Hole${hole}`].fairways.x++; // Short of fairway/topped/out of bounds
@@ -344,10 +351,16 @@ export const calculateSingleHoleMetrics = (courseInfo, allRounds) => {
                 // Greens
                 if (round[`hole${hole}`].gir === 'G') { // Green in regulation
                     singleHoleMetrics[`${round.courseKey}Hole${hole}`].greens.g++;
+                    singleHoleMetrics[`${round.courseKey}Hole${hole}`].greens.gScoreToPar = singleHoleMetrics[`${round.courseKey}Hole${hole}`].greens.gScoreToPar + round[`hole${hole}`].score - courseInfo[round.courseKey][`hole${hole}`].par;
                 } else {
-                    if (round[`hole${hole}`].gir === 'X') singleHoleMetrics[`${round.courseKey}Hole${hole}`].greens.x++; // Green missed
-                    else {
-                        if (round[`hole${hole}`].gir === 'G-1') singleHoleMetrics[`${round.courseKey}Hole${hole}`].greens.gur++; // Green under regulation
+                    if (round[`hole${hole}`].gir === 'X') { // Green missed
+                        singleHoleMetrics[`${round.courseKey}Hole${hole}`].greens.x++;
+                        singleHoleMetrics[`${round.courseKey}Hole${hole}`].greens.xScoreToPar = singleHoleMetrics[`${round.courseKey}Hole${hole}`].greens.xScoreToPar + round[`hole${hole}`].score - courseInfo[round.courseKey][`hole${hole}`].par;
+                    } else {
+                        if (round[`hole${hole}`].gir === 'G-1') {
+                            singleHoleMetrics[`${round.courseKey}Hole${hole}`].greens.gur++; // Green under regulation
+                            singleHoleMetrics[`${round.courseKey}Hole${hole}`].greens.gurScoreToPar = singleHoleMetrics[`${round.courseKey}Hole${hole}`].greens.gurScoreToPar + round[`hole${hole}`].score - courseInfo[round.courseKey][`hole${hole}`].par;
+                        }
                     }
                 }
                 // CTP
@@ -375,13 +388,18 @@ export const calculateSingleHoleMetrics = (courseInfo, allRounds) => {
                     round[`hole${hole}`].dtg && // DTG value must exist
                     courseInfo[round.courseKey][`hole${hole}`].par !== 3 // Must not be par 3
                 ) {
+                    let holeDtg = round[`hole${hole}`].dtg;
+                    if (typeof holeDtg !== "number") {
+                        const initialDtg = holeDtg.split(", ")
+                        holeDtg = initialDtg[0];
+                    }
                     if (!singleHoleMetrics.longestDrive[`${round.courseKey}Hole${hole}`] || (round[`hole${hole}`].dtg < singleHoleMetrics.longestDrive[`${round.courseKey}Hole${hole}`].dtg)) {
                         singleHoleMetrics.longestDrive[`${round.courseKey}Hole${hole}`] = {
                             date: round.date,
                             course: round.course,
                             hole: hole,
                             dtg: round[`hole${hole}`].dtg,
-                            longestDrive: courseInfo[round.courseKey][`hole${hole}`].distance - round[`hole${hole}`].dtg,
+                            longestDrive: courseInfo[round.courseKey][`hole${hole}`].distance - holeDtg,
                             score: round[`hole${hole}`].score,
                             distance: courseInfo[round.courseKey][`hole${hole}`].distance
                         }
@@ -443,14 +461,11 @@ export const calculateSingleHoleMetrics = (courseInfo, allRounds) => {
         }
     }
 
-    console.log("singleHoleMetrics",singleHoleMetrics)
-
     return singleHoleMetrics;
 }
 
 export const calculateCourseMetrics = (courseInfo, allRounds) => {
     let courseMetrics = {};
-    console.log("courseInfo",courseInfo)
     for (let course of Object.keys(courseInfo)) {
         courseMetrics[course] = {
             inDate: "",
@@ -472,7 +487,6 @@ export const calculateCourseMetrics = (courseInfo, allRounds) => {
     for (let round of allRounds) {
         // Best IN round
         if (courseMetrics[round.courseKey].in > round.in && round.in !== 0 && round.fullBack9 && !round.scrambleRound) {
-            console.log("round",round)
             courseMetrics[round.courseKey] = {
                 ...courseMetrics[round.courseKey],
                 inDate: round.date,
@@ -506,6 +520,9 @@ export const calculateCourseMetrics = (courseInfo, allRounds) => {
 }
 
 const calculateHandicaps = (courseInfo, handicapRounds) => {
+    console.log("handicapRounds",handicapRounds)
+    console.log("courseInfo",courseInfo)
+
     let tempHandicapData = {
         overall: {
             f9TotalScore: 0,
@@ -513,78 +530,97 @@ const calculateHandicaps = (courseInfo, handicapRounds) => {
             f9Rounds: 0,
             b9Rounds: 0,
         },
-        andersonGlen: {
-            f9TotalScore: 0,
-            b9TotalScore: 0,
-            f9Rounds: 0,
-            b9Rounds: 0,
-        },
-        gileadHighlands: {
-            f9TotalScore: 0,
-            b9TotalScore: 0,
-            f9Rounds: 0,
-            b9Rounds: 0,
-        }
+        // andersonGlen: {
+        //     f9TotalScore: 0,
+        //     b9TotalScore: 0,
+        //     f9Rounds: 0,
+        //     b9Rounds: 0,
+        // },
+        // gileadHighlands: {
+        //     f9TotalScore: 0,
+        //     b9TotalScore: 0,
+        //     f9Rounds: 0,
+        //     b9Rounds: 0,
+        // }
     }
 
-    let courses = ["overall", "andersonGlen", "gileadHighlands"]
-    for (let course in courses) {
-        for (let round of handicapRounds[`${courses[course]}HandicapRounds`]) {
-            if (round.out !== 0) {
-                tempHandicapData[courses[course]].f9Rounds++;
-                tempHandicapData[courses[course]].f9TotalScore = tempHandicapData[courses[course]].f9TotalScore + round.out;
-            }
-            if (round.in !== 0) {
-                tempHandicapData[courses[course]].b9Rounds++;
-                tempHandicapData[courses[course]].b9TotalScore = tempHandicapData[courses[course]].b9TotalScore + round.in;
-            }
+    // let courses = ["overall", "andersonGlen", "gileadHighlands"]
+    // let courses = ["overall"]
+    // for (let course in courses) {
+    //     for (let round of handicapRounds[`${courses[course]}HandicapRounds`]) {
+    //         if (round.out !== 0) {
+    //             tempHandicapData[courses[course]].f9Rounds++;
+    //             tempHandicapData[courses[course]].f9TotalScore = tempHandicapData[courses[course]].f9TotalScore + round.out;
+    //         }
+    //         if (round.in !== 0) {
+    //             tempHandicapData[courses[course]].b9Rounds++;
+    //             tempHandicapData[courses[course]].b9TotalScore = tempHandicapData[courses[course]].b9TotalScore + round.in;
+    //         }
+    //     }
+    // }
+    let holesPlayed = 0;
+    let strokesOverPar = 0;
+    for (let round of handicapRounds.overallHandicapRounds) {
+        if (round.fullFront9) {
+            holesPlayed = holesPlayed + 9;
+            strokesOverPar = strokesOverPar + round.out - courseInfo[round.courseKey].f9Par
+        }
+        if (round.fullBack9) {
+            holesPlayed = holesPlayed + 9;
+            strokesOverPar = strokesOverPar + round.in - courseInfo[round.courseKey].b9Par
         }
     }
 
     const handicapData = {
         overall: {
-            total: ((tempHandicapData.overall.f9TotalScore / tempHandicapData.overall.f9Rounds) + (tempHandicapData.overall.b9TotalScore / tempHandicapData.overall.b9Rounds) - 72).toFixed(1)
+            // total: ((tempHandicapData.overall.f9TotalScore / tempHandicapData.overall.f9Rounds) + (tempHandicapData.overall.b9TotalScore / tempHandicapData.overall.b9Rounds) - 72).toFixed(1)
+            total: (strokesOverPar/holesPlayed * 18).toFixed(1)
         },
-        andersonGlen: {
-            f9: ((tempHandicapData.andersonGlen.f9TotalScore / tempHandicapData.andersonGlen.f9Rounds) - courseInfo.andersonGlen.f9Par).toFixed(1),
-            b9: ((tempHandicapData.andersonGlen.b9TotalScore / tempHandicapData.andersonGlen.b9Rounds) - courseInfo.andersonGlen.b9Par).toFixed(1),
-            total: (((tempHandicapData.andersonGlen.f9TotalScore / tempHandicapData.andersonGlen.f9Rounds) - courseInfo.andersonGlen.f9Par) + ((tempHandicapData.andersonGlen.b9TotalScore / tempHandicapData.andersonGlen.b9Rounds) - courseInfo.andersonGlen.b9Par)).toFixed(1)
-        },
-        gileadHighlands: {
-            f9: ((tempHandicapData.gileadHighlands.f9TotalScore / tempHandicapData.gileadHighlands.f9Rounds) - courseInfo.gileadHighlands.f9Par).toFixed(1),
-            b9: ((tempHandicapData.gileadHighlands.b9TotalScore / tempHandicapData.gileadHighlands.b9Rounds) - courseInfo.gileadHighlands.b9Par).toFixed(1),
-            total: (((tempHandicapData.gileadHighlands.f9TotalScore / tempHandicapData.gileadHighlands.f9Rounds) - courseInfo.gileadHighlands.f9Par) + ((tempHandicapData.gileadHighlands.b9TotalScore / tempHandicapData.gileadHighlands.b9Rounds) - courseInfo.gileadHighlands.b9Par)).toFixed(1)
-        }
+        // andersonGlen: {
+        //     f9: ((tempHandicapData.andersonGlen.f9TotalScore / tempHandicapData.andersonGlen.f9Rounds) - courseInfo.andersonGlen.f9Par).toFixed(1),
+        //     b9: ((tempHandicapData.andersonGlen.b9TotalScore / tempHandicapData.andersonGlen.b9Rounds) - courseInfo.andersonGlen.b9Par).toFixed(1),
+        //     total: (((tempHandicapData.andersonGlen.f9TotalScore / tempHandicapData.andersonGlen.f9Rounds) - courseInfo.andersonGlen.f9Par) + ((tempHandicapData.andersonGlen.b9TotalScore / tempHandicapData.andersonGlen.b9Rounds) - courseInfo.andersonGlen.b9Par)).toFixed(1)
+        // },
+        // gileadHighlands: {
+        //     f9: ((tempHandicapData.gileadHighlands.f9TotalScore / tempHandicapData.gileadHighlands.f9Rounds) - courseInfo.gileadHighlands.f9Par).toFixed(1),
+        //     b9: ((tempHandicapData.gileadHighlands.b9TotalScore / tempHandicapData.gileadHighlands.b9Rounds) - courseInfo.gileadHighlands.b9Par).toFixed(1),
+        //     total: (((tempHandicapData.gileadHighlands.f9TotalScore / tempHandicapData.gileadHighlands.f9Rounds) - courseInfo.gileadHighlands.f9Par) + ((tempHandicapData.gileadHighlands.b9TotalScore / tempHandicapData.gileadHighlands.b9Rounds) - courseInfo.gileadHighlands.b9Par)).toFixed(1)
+        // }
     }
 
     return handicapData;
 }
 
-export const calculateHandicapMetrics = (courseInfo, allRounds) => {
+export const calculateHandicapMetrics = (courseInfo, displayedRounds) => {
     // 12 most recent rounds contribute to handicap
-    const roundsSortedByDescendingDate = allRounds.sort(function(a,b) {return (a.sequence < b.sequence) ? 1 : ((b.sequence < a.sequence) ? -1 : 0);} );
-    let overallHandicapRounds = [];
+    const roundsSortedByDescendingDate = displayedRounds.sort(function(a,b) {return (a.sequence < b.sequence) ? 1 : ((b.sequence < a.sequence) ? -1 : 0);} );
+    console.log("roundsSortedByDescendingDate",roundsSortedByDescendingDate)
     
+    let overallHandicapRounds = [];
     if (roundsSortedByDescendingDate.length <= 9) {
         overallHandicapRounds = roundsSortedByDescendingDate;
     } else {
         for (let i = 0; overallHandicapRounds.length < 9; i++) {
-            if (!roundsSortedByDescendingDate[i].scrambleRound) { // Scramble rounds should not be included in handicap
+            if (!roundsSortedByDescendingDate[i].scrambleRound && roundsSortedByDescendingDate[i].fullFront9 && roundsSortedByDescendingDate[i].fullBack9) { // Scramble rounds should not be included in handicap
                 // if (roundsSortedByDescendingDate[i].courseKey === "andersonGlen" || roundsSortedByDescendingDate[i].courseKey === "gileadHighlands") // Non-Blackledge rounds should not be included in handicap
                 overallHandicapRounds.push(roundsSortedByDescendingDate[i]);
             }
         }
     }
-    let andersonGlenHandicapRounds = [];
-    let gileadHighlandsHandicapRounds = [];
-    for (let i = 0; andersonGlenHandicapRounds.length < 12 && roundsSortedByDescendingDate[i]; i++) {
-        if (roundsSortedByDescendingDate[i].courseKey === "andersonGlen") andersonGlenHandicapRounds.push(roundsSortedByDescendingDate[i])
-    }
-    for (let i = 0; gileadHighlandsHandicapRounds.length < 12 && roundsSortedByDescendingDate[i]; i++) {
-        if (roundsSortedByDescendingDate[i].courseKey === "gileadHighlands") gileadHighlandsHandicapRounds.push(roundsSortedByDescendingDate[i])
-    }
 
-    const handicapRounds = { overallHandicapRounds, andersonGlenHandicapRounds, gileadHighlandsHandicapRounds };
+    console.log("overallHandicapRounds",overallHandicapRounds)
+
+    // let andersonGlenHandicapRounds = [];
+    // let gileadHighlandsHandicapRounds = [];
+    // for (let i = 0; andersonGlenHandicapRounds.length < 12 && roundsSortedByDescendingDate[i]; i++) {
+    //     if (roundsSortedByDescendingDate[i].courseKey === "andersonGlen") andersonGlenHandicapRounds.push(roundsSortedByDescendingDate[i])
+    // }
+    // for (let i = 0; gileadHighlandsHandicapRounds.length < 12 && roundsSortedByDescendingDate[i]; i++) {
+    //     if (roundsSortedByDescendingDate[i].courseKey === "gileadHighlands") gileadHighlandsHandicapRounds.push(roundsSortedByDescendingDate[i])
+    // }
+
+    // const handicapRounds = { overallHandicapRounds, andersonGlenHandicapRounds, gileadHighlandsHandicapRounds };
+    const handicapRounds = { overallHandicapRounds };
     const handicapsData = calculateHandicaps(courseInfo, handicapRounds);
 
     return handicapsData;
@@ -712,6 +748,8 @@ export const calculatePuttingMetrics = (puttingData) => {
         longestPutts: {},
     };
 
+    console.log("puttingData",puttingData)
+
     for (let putt of puttingData) {
         if (putt.dth === 0 || putt.dth % 3 === 0) {
             if (puttingMetrics.makeByDistance[`from${putt.dth}`]) {
@@ -728,6 +766,9 @@ export const calculatePuttingMetrics = (puttingData) => {
                     num4Putts: putt.putts > 3 ? 1 : 0
                 }
             }
+            // console.log("puttingMetrics.allPutts.gir",puttingMetrics.allPutts.gir)
+            // console.log("[`num${putt.putts}Putts`]",[`num${putt.putts}Putts`])
+            // console.log("puttingMetrics.allPutts.gir[`num${putt.putts}Putts`]",puttingMetrics.allPutts.gir[`num${putt.putts}Putts`])
             if (putt.gir === "G" || putt.gir === "G-1") {
                 puttingMetrics.allPutts.gir.byScore.total++;
                 puttingMetrics.allPutts.gir[`num${putt.putts}Putts`].total++;

@@ -50,7 +50,7 @@ export const calculateGreens = (round) => {
     let greens = { g: 0, x: 0, gur: 0, f9: 0, b9: 0 };
     for (let hole = 1; hole <= 18; hole++) {
         if (round[`hole${hole}`]) {
-            if (round[`hole${hole}`].gir === 'G') { // Green in regulation
+            if (round[`hole${hole}`].gir === 'G' || round[`hole${hole}`].gir === 'G-1') { // Green in regulation
                 greens.g++;
                 if (hole <= 9) {
                     greens.f9++;
@@ -76,10 +76,8 @@ export const calculatePuttLengths = (round) => {
         f9: 0,
         b9: 0
     };
-    // TODO: Scorecard putt length incorrect - maybe just front 9
-    // console.log("\n\nSTART")
+
     for (let hole = 1; hole <= 18; hole++) {
-        // console.log("hole",hole)
         if (round[`hole${hole}`]) {
             if (hole < 10) {
                 puttLengths.f9 = puttLengths.f9 + round[`hole${hole}`].puttLength;
@@ -91,10 +89,7 @@ export const calculatePuttLengths = (round) => {
                 console.log(`INVALID PUTT LENGTH VALUE FOR HOLE ${hole}: `, round[`hole${hole}`].puttLength);
             }
         }
-        // console.log("puttLengths",puttLengths)
     }
-
-    // console.log("\n\nFINAL puttLengths",puttLengths,"\n\n")
 
     return puttLengths;
 }
@@ -352,27 +347,27 @@ export const createFairwaysRow = (activeRound) => {
             if (hole === 9 && activeRound.fullFront9) {
                 fairwaysRow.push(
                     <>
-                        <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].fir}</TableCell>
+                        <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].fir === "NA" ? "-" : activeRound[`hole${hole}`].fir}</TableCell>
                         <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.fairways.f9}</TableCell>
                     </>
                 );
             } else if (hole === 18 && activeRound.fullBack9) {
                 fairwaysRow.push(
                     <>
-                        <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].fir}</TableCell>
+                        <TableCell key={`${hole}-1`} className="textCenter golfTableBorderRightSmall">{activeRound[`hole${hole}`].fir === "NA" ? "-" : activeRound[`hole${hole}`].fir}</TableCell>
                         <TableCell key={`${hole}-2`} className="textCenter golfTableBorderRightSmall">{activeRound.fairways.b9}</TableCell>
                         {activeRound.hole1 && <TableCell key={`${hole}-3`} className="textCenter">{activeRound.fairways.f} ({18 - activeRound.fairways.na})</TableCell>} {/* Display total row only when front 9 is also played */}
                     </>
                 );
             } else {
-                fairwaysRow.push(<TableCell key={`${hole}-1`} className="textCenter">{activeRound[`hole${hole}`].fir}</TableCell>);
+                fairwaysRow.push(<TableCell key={`${hole}-1`} className="textCenter">{activeRound[`hole${hole}`].fir === "NA" ? "-" : activeRound[`hole${hole}`].fir}</TableCell>);
             }
         }
     }
     if (activeRound.additionalHoles) {
         for (let hole = 1; hole <= 9; hole++ ) {
             if (activeRound.additionalHoles[`additionalHole${hole}`]) {
-                fairwaysRow.push(<TableCell key={`additionalHole${hole}-1`} className="textCenter">{activeRound.additionalHoles[`additionalHole${hole}`].fir}</TableCell>);
+                fairwaysRow.push(<TableCell key={`additionalHole${hole}-1`} className="textCenter">{activeRound[`hole${hole}`].fir === "NA" ? "-" : activeRound.additionalHoles[`additionalHole${hole}`].fir}</TableCell>);
             }
         }
     }
@@ -381,6 +376,7 @@ export const createFairwaysRow = (activeRound) => {
 }
 
 export const createGreensRow = (activeRound) => {
+    console.log("activeRound",activeRound)
     let greensRow = [];
     for (let hole = 1; hole <= 18; hole++) {
         if (activeRound[`hole${hole}`]) {
@@ -579,7 +575,7 @@ const createScorecardHoleRow = (activeRound) => {
 export const createScorecard = (courseInfo, activeRound, expandScorecard, setExpandScorecard) => {
     const courseKey = courseInfo[activeRound.courseKey];
     return (
-        <Table className={`subTable backgroundColorWhite borderRadiusSmall${activeRound.aceRound ? " backgroundColorEagleGlow" : ""}`}>
+        <Table style={{ marginTop: "-24px !important" }} className={`subTable negativeMarginTop backgroundColorWhite borderRadiusSmall${activeRound.aceRound ? " backgroundColorEagleGlow" : ""}`}>
             <TableHead>
                 <TableRow>
                     <TableCell key={1} className="golfTableBorderRightSmall"><b>HOLE</b></TableCell>
@@ -731,13 +727,13 @@ export const createDrivingTable = (drivingMetrics) => {
     );
 }
 
-const createCumulativeGraphs = (drivingMetrics, puttingMetrics) => {
+const createCumulativeGraphs = (displayedRounds, drivingMetrics, puttingMetrics) => {
     const sankeyGraphDistance = drivingMetrics.total;
     const totalGir = sankeyGraphDistance.lGir + sankeyGraphDistance.fGir + sankeyGraphDistance.rGir + sankeyGraphDistance.xGir;
     const totalMissedGreen = sankeyGraphDistance.total - totalGir;
     const totalByScore = puttingMetrics.allPutts.totalByScore;
 
-    console.log("puttingMetrics",puttingMetrics)
+    // console.log("puttingMetrics",puttingMetrics)
     
     const sankeyGraphData = [
         ["From", "To", "Weight"],
@@ -759,6 +755,7 @@ const createCumulativeGraphs = (drivingMetrics, puttingMetrics) => {
     ];
 
     // Score data - GIR
+    let totalHoles = 0;
     const scoreToParLabelMap = {
         scoreMinus2: "Eagle",
         scoreMinus1: "Birdie",
@@ -776,7 +773,7 @@ const createCumulativeGraphs = (drivingMetrics, puttingMetrics) => {
             }
         }
         if (score === "score2") {
-            pieChartData.push(["Double Bogey+", totalByScore.byScore.score2 + totalByScore.byScore.score3]);
+            pieChartData.push(["Bogey+", totalByScore.byScore.score2 + totalByScore.byScore.score3]);
         } else {
             if (score !== "score3") {
                 pieChartData.push([scoreToParLabelMap[score], totalByScore.byScore[score]]);
@@ -788,6 +785,54 @@ const createCumulativeGraphs = (drivingMetrics, puttingMetrics) => {
         sankeyGraphData.push([`X: ${sankeyGraphDistance.x}`, `X GIR: ${totalMissedGreen}`, sankeyGraphDistance.total - sankeyGraphDistance.g]);
         sankeyGraphData.push([`X: ${sankeyGraphDistance.x}`, `G: ${totalGir}`, sankeyGraphDistance.xGir]);
     }
+
+    // Round totals
+    let roundTotalTableData = [
+        [
+            "Date",
+            "Score",
+            "Handicap"
+        ]
+    ];
+    let roundTotalTableDataNine = [
+        [
+            "Date",
+            "Score",
+            "Handicap"
+        ]
+    ];
+    const sortedDisplayedRounds = displayedRounds.sort(function (a, b) {
+        a = a.date.split('/');
+        b = b.date.split('/');
+        return a[2] - b[2] || a[0] - b[0] || a[1] - b[1];
+    });
+    let currentHandicap = {strokes: 0, rounds: 0};
+    let currentHandicapNine = {strokes: 0, rounds: 0};
+    for (let i = 0; i < sortedDisplayedRounds.length; i++) {
+        const strokesOverPar = sortedDisplayedRounds[i].total - sortedDisplayedRounds[i].coursePar;
+        if (sortedDisplayedRounds[i].fullFront9 && sortedDisplayedRounds[i].fullBack9) {
+            roundTotalTableData.push([
+                sortedDisplayedRounds[i].date,
+                sortedDisplayedRounds[i].total,
+                currentHandicap.rounds === 0 ? sortedDisplayedRounds[i].coursePar : currentHandicap.strokes/currentHandicap.rounds.toFixed(1) + sortedDisplayedRounds[i].coursePar
+            ]);
+
+            currentHandicap.strokes = currentHandicap.strokes + strokesOverPar;
+            currentHandicap.rounds = currentHandicap.rounds + 1;
+        } else {
+            roundTotalTableDataNine.push([
+                sortedDisplayedRounds[i].date,
+                sortedDisplayedRounds[i].total,
+                currentHandicapNine.rounds === 0 ? sortedDisplayedRounds[i].coursePar : currentHandicapNine.strokes/currentHandicapNine.rounds.toFixed(1) + sortedDisplayedRounds[i].coursePar
+            ]);
+
+            currentHandicapNine.strokes = currentHandicapNine.strokes + strokesOverPar;
+            currentHandicapNine.rounds = currentHandicapNine.rounds + 1;
+        }
+    }
+
+    console.log("roundTotalTableData",roundTotalTableData)
+    console.log("roundTotalTableDataNine",roundTotalTableDataNine)
 
     return (
         <div>
@@ -815,13 +860,31 @@ const createCumulativeGraphs = (drivingMetrics, puttingMetrics) => {
                 <h3>Putting</h3>
                 <h3>Scoring</h3>
             </div>
-            <h1>Score Distibution</h1>
-            <div id="cumulativePie">
+            <h1>Score Distribution</h1>
+            <div id="cumulativePie" key="cumulativePie">
                 <Chart
-                    chartType="PieChart"
+                    chartType="ColumnChart"
                     data={pieChartData}
                     options={{is3D: true, backgroundColor: "#00000000" }}
                     width="600px"
+                />
+            </div>
+            <div id="roundTotals">
+                <Chart
+                    chartType="LineChart"
+                    width="100%"
+                    height="400px"
+                    data={roundTotalTableData}
+                    // options={options}
+                />
+            </div>
+            <div id="roundTotalsNine">
+                <Chart
+                    chartType="LineChart"
+                    width="100%"
+                    height="400px"
+                    data={roundTotalTableDataNine}
+                    // options={options}
                 />
             </div>
         </div>
@@ -915,22 +978,99 @@ export const createPuttingTable = (puttingMetrics) => {
     );
 }
 
-export const calculateStats = (courseInfo, allRounds, puttingData) => {
+const calculateCourseRecords = (courseInfo, courseMetrics) => {
+
+    let tableRows = [];
+    
+    Object.keys(courseMetrics).forEach(courseMetric => {
+        // if (courseMetric !== "andersonGlen" && courseMetric !== "gileadHighlands") {
+            console.log("courseMetric",courseMetric)
+            console.log("courseMetrics[courseMetric]",courseMetrics[courseMetric])
+            const courseName = courses.find(course => course.courseKey === courseMetric).displayName;
+            
+            let f9String = courseMetrics[courseMetric].out === 100 ? "-" : `${courseMetrics[courseMetric].out} (${courseMetrics[courseMetric].out - courseInfo[courseMetric].f9Par > 0 ? "+" : courseMetrics[courseMetric].out == courseInfo[courseMetric].f9Par ? "E" : ""}${courseMetrics[courseMetric].out !== courseInfo[courseMetric].f9Par ? courseMetrics[courseMetric].out - courseInfo[courseMetric].f9Par : ""})`;
+            let f9Date = courseMetrics[courseMetric].out === 100 ? "" : courseMetrics[courseMetric].outDate;
+            
+            let b9String = courseMetrics[courseMetric].in === 100 ? "-" : `${courseMetrics[courseMetric].in} (${courseMetrics[courseMetric].in - courseInfo[courseMetric].b9Par > 0 ? "+" : courseMetrics[courseMetric].in == courseInfo[courseMetric].b9Par ? "E" : ""}${courseMetrics[courseMetric].in !== courseInfo[courseMetric].b9Par ? courseMetrics[courseMetric].in - courseInfo[courseMetric].b9Par : ""})`;
+            let b9Date = courseMetrics[courseMetric].in === 100 ? "" : courseMetrics[courseMetric].inDate;
+
+            let totalString = (courseMetrics[courseMetric].out !== 100 && courseMetrics[courseMetric].in !== 100) ? `${courseMetrics[courseMetric].total} (${courseMetrics[courseMetric].out} - ${courseMetrics[courseMetric].in}: ${courseMetrics[courseMetric].total - courseInfo[courseMetric].par > 0 ? "+" : courseMetrics[courseMetric].total == courseInfo[courseMetric].par ? "E" : ""}${courseMetrics[courseMetric].total !== courseInfo[courseMetric].par ? courseMetrics[courseMetric].total - courseInfo[courseMetric].par : ""})` : "-";
+            let totalDate = (courseMetrics[courseMetric].out !== 100 && courseMetrics[courseMetric].in !== 100) ? courseMetrics[courseMetric].totalDate : "";
+
+            // if (courseMetrics[courseMetric].out === 100) {
+            //     scoreString = `${courseMetrics[courseMetric].in} (B9: ${courseMetrics[courseMetric].in - courseInfo[courseMetric].b9Par > 0 ? "+" : courseMetrics[courseMetric].in == courseInfo[courseMetric].b9Par ? "E" : ""}${courseMetrics[courseMetric].in !== courseInfo[courseMetric].b9Par ? courseMetrics[courseMetric].in - courseInfo[courseMetric].b9Par : ""})`;
+            // } else {
+            //     if (courseMetrics[courseMetric].in === 100) {
+            //         console.log("courseInfo",courseInfo)
+            //         scoreString = `${courseMetrics[courseMetric].out} (F9: ${courseMetrics[courseMetric].out - courseInfo[courseMetric].f9Par > 0 ? "+" : courseMetrics[courseMetric].out == courseInfo[courseMetric].f9Par ? "E" : ""}${courseMetrics[courseMetric].out !== courseInfo[courseMetric].f9Par ? courseMetrics[courseMetric].out - courseInfo[courseMetric].f9Par : ""})`;
+            //     } else {
+            //         scoreString = `${courseMetrics[courseMetric].total} (${courseMetrics[courseMetric].out} - ${courseMetrics[courseMetric].in}: ${courseMetrics[courseMetric].total - courseInfo[courseMetric].par > 0 ? "+" : courseMetrics[courseMetric].total == courseInfo[courseMetric].par ? "E" : ""}${courseMetrics[courseMetric].total !== courseInfo[courseMetric].par ? courseMetrics[courseMetric].total - courseInfo[courseMetric].par : ""})`;
+            //     }
+            // }
+            // return (
+            //     <div className="flexRow alignCenter marginBottomSmall" key={courseName}>
+            //         <h3 className="marginRightExtraSmall">{courseName} -</h3>
+            //         <h3 className="strongFont">{scoreString}</h3>
+            //     </div> 
+            // )
+
+            tableRows.push([
+                courseName,
+                f9String,
+                f9Date,
+                b9String,
+                b9Date,
+                totalString,
+                totalDate
+            ])
+        // } else return null;
+    })
+
+    return (
+        <table>
+            <tr>
+                <th><h2>Course</h2></th>
+
+                <th><h2>F9</h2></th>
+                <th><small>(Date)</small></th>
+                
+                <th><h2>B9</h2></th>
+                <th><small>(Date)</small></th>
+
+                <th><h2>Total</h2></th>
+                <th><small>(Date)</small></th>
+            </tr>
+            {tableRows.map(tableRow => {
+                return (
+                    <tr>
+                        {tableRow.map(tableData => {
+                            return <td className="paddingLeftLarge">{tableData}</td>
+                        })}
+                    </tr>
+                )
+            })}
+
+        </table>
+    )
+}
+
+
+export const calculateStats = (courseInfo, allRounds, puttingData, displayedRounds) => {
 
     const singleHoleMetrics = calculateSingleHoleMetrics(courseInfo, allRounds);
     const courseMetrics = calculateCourseMetrics(courseInfo, allRounds);
-    const handicapMetrics = calculateHandicapMetrics(courseInfo, allRounds);
+    const handicapMetrics = calculateHandicapMetrics(courseInfo, displayedRounds);
     const puttingMetrics = calculatePuttingMetrics(puttingData);
-    // const approachMetrics = calculateApproachMetrics(allRounds); // Import above
-    const drivingMetrics = calculateDrivingMetrics(courseInfo, allRounds);
+    // const approachMetrics = calculateApproachMetrics(displayedRounds); // Import above
+    const drivingMetrics = calculateDrivingMetrics(courseInfo, displayedRounds);
 
-    console.log("singleHoleMetrics",singleHoleMetrics)
-    console.log("courseMetrics",courseMetrics)
+    // console.log("singleHoleMetrics",singleHoleMetrics)
+    // console.log("courseMetrics",courseMetrics)
 
     return (
         <>
             {/* Handicap Metrics */}
-            <h1 className="marginTopExtraLarge marginBottomLarge">Handicap</h1>
+            {/* <h1 className="marginTopExtraLarge marginBottomLarge">Handicap</h1>
             <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightSmall">Anderson Glen -</h3>
                 <h3 className="strongFont">Front 9: ({handicapMetrics.andersonGlen.f9}), Back 9: ({handicapMetrics.andersonGlen.b9}), Total: ({handicapMetrics.andersonGlen.total})</h3>
@@ -938,14 +1078,14 @@ export const calculateStats = (courseInfo, allRounds, puttingData) => {
             <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightSmall">Gilead Highlands -</h3>
                 <h3 className="strongFont">Front 9: ({handicapMetrics.gileadHighlands.f9}), Back 9: ({handicapMetrics.gileadHighlands.b9}), Total: ({handicapMetrics.gileadHighlands.total})</h3>
-            </div>
+            </div> */}
             <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightSmall">Overall -</h3>
                 <h3 className="strongFont">{handicapMetrics.overall.total}</h3>
             </div>
 
             {/* Best Anderson Glen */}
-            <h1 className="marginTopExtraLarge marginBottomLarge">Best Anderson Glen</h1>
+            {/* <h1 className="marginTopExtraLarge marginBottomLarge">Best Anderson Glen</h1>
             <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightExtraSmall">Best score on Front 9 -</h3>
                 <h3 className="strongFont">({courseMetrics.andersonGlen.out}) {courseMetrics.andersonGlen.outDate} {courseMetrics.andersonGlen.outPutts} putts</h3>
@@ -957,10 +1097,10 @@ export const calculateStats = (courseInfo, allRounds, puttingData) => {
             <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightExtraSmall">Best score on 18 holes -</h3>
                 <h3 className="strongFont">({courseMetrics.andersonGlen.totalOut} + {courseMetrics.andersonGlen.totalIn} = {courseMetrics.andersonGlen.total}) {courseMetrics.andersonGlen.totalDate} {courseMetrics.andersonGlen.totalPutts} putts</h3>
-            </div>
+            </div> */}
 
             {/* Best Gilelad Highlands */}
-            <h1 className="marginTopExtraLarge marginBottomLarge">Best Gilead Highlands</h1>
+            {/* <h1 className="marginTopExtraLarge marginBottomLarge">Best Gilead Highlands</h1>
             <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightExtraSmall">Best score on Front 9 -</h3>
                 <h3 className="strongFont">({courseMetrics.gileadHighlands.out}) {courseMetrics.gileadHighlands.outDate} {courseMetrics.gileadHighlands.outPutts} putts</h3>
@@ -972,31 +1112,36 @@ export const calculateStats = (courseInfo, allRounds, puttingData) => {
             <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightExtraSmall">Best score on 18 holes -</h3>
                 <h3 className="strongFont">({courseMetrics.gileadHighlands.totalOut} + {courseMetrics.gileadHighlands.totalIn} = {courseMetrics.gileadHighlands.total}) {courseMetrics.gileadHighlands.totalDate} {courseMetrics.gileadHighlands.totalPutts} putts</h3>
-            </div>
+            </div> */}
 
             {/* Other Course Records */}
             <h1 className="marginTopExtraLarge marginBottomLarge">Other Course Records <span>(F9 - B9)</span></h1>
-            {Object.keys(courseMetrics).map(courseMetric => {
-                if (courseMetric !== "andersonGlen" && courseMetric !== "gileadHighlands") {
+            {calculateCourseRecords(courseInfo, courseMetrics)}
+
+            {/* {Object.keys(courseMetrics).map(courseMetric => {
+                // if (courseMetric !== "andersonGlen" && courseMetric !== "gileadHighlands") {
+                    console.log("courseMetric",courseMetric)
+                    console.log("courseMetrics[courseMetric]",courseMetrics[courseMetric])
                     const courseName = courses.find(course => course.courseKey === courseMetric).displayName;
                     let scoreString = "";
                     if (courseMetrics[courseMetric].out === 100) {
-                        scoreString = `${courseMetrics[courseMetric].in} (B9)`;
+                        scoreString = `${courseMetrics[courseMetric].in} (B9: ${courseMetrics[courseMetric].in - courseInfo[courseMetric].b9Par > 0 ? "+" : courseMetrics[courseMetric].in == courseInfo[courseMetric].b9Par ? "E" : ""}${courseMetrics[courseMetric].in !== courseInfo[courseMetric].b9Par ? courseMetrics[courseMetric].in - courseInfo[courseMetric].b9Par : ""})`;
                     } else {
                         if (courseMetrics[courseMetric].in === 100) {
-                            scoreString = `${courseMetrics[courseMetric].out} (F9)`;
+                            console.log("courseInfo",courseInfo)
+                            scoreString = `${courseMetrics[courseMetric].out} (F9: ${courseMetrics[courseMetric].out - courseInfo[courseMetric].f9Par > 0 ? "+" : courseMetrics[courseMetric].out == courseInfo[courseMetric].f9Par ? "E" : ""}${courseMetrics[courseMetric].out !== courseInfo[courseMetric].f9Par ? courseMetrics[courseMetric].out - courseInfo[courseMetric].f9Par : ""})`;
                         } else {
-                            scoreString = `${courseMetrics[courseMetric].total} (${courseMetrics[courseMetric].out} - ${courseMetrics[courseMetric].in})`;
+                            scoreString = `${courseMetrics[courseMetric].total} (${courseMetrics[courseMetric].out} - ${courseMetrics[courseMetric].in}: ${courseMetrics[courseMetric].total - courseInfo[courseMetric].par > 0 ? "+" : courseMetrics[courseMetric].total == courseInfo[courseMetric].par ? "E" : ""}${courseMetrics[courseMetric].total !== courseInfo[courseMetric].par ? courseMetrics[courseMetric].total - courseInfo[courseMetric].par : ""})`;
                         }
                     }
                     return (
-                        <div className="flexRow alignCenter marginBottomSmall">
+                        <div className="flexRow alignCenter marginBottomSmall" key={courseName}>
                             <h3 className="marginRightExtraSmall">{courseName} -</h3>
                             <h3 className="strongFont">{scoreString}</h3>
                         </div> 
                     )
-                } else return null;
-            })}
+                // } else return null;
+            })} */}
 
             {/* Single Hole Metrics */}
             <h1 className="marginTopExtraLarge marginBottomLarge">Single Hole Metrics</h1>
@@ -1004,10 +1149,10 @@ export const calculateStats = (courseInfo, allRounds, puttingData) => {
                 <h3 className="marginRightExtraSmall">Most birdies on a single hole -</h3>
                 <h3 className="strongFont">({singleHoleMetrics.birdies.mostBirdies}) {singleHoleMetrics.birdies.mostBirdiesCourse} Par {singleHoleMetrics.birdies.mostBirdiesPar} Hole {singleHoleMetrics.birdies.mostBirdiesHole} played {singleHoleMetrics.birdies.mostBirdiesRounds} times</h3>
             </div>
-            <div className="flexRow alignCenter marginBottomSmall">
+            {/* <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightExtraSmall">Least bogey+ on a single hole -</h3>
                 <h3 className="strongFont">({singleHoleMetrics.bogeyPlus.leastBogeyPlus}) {singleHoleMetrics.bogeyPlus.leastBogeyPlusCourse} Par {singleHoleMetrics.bogeyPlus.leastBogeyPlusPar} Hole {singleHoleMetrics.bogeyPlus.leastBogeyPlusHole} played {singleHoleMetrics.bogeyPlus.leastBogeyPlusRounds} times</h3>
-            </div>
+            </div> */}
             <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightExtraSmall">Most bogey+ on a single hole -</h3>
                 <h3 className="strongFont">({singleHoleMetrics.bogeyPlus.mostBogeyPlus}) {singleHoleMetrics.bogeyPlus.mostBogeyPlusCourse} Par {singleHoleMetrics.bogeyPlus.mostBogeyPlusPar} Hole {singleHoleMetrics.bogeyPlus.mostBogeyPlusHole} played {singleHoleMetrics.bogeyPlus.mostBogeyPlusRounds} times</h3>
@@ -1025,35 +1170,35 @@ export const calculateStats = (courseInfo, allRounds, puttingData) => {
             <h1 className="marginTopExtraLarge marginBottomLarge">Closest to the Pin</h1>
             {Object.keys(singleHoleMetrics.ctp).map((hole) => {
                 const ctp = singleHoleMetrics.ctp[hole];
-                if (ctp.course === "Anderson Glen" || ctp.course === "Gilead Highlands") {
+                // if (ctp.course === "Anderson Glen" || ctp.course === "Gilead Highlands") {
                     return (
-                        <div className="flexRow alignCenter marginBottomSmall">
+                        <div className="flexRow alignCenter marginBottomSmall" key={ctp.hole}>
                             <h3 className="marginRightExtraSmall">{ctp.course} {ctp.hole} ({ctp.distance} yards) -</h3>
                             <h3 className="strongFont">{ctp.dth} feet ({ctp.date} Score: {ctp.score})</h3>
                         </div>
                     );
-                } else {
-                    return null;
-                }
+                // } else {
+                //     return null;
+                // }
             })}
 
             {/* Miscellaneous Metrics */}
             <h1 className="marginTopExtraLarge marginBottomLarge">Miscellaneous Metrics</h1>
             <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightExtraSmall">Most consecutive 1 putts -</h3>
-                {calculateConsecutiveOnePutts(allRounds)}
+                {calculateConsecutiveOnePutts(displayedRounds)}
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightExtraSmall">Most putts in 9 holes & 18 holes -</h3>
-                {calculateMostPutts(allRounds)}
+                {calculateMostPutts(displayedRounds)}
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightExtraSmall">Least putts in 9 holes & 18 holes -</h3>
-                {calculateLeastPutts(allRounds)}
+                {calculateLeastPutts(displayedRounds)}
             </div>
             <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightExtraSmall">Largest score disparity between front 9 and back 9 -</h3>
-                {calculateLargestScoreDisparity(allRounds)}
+                {calculateLargestScoreDisparity(displayedRounds)}
             </div>
             {/* <div className="flexRow alignCenter marginBottomSmall">
                 <h3 className="marginRightSmall">Most FIR and GIR on the same hole in 9 holes & 18 holes -</h3>
@@ -1093,7 +1238,7 @@ export const calculateStats = (courseInfo, allRounds, puttingData) => {
             </div>
 
             <h1 className="marginTopExtraLarge marginBottomLarge">Hole Flow</h1>
-            {createCumulativeGraphs(drivingMetrics, puttingMetrics)}
+            {createCumulativeGraphs(displayedRounds, drivingMetrics, puttingMetrics)}
         </>
     );
 }
@@ -1200,7 +1345,7 @@ const createSingleHoleGraph = (courseInfo, singleHoleMetrics) => {
         }
     }
 
-    // Score distibution
+    // Score distribution
     for (let score of Object.keys(scoringMetrics.gir)) {
         if (scoringMetrics.gir[score] !== 0) {
             sankeyGraphData.push([`GIR: ${totalGir}`, `${score.substring(score.length - 1, score.length)}: ${scoringMetrics.gir[score] + scoringMetrics.nonGir[score]}`, scoringMetrics.gir[score]]);
@@ -1228,20 +1373,30 @@ const createSingleHoleGraph = (courseInfo, singleHoleMetrics) => {
     )
 }
 
-export const courseSummary = (courseInfo, allRounds, expandSingleHoleMetric, handleSetExpandSingleHoleMetric) => {
+export const courseSummary = (courseInfo, allRounds, expandSingleHoleMetric, handleSetExpandSingleHoleMetric, courseTours) => {
     const singleHoleMetrics = calculateSingleHoleMetrics(courseInfo, allRounds);
     const nonHoleMetrics = ["bestCumulativeScoreSingle", "worstCumulativeScoreSingle", "birdies", "bogeyPlus", "mostPutts", "ctp", "longestDrive"];
+
+    let selectedCourseTours = [];
+    const courseNames = Object.keys(courseInfo);
+    for (let course of courseTours) {
+        if (course !== "Signature Holes") {
+            const selectedCourse = courseNames.filter(function(courseName) {
+                if (courseInfo[courseName].displayName === course) return course;
+            })
+            selectedCourseTours.push(selectedCourse[0])
+        }
+    }
     
     return (
         <div className="singleHoleMetricContainer flexFlowRowWrap marginBottomExtraLarge justifyCenter">
             {Object.keys(singleHoleMetrics).sort(function(a,b) {return (singleHoleMetrics[a].courseKey > singleHoleMetrics[b].courseKey || (singleHoleMetrics[a].hole > singleHoleMetrics[b].courseKey && singleHoleMetrics[a].hole < singleHoleMetrics[b].courseKey)) ? 1 : ((singleHoleMetrics[b].courseKey > singleHoleMetrics[a].courseKey) ? -1 : 0);} ).map((hole) => {
-                if (!nonHoleMetrics.includes(hole) && (singleHoleMetrics[hole].courseKey === "andersonGlen" || singleHoleMetrics[hole].courseKey === "gileadHighlands")) { // Not actually holes
-                // if (!nonHoleMetrics.includes(hole)) { // Not actually holes - could include all holes with above line
+                if (!nonHoleMetrics.includes(hole) && selectedCourseTours.includes(singleHoleMetrics[hole].courseKey)) {
                     const holeSummaryRef = React.createRef();
                     const executeScroll = () => holeSummaryRef.current.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
                     return (
                         <div ref={holeSummaryRef} id={hole.key} className={`holeData flexRow${expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? " expanded" : ""}`} key={hole.key}>
-                            <img src={imageSourceMappings[hole]} style={{ height: `${expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? "700px" : "476px"}`, marginRight: "8px", borderTopLeftRadius: "12px", borderBottomLeftRadius: "12px" }} alt={`${hole}SingleHoleMetric`} />
+                            {/* <img src={imageSourceMappings[hole]} style={{ height: `${expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? "700px" : "476px"}`, marginRight: "8px", borderTopLeftRadius: "12px", borderBottomLeftRadius: "12px" }} alt={`${hole}SingleHoleMetric`} /> */}
                             <div className="flexRow width100Percent justifySpaceAround">
                                 {expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole &&
                                     <div className="flexColumn marginTopMedium dynamicPanel">
@@ -1258,7 +1413,7 @@ export const courseSummary = (courseInfo, allRounds, expandSingleHoleMetric, han
                                         </div>
                                         {singleHoleMetrics[hole].roundsData.sort(function(a,b) {return (a.sequence > b.sequence) ? 1 : ((b.sequence > a.sequence) ? -1 : 0);}).map((round) => {
                                             return (
-                                                <div className="flexRow width100Percent justifySpaceBetween borderTopSmall">
+                                                <div className="flexRow width100Percent justifySpaceBetween borderTopSmall" key={round.key}>
                                                     <div className="width76px borderRightSmall paddingTopSmall paddingBottomSmall">{round.date}</div>
                                                     <div className="width76px borderRightSmall paddingTopSmall paddingBottomSmall">{round.score}</div>
                                                     <div className="width76px borderRightSmall paddingTopSmall paddingBottomSmall">{round.putts}</div>
@@ -1266,7 +1421,7 @@ export const courseSummary = (courseInfo, allRounds, expandSingleHoleMetric, han
                                                     <div className="width76px borderRightSmall paddingTopSmall paddingBottomSmall">{round.gir}</div>
                                                     <div className="width76px borderRightSmall paddingTopSmall paddingBottomSmall">{round.dtg}</div>
                                                     <div className="width76px borderRightSmall paddingTopSmall paddingBottomSmall">{round.dth}</div>
-                                                    <div className="width76px borderRightSmall paddingTopSmall paddingBottomSmall">{round.puttLengthTotal}</div>
+                                                    <div className="width76px borderRightSmall paddingTopSmall paddingBottomSmall">{round.puttLength}</div>
                                                     <div className="width76px paddingTopSmall paddingBottomSmall">{round.notes}</div>
                                                 </div>
                                             )
@@ -1284,30 +1439,30 @@ export const courseSummary = (courseInfo, allRounds, expandSingleHoleMetric, han
                                             <p className="flexRow justifySpaceBetween"><span>Pars: </span> <b>{singleHoleMetrics[hole].numPars}</b></p>
                                             <p className="flexRow justifySpaceBetween"><span>Bogey: </span> <b>{singleHoleMetrics[hole].numBogeys}</b></p>
                                             <p className="flexRow justifySpaceBetween"><span>Bogey+: </span> <b>{singleHoleMetrics[hole].numBogeyPlus}</b></p>
-                                            <p className="flexRow justifySpaceBetween marginTopSmall paddingTopExtraSmall" style={{ borderTop: "1px solid white" }}><span>Cumulative Score: </span> <b>{singleHoleMetrics[hole].cumulativeScoreToPar > 0 ? `+${singleHoleMetrics[hole].cumulativeScoreToPar}` : singleHoleMetrics[hole].cumulativeScoreToPar}</b></p>
+                                            <p className="flexRow justifySpaceBetween marginTopSmall paddingTopExtraSmall" style={{ borderTop: "1px solid white" }}><span>Cumulative Score: </span> <b>{singleHoleMetrics[hole].cumulativeScoreToPar > 0 ? `+${singleHoleMetrics[hole].cumulativeScoreToPar}` : singleHoleMetrics[hole].cumulativeScoreToPar}</b> <small style={{ paddingTop: "2px" }}>({(singleHoleMetrics[hole].cumulativeScoreToPar / singleHoleMetrics[hole].rounds) > 0 ? "+" : ""}{(singleHoleMetrics[hole].cumulativeScoreToPar / singleHoleMetrics[hole].rounds) == 0 ? "E" : (singleHoleMetrics[hole].cumulativeScoreToPar / singleHoleMetrics[hole].rounds).toFixed(1)})</small></p>
                                         </div>
                                         <div className="flexColumn marginTopSmall marginBottomExtraSmall">
                                             <h3>Cumulative Metrics</h3>
                                             <p className="flexRow justifySpaceBetween"><span>Best Score: </span> <b>{singleHoleMetrics[hole].best}</b></p>
                                             <p className="flexRow justifySpaceBetween"><span>Worst Score: </span> <b>{singleHoleMetrics[hole].worst}</b></p>
-                                            {singleHoleMetrics[hole].par !== 3 && singleHoleMetrics.longestDrive[`${singleHoleMetrics[hole].courseKey}Hole${singleHoleMetrics[hole].hole}`] && <p className="flexRow justifySpaceBetween"><span>Long Drive: </span> <b>{singleHoleMetrics.longestDrive[`${singleHoleMetrics[hole].courseKey}Hole${singleHoleMetrics[hole].hole}`].longestDrive} ({singleHoleMetrics.longestDrive[`${singleHoleMetrics[hole].courseKey}Hole${singleHoleMetrics[hole].hole}`].distance - singleHoleMetrics.longestDrive[`${singleHoleMetrics[hole].courseKey}Hole${singleHoleMetrics[hole].hole}`].longestDrive} DTG)</b></p>}
+                                            {singleHoleMetrics[hole].par !== 3 && singleHoleMetrics.longestDrive[`${singleHoleMetrics[hole].courseKey}Hole${singleHoleMetrics[hole].hole}`] && <p className="flexRow justifySpaceBetween"><span>Long Drive: </span> <span><b>{singleHoleMetrics.longestDrive[`${singleHoleMetrics[hole].courseKey}Hole${singleHoleMetrics[hole].hole}`].longestDrive}</b> <small>({singleHoleMetrics.longestDrive[`${singleHoleMetrics[hole].courseKey}Hole${singleHoleMetrics[hole].hole}`].distance - singleHoleMetrics.longestDrive[`${singleHoleMetrics[hole].courseKey}Hole${singleHoleMetrics[hole].hole}`].longestDrive} DTG)</small></span></p>}
                                             {singleHoleMetrics[hole].par === 3 && singleHoleMetrics.ctp[`${singleHoleMetrics[hole].courseKey}Hole${singleHoleMetrics[hole].hole}`] && <p className="flexRow justifySpaceBetween"><span>CTP (feet): </span> <b>{singleHoleMetrics.ctp[`${singleHoleMetrics[hole].courseKey}Hole${singleHoleMetrics[hole].hole}`].dth}</b></p>}
                                         </div>
                                         <div className="flexColumn marginTopSmall marginBottomExtraSmall">
                                             <h3>Greens</h3>
                                             <div className="flexRow justifySpaceBetween">
                                                 <div className="flexColumn">
-                                                    <p>Miss:</p>
-                                                    <b>{singleHoleMetrics[hole].greens.x}</b>
+                                                    <p>X: {singleHoleMetrics[hole].greens.x > 0 && <small>({Math.round(100 * singleHoleMetrics[hole].greens.x / (singleHoleMetrics[hole].greens.x + singleHoleMetrics[hole].greens.g + singleHoleMetrics[hole].greens.gur))}%)</small>}</p>
+                                                    <p><b>{singleHoleMetrics[hole].greens.x}</b> {singleHoleMetrics[hole].greens.x > 0 && <small>({(singleHoleMetrics[hole].greens.xScoreToPar) > 0 ? "+" : ""}{(singleHoleMetrics[hole].greens.xScoreToPar / singleHoleMetrics[hole].greens.x) === 0 ? "E" : (singleHoleMetrics[hole].greens.xScoreToPar / singleHoleMetrics[hole].greens.x).toFixed(1)})</small>}</p>
                                                 </div>
                                                 <div className="flexColumn">
-                                                    <p>GIR:</p>
-                                                    <b>{singleHoleMetrics[hole].greens.g}</b>
+                                                    <p>G: {singleHoleMetrics[hole].greens.g > 0 && <small>({Math.round(100 * singleHoleMetrics[hole].greens.g / (singleHoleMetrics[hole].greens.x + singleHoleMetrics[hole].greens.g + singleHoleMetrics[hole].greens.gur))}%)</small>}</p>
+                                                    <p><b>{singleHoleMetrics[hole].greens.g}</b> {singleHoleMetrics[hole].greens.g > 0 && <small>({(singleHoleMetrics[hole].greens.gScoreToPar) > 0 ? "+" : ""}{(singleHoleMetrics[hole].greens.gScoreToPar / singleHoleMetrics[hole].greens.g) === 0 ? "E" : (singleHoleMetrics[hole].greens.gScoreToPar / singleHoleMetrics[hole].greens.g).toFixed(1)})</small>}</p>
                                                 </div>
                                                 {singleHoleMetrics[hole].par === 5 &&
                                                     <div className="flexColumn">
-                                                        <p>GUR:</p>
-                                                        <b>{singleHoleMetrics[hole].greens.gur}</b>
+                                                        <p>G-1: {singleHoleMetrics[hole].greens.gur > 0 && <small>({Math.round(100 * singleHoleMetrics[hole].greens.gur / (singleHoleMetrics[hole].greens.x + singleHoleMetrics[hole].greens.g + singleHoleMetrics[hole].greens.gur))}%)</small>}</p>
+                                                        <p><b>{singleHoleMetrics[hole].greens.gur}</b> {singleHoleMetrics[hole].greens.gur > 0 && <small>({(singleHoleMetrics[hole].greens.gurScoreToPar) > 0 ? "+" : ""}{(singleHoleMetrics[hole].greens.gurScoreToPar / singleHoleMetrics[hole].greens.gur) === 0 ? "E" : (singleHoleMetrics[hole].greens.gurScoreToPar / singleHoleMetrics[hole].greens.gur).toFixed(1)})</small>}</p>
                                                     </div>
                                                 }
                                             </div>
@@ -1318,16 +1473,16 @@ export const courseSummary = (courseInfo, allRounds, expandSingleHoleMetric, han
                                                     <h3>Fairways</h3>
                                                     <div className="flexRow justifySpaceBetween">
                                                         <div className="flexColumn">
-                                                            <p>Left:</p>
-                                                            <b>{singleHoleMetrics[hole].fairways.l}</b>
+                                                            <p>L: {singleHoleMetrics[hole].fairways.l > 0 && <small>({(singleHoleMetrics[hole].fairways.l / singleHoleMetrics[hole].rounds * 100).toFixed(1)}%)</small>}</p>
+                                                            <p><b>{singleHoleMetrics[hole].fairways.l}</b> {singleHoleMetrics[hole].fairways.l > 0 && <small>({(singleHoleMetrics[hole].fairways.lScoreToPar) > 0 ? '+' : ''}{(singleHoleMetrics[hole].fairways.lScoreToPar / singleHoleMetrics[hole].fairways.l).toFixed(1)})</small>}</p>
                                                         </div>
                                                         <div className="flexColumn">
-                                                            <p>FIR:</p>
-                                                            <b>{singleHoleMetrics[hole].fairways.f}</b>
+                                                            <p>F: {singleHoleMetrics[hole].fairways.f > 0 && <small>({(singleHoleMetrics[hole].fairways.f / singleHoleMetrics[hole].rounds * 100).toFixed(1)}%)</small>}</p>
+                                                            <p><b>{singleHoleMetrics[hole].fairways.f}</b> {singleHoleMetrics[hole].fairways.f > 0 && <small>({(singleHoleMetrics[hole].fairways.fScoreToPar) > 0 ? '+' : ''}{(singleHoleMetrics[hole].fairways.fScoreToPar / singleHoleMetrics[hole].fairways.f).toFixed(1)})</small>}</p>
                                                         </div>
                                                         <div className="flexColumn">
-                                                            <p>Right:</p>
-                                                            <b>{singleHoleMetrics[hole].fairways.r}</b>
+                                                            <p>R: {singleHoleMetrics[hole].fairways.r > 0 && <small>({(singleHoleMetrics[hole].fairways.r / singleHoleMetrics[hole].rounds * 100).toFixed(1)}%)</small>}</p>
+                                                            <p><b>{singleHoleMetrics[hole].fairways.r}</b> {singleHoleMetrics[hole].fairways.r > 0 && <small>({(singleHoleMetrics[hole].fairways.rScoreToPar) > 0 ? '+' : ''}{(singleHoleMetrics[hole].fairways.rScoreToPar / singleHoleMetrics[hole].fairways.r).toFixed(1)})</small>}</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1341,7 +1496,9 @@ export const courseSummary = (courseInfo, allRounds, expandSingleHoleMetric, han
                                     </div>
                                 </div>
                             </div>
-                            <span className="cursorPointer marginBottomSmall" style={{ width: "0", position: "relative", top: expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? "670px" : "452px", right: "60px" }} onClick={() => { executeScroll(); handleSetExpandSingleHoleMetric(hole); }}>{expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? "Collapse" : "Expand"}</span>
+                            {/* Changing Expand positioning */}
+                            {/* <span className="cursorPointer marginBottomSmall" style={{ width: "0", position: "relative", top: expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? "670px" : "452px", right: "60px" }} onClick={() => { executeScroll(); handleSetExpandSingleHoleMetric(hole); }}>{expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? "Collapse" : "Expand"}</span> */}
+                            <span className="cursorPointer marginBottomSmall" style={{ width: "0", position: "relative", bottom: "-24px", right: "60px" }} onClick={() => { executeScroll(); handleSetExpandSingleHoleMetric(hole); }}>{expandSingleHoleMetric.expanded && expandSingleHoleMetric.hole === hole ? "Collapse" : "Expand"}</span>
                         </div>
                     );
                 } else return null;

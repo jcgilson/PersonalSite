@@ -186,14 +186,74 @@ export const courses = [
     },
     {
         sequence: 19,
-        displayName: "Kennedy",
-        courseKey: "kennedy",
+        displayName: "Kennedy - Babe Lind",
+        courseKey: "kennedyBabeLind",
         scoreCardHoleAbbreviation: ""
     },
     {
         sequence: 20,
         displayName: "Littleton",
         courseKey: "littleton",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 21,
+        displayName: "Wellshire",
+        courseKey: "wellshire",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 22,
+        displayName: "Penmar",
+        courseKey: "penmar",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 23,
+        displayName: "Plum Creek - CO",
+        courseKey: "plumCreekCo",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 24,
+        displayName: "Homestead",
+        courseKey: "homestead",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 25,
+        displayName: "Lone Tree",
+        courseKey: "loneTree",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 26,
+        displayName: "Kennedy - Creek",
+        courseKey: "kennedyCreek",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 27,
+        displayName: "Bear Dance",
+        courseKey: "bearDance",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 28,
+        displayName: "TPC Scottsdale - Stadium",
+        courseKey: "tpcScottsdaleStadium",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 29,
+        displayName: "Quintero",
+        courseKey: "quintero",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 30,
+        displayName: "Palm Valley",
+        courseKey: "pamlmValley",
         scoreCardHoleAbbreviation: ""
     }
 ]

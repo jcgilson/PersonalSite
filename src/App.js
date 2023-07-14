@@ -133,7 +133,7 @@ function App() {
           <section className="backgroundOpacity zIndexNegative" />
         </article>
         <main>
-          <Header links={links} setCurrentPage={setCurrentPage} currentPage={currentPage} />
+          {/* <Header links={links} setCurrentPage={setCurrentPage} currentPage={currentPage} /> */}
           {currentPage === "Home" && <Home links={links} setCurrentPage={setCurrentPage} />}
           {currentPage === "Itineraries" && <Itineraries itineraries={itineraries} configuration={configuration} />}
           {currentPage === "National Parks" && <NationalParks />}
