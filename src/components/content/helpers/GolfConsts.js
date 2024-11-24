@@ -34,24 +34,24 @@ import andersonGlenHole15 from "../../../images/andersonGlenHole15.png";
 import andersonGlenHole16 from "../../../images/andersonGlenHole16.png";
 import andersonGlenHole17 from "../../../images/andersonGlenHole17.png";
 import andersonGlenHole18 from "../../../images/andersonGlenHole18.png";
-// import southSuburbanHole1 from "../../../images/southSuburbanHole1.png";
-// import southSuburbanHole2 from "../../../images/southSuburbanHole2.png";
-// import southSuburbanHole3 from "../../../images/southSuburbanHole3.png";
-// import southSuburbanHole4 from "../../../images/southSuburbanHole4.png";
-// import southSuburbanHole5 from "../../../images/southSuburbanHole5.png";
-// import southSuburbanHole6 from "../../../images/southSuburbanHole6.png";
-// import southSuburbanHole7 from "../../../images/southSuburbanHole7.png";
-// import southSuburbanHole8 from "../../../images/southSuburbanHole8.png";
-// import southSuburbanHole9 from "../../../images/southSuburbanHole9.png";
-// import southSuburbanHole10 from "../../../images/southSuburbanHole10.png";
-// import southSuburbanHole11 from "../../../images/southSuburbanHole11.png";
-// import southSuburbanHole12 from "../../../images/southSuburbanHole12.png";
-// import southSuburbanHole13 from "../../../images/southSuburbanHole13.png";
-// import southSuburbanHole14 from "../../../images/southSuburbanHole14.png";
-// import southSuburbanHole15 from "../../../images/southSuburbanHole15.png";
-// import southSuburbanHole16 from "../../../images/southSuburbanHole16.png";
-// import southSuburbanHole17 from "../../../images/southSuburbanHole17.png";
-// import southSuburbanHole18 from "../../../images/southSuburbanHole18.png";
+import southSuburbanHole1 from "../../../images/southSuburbanHole1.png";
+import southSuburbanHole2 from "../../../images/southSuburbanHole2.png";
+import southSuburbanHole3 from "../../../images/southSuburbanHole3.png";
+import southSuburbanHole4 from "../../../images/southSuburbanHole4.png";
+import southSuburbanHole5 from "../../../images/southSuburbanHole5.png";
+import southSuburbanHole6 from "../../../images/southSuburbanHole6.png";
+import southSuburbanHole7 from "../../../images/southSuburbanHole7.png";
+import southSuburbanHole8 from "../../../images/southSuburbanHole8.png";
+import southSuburbanHole9 from "../../../images/southSuburbanHole9.png";
+import southSuburbanHole10 from "../../../images/southSuburbanHole10.png";
+import southSuburbanHole11 from "../../../images/southSuburbanHole11.png";
+import southSuburbanHole12 from "../../../images/southSuburbanHole12.png";
+import southSuburbanHole13 from "../../../images/southSuburbanHole13.png";
+import southSuburbanHole14 from "../../../images/southSuburbanHole14.png";
+import southSuburbanHole15 from "../../../images/southSuburbanHole15.png";
+import southSuburbanHole16 from "../../../images/southSuburbanHole16.png";
+import southSuburbanHole17 from "../../../images/southSuburbanHole17.png";
+import southSuburbanHole18 from "../../../images/southSuburbanHole18.png";
 
 export const imageSourceMappings = {
     gileadHighlandsHole1: gileadHighlandsHole1,
@@ -90,24 +90,24 @@ export const imageSourceMappings = {
     andersonGlenHole16: andersonGlenHole16,
     andersonGlenHole17: andersonGlenHole17,
     andersonGlenHole18: andersonGlenHole18,
-    // southSuburbanHole1: southSuburbanHole1,
-    // southSuburbanHole2: southSuburbanHole2,
-    // southSuburbanHole3: southSuburbanHole3,
-    // southSuburbanHole4: southSuburbanHole4,
-    // southSuburbanHole5: southSuburbanHole5,
-    // southSuburbanHole6: southSuburbanHole6,
-    // southSuburbanHole7: southSuburbanHole7,
-    // southSuburbanHole8: southSuburbanHole8,
-    // southSuburbanHole9: southSuburbanHole9,
-    // southSuburbanHole10: southSuburbanHole10,
-    // southSuburbanHole11: southSuburbanHole11,
-    // southSuburbanHole12: southSuburbanHole12,
-    // southSuburbanHole13: southSuburbanHole13,
-    // southSuburbanHole14: southSuburbanHole14,
-    // southSuburbanHole15: southSuburbanHole15,
-    // southSuburbanHole16: southSuburbanHole16,
-    // southSuburbanHole17: southSuburbanHole17,
-    // southSuburbanHole18: southSuburbanHole18
+    southSuburbanHole1: southSuburbanHole1,
+    southSuburbanHole2: southSuburbanHole2,
+    southSuburbanHole3: southSuburbanHole3,
+    southSuburbanHole4: southSuburbanHole4,
+    southSuburbanHole5: southSuburbanHole5,
+    southSuburbanHole6: southSuburbanHole6,
+    southSuburbanHole7: southSuburbanHole7,
+    southSuburbanHole8: southSuburbanHole8,
+    southSuburbanHole9: southSuburbanHole9,
+    southSuburbanHole10: southSuburbanHole10,
+    southSuburbanHole11: southSuburbanHole11,
+    southSuburbanHole12: southSuburbanHole12,
+    southSuburbanHole13: southSuburbanHole13,
+    southSuburbanHole14: southSuburbanHole14,
+    southSuburbanHole15: southSuburbanHole15,
+    southSuburbanHole16: southSuburbanHole16,
+    southSuburbanHole17: southSuburbanHole17,
+    southSuburbanHole18: southSuburbanHole18
 }
 
 // In order of sheet appearance from upload
