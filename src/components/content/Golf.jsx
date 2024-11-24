@@ -30,6 +30,17 @@ const Excel = require('exceljs');
 const Golf = () => {
 
     /**
+     * Start scripts
+     * npm start
+     * 
+     * Server:
+     * cd server
+     * node index.js
+     * 
+     * Redeploy:
+     * npm run deploy
+     * 
+     * 
      * TODO
      * 
      * Find all instances of array of 2 Blackledge courses and make into CONST file

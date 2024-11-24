@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 // Components
-import Header from './components/common/Header';
+// import Header from './components/common/Header';
 import Home from './components/common/Home';
 import Itineraries from './components/content/Itineraries';
 import NationalParks from './components/content/NationalParks';
@@ -15,9 +15,9 @@ import './global.css';
 import './components/common/shared.css';
 import './configurableStyles.css';
 
-import { defaultItineraries } from './src/components/content/consts/DefaultItineraries.js';
+import { defaultItineraries } from './components/content/consts/DefaultItineraries.js';
 import siteConfigurationDownloadFile from './SiteConfiguration.xlsx';
-const defaultConfiguration = require('./src/defaultConfiguration.json');
+const defaultConfiguration = require('./defaultConfiguration.json');
 const Excel = require('exceljs');
 
 function App() {
