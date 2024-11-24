@@ -34,6 +34,24 @@ import andersonGlenHole15 from "../../../images/andersonGlenHole15.png";
 import andersonGlenHole16 from "../../../images/andersonGlenHole16.png";
 import andersonGlenHole17 from "../../../images/andersonGlenHole17.png";
 import andersonGlenHole18 from "../../../images/andersonGlenHole18.png";
+// import southSuburbanHole1 from "../../../images/southSuburbanHole1.png";
+// import southSuburbanHole2 from "../../../images/southSuburbanHole2.png";
+// import southSuburbanHole3 from "../../../images/southSuburbanHole3.png";
+// import southSuburbanHole4 from "../../../images/southSuburbanHole4.png";
+// import southSuburbanHole5 from "../../../images/southSuburbanHole5.png";
+// import southSuburbanHole6 from "../../../images/southSuburbanHole6.png";
+// import southSuburbanHole7 from "../../../images/southSuburbanHole7.png";
+// import southSuburbanHole8 from "../../../images/southSuburbanHole8.png";
+// import southSuburbanHole9 from "../../../images/southSuburbanHole9.png";
+// import southSuburbanHole10 from "../../../images/southSuburbanHole10.png";
+// import southSuburbanHole11 from "../../../images/southSuburbanHole11.png";
+// import southSuburbanHole12 from "../../../images/southSuburbanHole12.png";
+// import southSuburbanHole13 from "../../../images/southSuburbanHole13.png";
+// import southSuburbanHole14 from "../../../images/southSuburbanHole14.png";
+// import southSuburbanHole15 from "../../../images/southSuburbanHole15.png";
+// import southSuburbanHole16 from "../../../images/southSuburbanHole16.png";
+// import southSuburbanHole17 from "../../../images/southSuburbanHole17.png";
+// import southSuburbanHole18 from "../../../images/southSuburbanHole18.png";
 
 export const imageSourceMappings = {
     gileadHighlandsHole1: gileadHighlandsHole1,
@@ -71,7 +89,25 @@ export const imageSourceMappings = {
     andersonGlenHole15: andersonGlenHole15,
     andersonGlenHole16: andersonGlenHole16,
     andersonGlenHole17: andersonGlenHole17,
-    andersonGlenHole18: andersonGlenHole18
+    andersonGlenHole18: andersonGlenHole18,
+    // southSuburbanHole1: southSuburbanHole1,
+    // southSuburbanHole2: southSuburbanHole2,
+    // southSuburbanHole3: southSuburbanHole3,
+    // southSuburbanHole4: southSuburbanHole4,
+    // southSuburbanHole5: southSuburbanHole5,
+    // southSuburbanHole6: southSuburbanHole6,
+    // southSuburbanHole7: southSuburbanHole7,
+    // southSuburbanHole8: southSuburbanHole8,
+    // southSuburbanHole9: southSuburbanHole9,
+    // southSuburbanHole10: southSuburbanHole10,
+    // southSuburbanHole11: southSuburbanHole11,
+    // southSuburbanHole12: southSuburbanHole12,
+    // southSuburbanHole13: southSuburbanHole13,
+    // southSuburbanHole14: southSuburbanHole14,
+    // southSuburbanHole15: southSuburbanHole15,
+    // southSuburbanHole16: southSuburbanHole16,
+    // southSuburbanHole17: southSuburbanHole17,
+    // southSuburbanHole18: southSuburbanHole18
 }
 
 // In order of sheet appearance from upload
@@ -170,6 +206,204 @@ export const courses = [
         sequence: 16,
         displayName: "Keney Park",
         courseKey: "keneyPark",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 17,
+        displayName: "South Suburban",
+        courseKey: "southSuburban",
+        scoreCardHoleAbbreviation: "SS"
+    },
+    {
+        sequence: 18,
+        displayName: "South Suburban - Par 3",
+        courseKey: "southSuburbanPar3",
+        scoreCardHoleAbbreviation: "SSP3"
+    },
+    {
+        sequence: 19,
+        displayName: "Kennedy - Babe Lind",
+        courseKey: "kennedyBabeLind",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 20,
+        displayName: "Littleton",
+        courseKey: "littleton",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 21,
+        displayName: "Wellshire",
+        courseKey: "wellshire",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 22,
+        displayName: "Penmar",
+        courseKey: "penmar",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 23,
+        displayName: "Plum Creek - CO",
+        courseKey: "plumCreekCo",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 24,
+        displayName: "Homestead",
+        courseKey: "homestead",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 25,
+        displayName: "Lone Tree",
+        courseKey: "loneTree",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 26,
+        displayName: "Kennedy - Creek",
+        courseKey: "kennedyCreek",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 27,
+        displayName: "Bear Dance",
+        courseKey: "bearDance",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 28,
+        displayName: "TPC Scottsdale - Stadium",
+        courseKey: "tpcScottsdaleStadium",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 29,
+        displayName: "Quintero",
+        courseKey: "quintero",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 30,
+        displayName: "Palm Valley",
+        courseKey: "pamlmValley",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 31,
+        displayName: "Kings Deer",
+        courseKey: "kingsDeer",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 32,
+        displayName: "Arrowhead",
+        courseKey: "arrowhead",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 33,
+        displayName: "Indian Tree",
+        courseKey: "indianTree",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 34,
+        displayName: "Gillette Ridge",
+        courseKey: "gilletteRidge",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 35,
+        displayName: "Old Head",
+        courseKey: "oldHead",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 36,
+        displayName: "Harrisville",
+        courseKey: "harrisville",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 37,
+        displayName: "Arrowhead CC",
+        courseKey: "arrowheadCC",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 38,
+        displayName: "Grass Clippings",
+        courseKey: "grassClippingsPar3",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 39,
+        displayName: "Legends at Arrowhead",
+        courseKey: "arrowheadLegends",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 40,
+        displayName: "City Park",
+        courseKey: "cityPark",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 41,
+        displayName: "Fossil Trace",
+        courseKey: "fossilTrace",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 42,
+        displayName: "Raccoon Creek",
+        courseKey: "raccoonCreek",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 43,
+        displayName: "Foothills",
+        courseKey: "foothills",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 44,
+        displayName: "Broken Tee",
+        courseKey: "brokenTee",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 45,
+        displayName: "Castle Pines N.",
+        courseKey: "castlePinesNorth",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 46,
+        displayName: "Mosfellsbaer",
+        courseKey: "mosfellsbaer",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 47,
+        displayName: "Overland",
+        courseKey: "overland",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 48,
+        displayName: "Springhill",
+        courseKey: "springhill",
+        scoreCardHoleAbbreviation: ""
+    },
+    {
+        sequence: 49,
+        displayName: "TPC Colorado",
+        courseKey: "tpcColorado",
         scoreCardHoleAbbreviation: ""
     }
 ]

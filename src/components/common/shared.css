@@ -33,6 +33,22 @@
 }
 
 /* Golf Page */
+.marginBottomMassive.golf {
+    margin-bottom: 124px !important;
+}
+.filterDropdownContainer {
+    position: fixed;
+    bottom: -8px;    
+}
+.filterDropdownContainer .MuiFormControl-root .MuiFilledInput-root {
+    background-color: rgba(256, 256, 256, 0.9);
+}
+.filterDropdownContainer label, .filterDropdownContainer svg, .filterDropdownContainer .MuiFormControl-root .MuiSelect-select.MuiSelect-filled {
+    color: black !important;
+}
+.filterDropdownContainer .MuiPaper-root li span.MuiListItemText-root {
+    font-family: var(--fontFamily-Serif) !important
+}
 .sectionBorder {
     display: flex;
     flex-direction: column;
@@ -44,13 +60,32 @@
 .sectionBorder:last-of-type {
     border-right: none;
 }
+.golfTable .distribute8 {
+    width: calc(100% / 12) !important;
+    max-width: 10% !important;
+}
 .golfTable .distribute10 {
     width: calc(100% / 10) !important;
     max-width: 12.5% !important;
 }
+.golfTable .distribute12 {
+    width: calc(100% / 8) !important;
+    max-width: 14% !important;
+}
 .golf h1, .golf h2, .golf h3, .golf h4, .golf h5, .golf h6,
 .golf span, .golf th, .golf td, .golf div, .golf p, .golf a {
     color: white;
+}
+
+.golf .subTable.negativeMarginTop {
+    margin-top: -20px !important;
+}
+
+.handicapScoreBackground {
+    background-color: rgba(256, 256, 256, .2) !important;
+    padding: 6px 8px;
+    border-radius: 4px;
+    margin-left: -8px !important;
 }
 
 .golf .subTable h1, .golf .subTable h2, .golf .subTable h3, .golf .subTable h4,
@@ -81,6 +116,28 @@
     margin-left: 8px;
 }
 
+.golfTable .hideTableBottomBorder  {
+    border-bottom: none !important;
+}
+
+.golfTable .hideTableBottomBorderChildCell td {
+    border-bottom: none !important;
+}
+
+.golfTable tr.hideTableBottomBorderLastChildCell:last-of-type td {
+    border-bottom: none !important;
+}
+
+.golfTable .backgroundColorEagleRow span {
+    color: rgb(254, 205, 49) !important;
+
+    /* color: black !important; */
+}
+
+.golfTable .handicapCutoffRoundBottomBorder {
+    border-bottom: 6px solid white !important;
+}
+
 .singleHoleMetricContainer > .expanded {
     width: 100%;
 }
@@ -89,7 +146,8 @@
     border: 1px solid rgba(256, 256, 256, .3);
     border-radius: 12px;
     margin: 30px 36px;
-    min-width: 480px;
+    /* min-width: 480px; */
+    min-width: 320px;
     box-shadow: 0 1px 8px -2px rgba(256, 256, 256, .6) !important;
 }
 

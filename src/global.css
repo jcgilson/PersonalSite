@@ -65,7 +65,7 @@
     --margin-padding-small: 8px;
     --margin-padding-medium: 12px;
     --margin-padding-large: 16px;
-    --margin-padding-extra-large: 20px;
+    --margin-padding-extra-large: 24px;
     --margin-padding-massive: 48px
 }
 
@@ -79,6 +79,9 @@ body {
 }
 .noMargin, h1, h2, h3, h4, h5, h6, span {
     margin: 0 !important
+}
+.noPadding {
+    padding: 0 !important;
 }
 .noMarginTop {
     margin-top: 0 !important
@@ -282,11 +285,14 @@ body {
 .backgroundColorBogeyPlus {
     background-color: #7BA9CF !important;
 }
-.backgroundColorEagleRow {
-    background-color: rgba(254, 205, 49, 150) !important;
-}
+/* .backgroundColorEagleRow {
+    background-color: rgba(254, 205, 49, 1) !important;
+    background-color: rgb(254, 205, 49) !important;
+} */
 .backgroundColorEagleRow td, .backgroundColorEagleRow a {
-    color: black;
+    /* color: black; */
+    color: rgb(254, 205, 49) !important;
+
 }
 .backgroundColorEagleGlow {
     box-shadow: 0 4px 16px -2px rgba(254, 205, 49, 200) !important;
@@ -330,7 +336,7 @@ body {
 }
 .justifySpaceBetween {
     display: flex;
-    justify-content: space-between
+    justify-content: space-between !important
 }
 .justifySpaceAround {
     display: flex;
@@ -518,6 +524,9 @@ h6 {
 .italicFont {
     font-style: italic
 }
+.textDecoration {
+    text-decoration: underline;
+}
 .removeTextDecoration {
     text-decoration: none;
 }
@@ -564,7 +573,10 @@ a, button, div, input, small, span, td, th {
 .actionFont:hover, .altActionFont:hover {
     cursor: pointer !important
 }
-
+.pageLinkFont.active {
+    text-underline-offset: 0.5em;
+    text-decoration: underline;
+}
 button {
     padding: 8px 12px;
     font-size: 18px;
@@ -602,23 +614,34 @@ button.small, .mapbox button {
 .cursorPointer, button:hover {
     cursor: pointer
 }
+.setWidth200px {
+    width: 200px;
+}
 .width80Percent {
-    width: 80% !important
-}.width90Percent {
-    width: 90% !important
+    width: 80% !important;
+}
+.width90Percent {
+    width: 90% !important;
 }
 .width100Percent {
-    width: 100% !important
+    width: 100% !important;
 }
 .widthFitContent {
     width: -webkit-fit-content;
     width: -moz-fit-content;
-    width: fit-content
+    width: fit-content;
+}
+.summaryRowBoxShadow {
+    box-shadow: 0 10px 10px -8px white !important;
 }
 
 /* MUI inputs */
 .MuiInputLabel-root, .MuiFormLabel-root, .MuiSelect-icon {
     color: white !important;
+}
+/* Year filter field */
+.css-1eed5fa-MuiInputBase-root-MuiInput-root::before, .css-1eed5fa-MuiInputBase-root-MuiInput-root::before {
+    border-bottom: 1px solid white !important;
 }
 .css-1480iag-MuiInputBase-root-MuiInput-root:before, .css-1480iag-MuiInputBase-root-MuiInput-root:after {
     border-bottom: 1px solid white !important;
@@ -631,6 +654,16 @@ button.small, .mapbox button {
 }
 
 /* Misc. */
+.color026647 {
+    /* width: 100vw !important; */
+    /* min-height: 100vh !important; */
+    /* background-image: radial-gradient(#26755C, #026647); */
+    /* background-image: url('./images/leather-texture.png'); /* https://www.transparenttextures.com/ */
+    /* background-color: #026647; */
+    /* position: absolute; */
+    /* top: 0; */
+    /* z-index: 0; */
+}
 .boxShadowSmall {
     box-shadow: 0 4px 2px -2px rgba(0, 0, 0, .4) !important
 }
@@ -657,6 +690,21 @@ button.small, .mapbox button {
 }
 table {
     border-collapse: collapse
+}
+.hideBorderBottom td {
+    border-bottom: 0px !important;
+}
+.pageLinks {
+    
+}
+.golfTable thead.stickyGolfTableHeader th {
+    box-shadow: inset 0 -10px 5px -8px white !important;
+}
+.golfTable thead.stickyGolfTableHeader {
+    position: sticky;
+    top: 0px;
+    background-image: url('./images/leather-texture.png'); /* https://www.transparenttextures.com/ */
+    background-color: #026647;
 }
 
 @media print {
