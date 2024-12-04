@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 // Components
 // import Header from './components/common/Header';
 import Home from './components/common/Home';
@@ -22,14 +22,13 @@ const Excel = require('exceljs');
 
 function App() {
   // Server
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    fetch('/api')
-      .then(res => res.json())
-      .then(data => setMessage(data.message));
-  }, []);
-  console.log("message",message)
+  // const [message, setMessage] = useState('');
+  // useEffect(() => {
+  //   fetch('/api')
+  //     .then(res => res.json())
+  //     .then(data => setMessage(data.message));
+  // }, []);
+  // console.log("message",message)
   // End Server
 
   const links = ["Itineraries", "National Parks", "Gallery", "Golf", "Resources"];

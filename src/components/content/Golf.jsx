@@ -6,7 +6,8 @@ import React, { useState, useEffect, useRef } from "react";
 // MUI
 import {
     Table, TableHead, TableBody, TableRow, TableCell, Radio, RadioGroup, FormControl, FormControlLabel, CircularProgress, TextField,
-    InputLabel, MenuItem, Select, OutlinedInput, ListItemText, Checkbox, Modal, Paper, Popover, Slide, Button, Card, CardContent
+    InputLabel, MenuItem, Select, OutlinedInput, ListItemText, Checkbox, Modal, Paper, Popover, Slide, Button, Card, CardContent,
+    Divider
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { Check, Close, TurnSlightLeft, TurnSlightRight, LooksOne, LooksTwo, Looks3, Looks4, RemoveCircle, AddCircle, RoomRounded, PushPin, TryRounded } from '@mui/icons-material';
@@ -21,11 +22,11 @@ import { courses } from "./helpers/GolfConsts";
 import scorecard from "../../images/scorecard.png";
 import metrics from "../../images/metrics.png";
 import singleHoleMetrics from "../../images/singleHoleMetrics.png";
-import { ConstructionOutlined } from "@mui/icons-material";
+// import { insertRounds } from "../../../server/insertRounds";
 // C:\Users\Jack Gilson\ReactProjects\my-app\src\components\content\Golf.jsx
 const Excel = require('exceljs');
 // const reader = require('xlsx');
-
+import { MongoClient } from "mongodb";
 
 const Golf = () => {
 
@@ -35,7 +36,7 @@ const Golf = () => {
      * 
      * Server:
      * cd server
-     * node index.js
+     * node server.js
      * 
      * Redeploy:
      * npm run deploy
@@ -78,7 +79,7 @@ const Golf = () => {
      *          Settings: can control archived features *which is a great idea
      * 5-M: FIR L/F/R attribute should be stat displayed somethere
      *          Simliar to how individual holes show a stat for FIR L/F/R and scores for left miss vs right, show this is a flow state
-     *          Get rid on sankey graph (not working) and create visual to illustrate hole
+     *          Get rid of sankey graph (not working) and create visual to illustrate hole
      *          Reference swing thoughts to book & copy phrases
      * 
      * 
@@ -104,8 +105,6 @@ const Golf = () => {
      * Need to publish this site
      * Need to connect to mongo and not have to use Excel - migrate all legacy data, can probably translate with a Anaconda PY code editing tool (could be on other laptop)
      * 
-     * 
-     * ASAP ASAP ASAP Need to move code to other laptop
      * 
      * 
      * Add environment variable (DEV_MODE=true, default to false when not being passed, in case of deploy)
@@ -227,7 +226,7 @@ const Golf = () => {
      * 
      * 
      * 
-     * 
+     * Maybe not needed - search "handicapCutoffRoundBottomBorder"
      * Small style: handicap 20 round subsomponent?
      * ----- better divider to show "Handicap" Cutoff similar to the appearance of this row with divider? (Could make use of CSS :after if needed) ------
      * .map(rounds => (need to take index parameter "i" to show small divider subcomponent to show HDCP cutoff indication, which only shows when sorted by date) => ( return ) ) function that is used to display 
@@ -310,6 +309,13 @@ const Golf = () => {
      * Golf - specific part: "How did you do this year, what did you work on, what was the best swing thought/insp item from this year, what can be improved, goals for next year"
      * 
      * 
+     * 
+     * Hide mongo uri in ENV's
+     * 
+     * 
+     * Latest NPM version - should get latest Node version too
+     * https://docs.npmjs.com/try-the-latest-stable-version-of-npm
+     * 
      *  
      * 
      * Compile all notes into this file going forward.
@@ -327,7 +333,7 @@ const Golf = () => {
     const [displayUploadButton, setDisplayUploadButton] = useState(true);
     const [filters, setFilters] = useState(["2024"]);
     // const [courseTours, setCourseTours] = useState(["South Suburban"]);
-    const [courseTours, setCourseTours] = useState(["South Suburban"]);
+    const [courseTours, setCourseTours] = useState(["Gilead Highlands"]);
     const [isLoading, setIsLoading] = useState(false);
     const [allRounds, setAllRounds] = useState([]);
     const [displayedRounds, setDisplayedRounds] = useState([]);
@@ -363,6 +369,22 @@ const Golf = () => {
     const pinnedCourse = "South Suburban"; // Course pinned atop scorecard entry
     const includePartialRounds = true; // Displays partial rounds
 
+    // Fetch working here
+    // useEffect(() => {
+    //     // let result = fetch('mongodb+srv://jcgilson:<Arliss0329!>@jackgilson.qjfz86t.mongodb.net/?retryWrites=true&w=majority&appName=JackGilson', {
+    //     let result = fetch('http://localhost:5000/register', {
+    //       method: "post",
+    //       body: "hello",
+    //       headers: {
+    //         'Content-Type': 'application/json'
+    //       }
+    //     })
+    //     console.warn("result",result) 
+    //   })
+
+    // console.log("allRounds",allRounds)
+    
+
     const fileInputRef = useRef(null);
 
     useEffect(() => {
@@ -372,12 +394,13 @@ const Golf = () => {
         for (let hole = 1; hole <= 18; hole++) {
             scorecardData[`hole${hole}`] = {
                 score: activeScorecardEntry === "" ? 100 : courseInfo[activeScorecardEntry][`hole${hole}`].par, // Default score to par
-                numPutts: 2,
-                f: "F",
-                g: "G",
+                putts: 2,
+                fir: "F",
+                gir: "G",
                 dtg: 1000,
                 dth: 1000,
                 fpm: 1000,
+                notes: ""
                 // ...
                 // Notes don't need to be entered
             };
@@ -805,7 +828,7 @@ const Golf = () => {
                                     roundData.additionalHoles = {};
                                     let holeCount = 1;
                                     let columnCount = additionalHoleCount;
-                                    for (let i = 0; i < 9; i++ ) {
+                                    for (let i = 0; i < 9; i++) {
                                         if (row[columnCount]) {
                                             roundData.additionalHoles[`additionalHole${holeCount}`] = {
                                                 course: row[columnCount],
@@ -1052,6 +1075,40 @@ const Golf = () => {
 
     const submitScorecard = () => {
         console.log("scorecardEntryData being submitted:",scorecardEntryData)
+        let tempScorecardEntryData = scorecardEntryData;
+
+        for (let round of allRounds) {
+            if (round.sequence === 300) {
+                console.log("round",round)
+                
+                
+                // Replace the uri string with your MongoDB deployment's connection string.
+                // const uri = "'mongodb+srv://jcgilson:<Arliss0329!>@jackgilson.qjfz86t.mongodb.net/?retryWrites=true&w=majority&appName=JackGilson'";
+                // const client = new MongoClient(uri);
+                // async function insertRounds(insertedRound) {
+                //         console.log("round being passed", round)
+                //     try {
+                //         await client.connect();
+                //         const database = client.db("JackGilson");
+                //         const insertedDocument = database.collection("GolfRounds");
+                //         // create a document to insert
+                //         const result = await insertedDocument.insertOne(insertedRound);
+                //         console.log(`A document was inserted with the _id: ${result.insertedId}`);
+                //     } finally {
+                //         await client.close();
+                //     }
+                // }
+                // insertRounds(round)
+            }
+        }
+
+
+        // for (let hole of holes) {
+
+        // }
+
+        tempScorecardEntryData.course = ""
+
   
         // // Reading our test file
         // const file = reader.readFile('../../GolfEdit.xlsx')
@@ -1343,7 +1400,22 @@ const Golf = () => {
                 </Paper>
             }
 
+            {/* TODO 11/25/24: Modular GolfTable into separate component */}
             {/* Default Golf Rounds view */}
+            {/* {displayDefaultPage && activePage === "Golf Rounds" &&
+                <GolfRounds
+                    handleSetYearFilter={handleSetYearFilter}
+                    tableSort={tableSort}
+                    changeSortMethod={changeSortMethod}
+                    roundYears={roundYears}
+
+
+
+                    // Separate imports
+                    getAnnualSummaryRows
+                />
+            } */}
+
             {displayDefaultPage && activePage === "Golf Rounds" &&
                 <Table style={{ maxWidth: "80vw" }} className="golfTable">
                     <TableHead className="stickyGolfTableHeader">
@@ -1539,7 +1611,6 @@ const Golf = () => {
                                                         <LooksOne onClick={() => updateScorecardEntryData(1, "numPutts", hole)} className={`whiteFont${scorecardEntryData[hole].numPutts === 1 ? " selected" : ""}`} />
                                                         <LooksTwo onClick={() => updateScorecardEntryData(2, "numPutts", hole)} className={`whiteFont${scorecardEntryData[hole].numPutts === 2 ? " selected" : ""}`} />
                                                         <Looks3 onClick={() => updateScorecardEntryData(3, "numPutts", hole)} className={`whiteFont${scorecardEntryData[hole].numPutts === 3 ? " selected" : ""}`} />
-                                                        <Looks4 onClick={() => updateScorecardEntryData(4, "numPutts", hole)} className={`whiteFont${scorecardEntryData[hole].numPutts === 4 ? " selected" : ""}`} />
                                                     </div>
                                                 </div>
                                                 {courseInfo[activeScorecardEntry][hole].par !== 3 ?
@@ -1692,6 +1763,7 @@ const Golf = () => {
                 </div>
             }
 
+            {/* Ideally this is not needed when data is pulled from DB */}
             {/* Helper Text */}
             {displayUploadButton &&
                 <>
